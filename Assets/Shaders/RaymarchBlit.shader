@@ -172,13 +172,24 @@ Shader "Custom/RaymarchBlit"
                         float3 n = getNormal(p);
                         float3 lightDir = normalize(lightPos);
                         float diff = max(0, dot(n, lightDir));
-                        float v1 = perlin3D(p);
-                        float v2 = perlin3D(p*2.0);
-                        float v3 = perlin3D(p*4.0);
-                        float v4 = perlin3D(p*8.0);
-                        float v5 = perlin3D(p*16.0);
-                        float v = min(v1/16.0+v2/8.0+v3/4.0+v4/2+v5,1.0);
-                        return float4(diff.xxx ,v);
+                        const float INTERNAL_STEP = 0.1;
+                        float3 ir = p;
+                        float res = 0;
+                        float count = 0;
+                        for(int j = 0; j<MAX_STEPS; j++){    
+                            float v1 = perlin3D(ir);
+                            float v2 = perlin3D(ir*2.0);
+                            float v3 = perlin3D(ir*4.0);
+                            float v4 = perlin3D(ir*8.0);
+                            float v5 = perlin3D(ir*16.0);
+                            float v = min(v1/16.0+v2/8.0+v3/4.0+v4/2+v5,1.0);
+                            res += v;
+                            count = count + 1.0;
+                            float id = SceneSDF(ir);
+                            ir = ir + rd*INTERNAL_STEP; 
+                            if(id>EPSILON) break;
+                        }
+                        return float4(diff.xxx ,res/count);
                     }
                     t += d;
                     if (t > MAX_DIST) break;
