@@ -61,51 +61,100 @@ Shader "Custom/RaymarchBlit"
                 ));
             }
 
-            float fade(float t) { return 6*pow(t,5) - 15*pow(t,4) + 10*pow(t,3); }
+            float fade(float t) { return t * t * t * (t * (t * 6 - 15) + 10); }
 
-            int grad(int hash, float x, float y, float z){
+            float3 fade3(float3 t) { return float3(fade(t.x), fade(t.y), fade(t.z)); }
+
+            float grad(int hash, float3 p)
+            {
+                // Pick gradient direction from hash
                 int h = hash & 15;
-                float u = (h < 8) ? x : y;
-                float v = (h < 4) ? y : (h>=12 && h<=14) ? x : z;
-                return (((h & 1) == 0)?u:-u) + (((h & 2) == 0)?v:-v);
+                float3 grads[16] = {
+                    float3(1,1,0), float3(-1,1,0), float3(1,-1,0), float3(-1,-1,0),
+                    float3(1,0,1), float3(-1,0,1), float3(1,0,-1), float3(-1,0,-1),
+                    float3(0,1,1), float3(0,-1,1), float3(0,1,-1), float3(0,-1,-1),
+                    float3(1,1,0), float3(-1,1,0), float3(0,-1,1), float3(0,-1,-1)
+                };
+                return dot(grads[h], p);
             }
 
             float lerp(float a, float b, float t) { return a + t * (b - a); }
 
-            float perlin(float3 p){
-                int X = int(floor(p.x)) & 255;
-                int Y = int(floor(p.y)) & 255;
-                int Z = int(floor(p.z)) & 255;
-                float x = p.x - floor(p.x);
-                float y = p.y - floor(p.y);
-                float z = p.z - floor(p.z);
-                float u = fade(x);
-                float v = fade(y);
-                float w = fade(z);
-                int A  = myArray[X] + Y;
-                int AA = myArray[A] + Z;
-                int AB = myArray[A + 1] + Z;
-                int B  = myArray[X + 1] + Y;
-                int BA = myArray[B] + Z;
-                int BB = myArray[B + 1] + Z;
-                return lerp(
-                    lerp(
-                        lerp(grad(myArray[AA], x, y, z),
-                            grad(myArray[BA], x - 1, y, z), u),
-                        lerp(grad(myArray[AB], x, y - 1, z),
-                            grad(myArray[BB], x - 1, y - 1, z), u),
-                        v
-                    ),
-                    lerp(
-                        lerp(grad(myArray[AA + 1], x, y, z - 1),
-                            grad(myArray[BA + 1], x - 1, y, z - 1), u),
-                        lerp(grad(myArray[AB + 1], x, y - 1, z - 1),
-                            grad(myArray[BB + 1], x - 1, y - 1, z - 1), u),
-                        v
-                    ),
-                    w
-                );
+            float permute(float x) { return fmod((34.0 * x + 1.0) * x, 289.0); }
+
+            float perlin3D(float3 p)
+            {
+                // Floor and fractional part
+                float3 Pi = floor(p);
+                float3 Pf = p - Pi;
+
+                // Fade curves
+                float3 f = fade3(Pf);
+
+                // Permutation hashing
+                float A = permute(Pi.x) + Pi.y;
+                float AA = permute(A) + Pi.z;
+                float AB = permute(A + 1.0) + Pi.z;
+                float B = permute(Pi.x + 1.0) + Pi.y;
+                float BA = permute(B) + Pi.z;
+                float BB = permute(B + 1.0) + Pi.z;
+
+                // 8 corner gradients
+                float v000 = grad((int)permute(AA), Pf);
+                float v100 = grad((int)permute(BA), Pf - float3(1, 0, 0));
+                float v010 = grad((int)permute(AB), Pf - float3(0, 1, 0));
+                float v110 = grad((int)permute(BB), Pf - float3(1, 1, 0));
+                float v001 = grad((int)permute(AA + 1.0), Pf - float3(0, 0, 1));
+                float v101 = grad((int)permute(BA + 1.0), Pf - float3(1, 0, 1));
+                float v011 = grad((int)permute(AB + 1.0), Pf - float3(0, 1, 1));
+                float v111 = grad((int)permute(BB + 1.0), Pf - float3(1, 1, 1));
+
+                // Trilinear interpolation
+                float x1 = lerp(v000, v100, f.x);
+                float x2 = lerp(v010, v110, f.x);
+                float y1 = lerp(x1, x2, f.y);
+
+                float x3 = lerp(v001, v101, f.x);
+                float x4 = lerp(v011, v111, f.x);
+                float y2 = lerp(x3, x4, f.y);
+
+                return lerp(y1, y2, f.z);
             }
+
+            // float perlin(float3 p){
+            //     int X = int(floor(p.x)) & 255;
+            //     int Y = int(floor(p.y)) & 255;
+            //     int Z = int(floor(p.z)) & 255;
+            //     float x = p.x - floor(p.x);
+            //     float y = p.y - floor(p.y);
+            //     float z = p.z - floor(p.z);
+            //     float u = fade(x);
+            //     float v = fade(y);
+            //     float w = fade(z);
+            //     int A  = myArray[X] + Y;
+            //     int AA = myArray[A] + Z;
+            //     int AB = myArray[A + 1] + Z;
+            //     int B  = myArray[X + 1] + Y;
+            //     int BA = myArray[B] + Z;
+            //     int BB = myArray[B + 1] + Z;
+            //     return lerp(
+            //         lerp(
+            //             lerp(grad(myArray[AA], x, y, z),
+            //                 grad(myArray[BA], x - 1, y, z), u),
+            //             lerp(grad(myArray[AB], x, y - 1, z),
+            //                 grad(myArray[BB], x - 1, y - 1, z), u),
+            //             v
+            //         ),
+            //         lerp(
+            //             lerp(grad(myArray[AA + 1], x, y, z - 1),
+            //                 grad(myArray[BA + 1], x - 1, y, z - 1), u),
+            //             lerp(grad(myArray[AB + 1], x, y - 1, z - 1),
+            //                 grad(myArray[BB + 1], x - 1, y - 1, z - 1), u),
+            //             v
+            //         ),
+            //         w
+            //     );
+            // }
 
             float4 raymarch(float3 ro, float3 rd, float3 lightPos)
             {
@@ -123,7 +172,7 @@ Shader "Custom/RaymarchBlit"
                         float3 n = getNormal(p);
                         float3 lightDir = normalize(lightPos);
                         float diff = max(0, dot(n, lightDir));
-                        return float4(diff.xxx ,perlin(p/100));
+                        return float4(diff.xxx ,1.0);
                     }
                     t += d;
                     if (t > MAX_DIST) break;
@@ -151,8 +200,11 @@ Shader "Custom/RaymarchBlit"
                 float4 col = raymarch(ro, rd, float3(xtime, ytime, -0.8));
                 float4 sceneCol = tex2D(_MainTex, i.uv);
                 float alfa = col.w;
-                float v = perlin(float3(uv.x/1.5,uv.y/1.5,xtime/100));
-                return fixed4(v,v,v,1.0);
+                float v1 = perlin3D(float3(uv.x*10.0,uv.y*10.0,xtime));
+                float v2 = perlin3D(float3(uv.x*20.0,uv.y*20.0,xtime));
+                float v3 = perlin3D(float3(uv.x*40.0,uv.y*40.0,xtime));
+                float v = min(v1/2.0+v2/2.0+v3/4.0,1.0);
+                return fixed4(1.0,1.0,1.0,v);
                 return alfa*col+(1-alfa)*sceneCol;
             }
             ENDCG
