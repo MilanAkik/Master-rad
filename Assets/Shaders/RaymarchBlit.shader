@@ -172,7 +172,13 @@ Shader "Custom/RaymarchBlit"
                         float3 n = getNormal(p);
                         float3 lightDir = normalize(lightPos);
                         float diff = max(0, dot(n, lightDir));
-                        return float4(diff.xxx ,1.0);
+                        float v1 = perlin3D(p);
+                        float v2 = perlin3D(p*2.0);
+                        float v3 = perlin3D(p*4.0);
+                        float v4 = perlin3D(p*8.0);
+                        float v5 = perlin3D(p*16.0);
+                        float v = min(v1/16.0+v2/8.0+v3/4.0+v4/2+v5,1.0);
+                        return float4(diff.xxx ,v);
                     }
                     t += d;
                     if (t > MAX_DIST) break;
@@ -200,11 +206,9 @@ Shader "Custom/RaymarchBlit"
                 float4 col = raymarch(ro, rd, float3(xtime, ytime, -0.8));
                 float4 sceneCol = tex2D(_MainTex, i.uv);
                 float alfa = col.w;
-                float v1 = perlin3D(float3(uv.x*10.0,uv.y*10.0,xtime));
-                float v2 = perlin3D(float3(uv.x*20.0,uv.y*20.0,xtime));
-                float v3 = perlin3D(float3(uv.x*40.0,uv.y*40.0,xtime));
-                float v = min(v1/2.0+v2/2.0+v3/4.0,1.0);
-                return fixed4(1.0,1.0,1.0,v);
+                // return fixed4(1.0,1.0,1.0,v);
+                // if(alfa==0) return sceneCol;
+                // return col;
                 return alfa*col+(1-alfa)*sceneCol;
             }
             ENDCG
