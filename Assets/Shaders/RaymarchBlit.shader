@@ -182,11 +182,11 @@ Shader "Custom/RaymarchBlit"
                             float v3 = perlin3D(ir*4.0);
                             float v4 = perlin3D(ir*8.0);
                             float v5 = perlin3D(ir*16.0);
-                            float v = min(v1/16.0+v2/8.0+v3/4.0+v4/2+v5,1.0);
+                            float v = min(v1/16.0+v2/16.0+v3/8.0+v4/4.0+v5/2.0,1.0);
                             res += v;
                             count = count + 1.0;
-                            float id = SceneSDF(ir);
                             ir = ir + rd*INTERNAL_STEP; 
+                            float id = SceneSDF(ir);
                             if(id>EPSILON) break;
                         }
                         return float4(diff.xxx ,res/count);
@@ -220,7 +220,12 @@ Shader "Custom/RaymarchBlit"
                 // return fixed4(1.0,1.0,1.0,v);
                 // if(alfa==0) return sceneCol;
                 // return col;
-                return alfa*col+(1-alfa)*sceneCol;
+                float r = (alfa) * col.x + (1-alfa) * sceneCol.x;
+                float g = (alfa) * col.y + (1-alfa) * sceneCol.y;
+                float b = (alfa) * col.z + (1-alfa) * sceneCol.z;
+                fixed4 res = alfa*col+(1-alfa)*sceneCol;
+                res.w=alfa;
+                return fixed4(r,g,b,1.0);
             }
             ENDCG
         }
