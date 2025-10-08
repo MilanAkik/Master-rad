@@ -121,41 +121,6 @@ Shader "Custom/RaymarchBlit"
                 return lerp(y1, y2, f.z);
             }
 
-            // float perlin(float3 p){
-            //     int X = int(floor(p.x)) & 255;
-            //     int Y = int(floor(p.y)) & 255;
-            //     int Z = int(floor(p.z)) & 255;
-            //     float x = p.x - floor(p.x);
-            //     float y = p.y - floor(p.y);
-            //     float z = p.z - floor(p.z);
-            //     float u = fade(x);
-            //     float v = fade(y);
-            //     float w = fade(z);
-            //     int A  = myArray[X] + Y;
-            //     int AA = myArray[A] + Z;
-            //     int AB = myArray[A + 1] + Z;
-            //     int B  = myArray[X + 1] + Y;
-            //     int BA = myArray[B] + Z;
-            //     int BB = myArray[B + 1] + Z;
-            //     return lerp(
-            //         lerp(
-            //             lerp(grad(myArray[AA], x, y, z),
-            //                 grad(myArray[BA], x - 1, y, z), u),
-            //             lerp(grad(myArray[AB], x, y - 1, z),
-            //                 grad(myArray[BB], x - 1, y - 1, z), u),
-            //             v
-            //         ),
-            //         lerp(
-            //             lerp(grad(myArray[AA + 1], x, y, z - 1),
-            //                 grad(myArray[BA + 1], x - 1, y, z - 1), u),
-            //             lerp(grad(myArray[AB + 1], x, y - 1, z - 1),
-            //                 grad(myArray[BB + 1], x - 1, y - 1, z - 1), u),
-            //             v
-            //         ),
-            //         w
-            //     );
-            // }
-
             float4 raymarch(float3 ro, float3 rd, float3 lightPos)
             {
                 float t = 0.0;
