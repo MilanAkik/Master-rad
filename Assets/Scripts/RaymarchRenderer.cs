@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[ExecuteInEditMode]
+[ExecuteInEditMode, ImageEffectAllowedInSceneView]
 public class RaymarchRenderer : MonoBehaviour
 {
     public Material raymarchMat;
