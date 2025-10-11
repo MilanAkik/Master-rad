@@ -4,6 +4,8 @@ using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.Generators
 {
+
+    [CreateAssetMenu(menuName = "CylinderGenerator/Random")]
     public class RandomCylinderGenerator : CylinderGenerator
     {
         public override Vector4[] getCylinders(params object[] objects)
