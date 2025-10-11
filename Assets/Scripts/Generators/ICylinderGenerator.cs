@@ -2,7 +2,7 @@
 
 namespace Assets.Scripts.Generators
 {
-    public abstract class CylinderGenerator : ScriptableObject, ICylinderGenerator
+    internal interface ICylinderGenerator
     {
         public abstract Vector4[] getCylinders(params object[] objects);
     }
