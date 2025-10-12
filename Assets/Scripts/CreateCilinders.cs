@@ -58,9 +58,8 @@ public class CreateCilinders : MonoBehaviour
             var a = a1 * a1;
             var b = -a * (f + 1);
             var c = 1 - a - b;
-            var h = 2 - a * r * r - b * r - c;
-
-            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            var h = 1.1f - a * r * r - b * r - c;
+            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             cube.transform.position = parentPosition + new Vector3(x, y + h / 2.0f, z);
             cube.transform.rotation = Quaternion.identity;
             cube.transform.localScale = new Vector3(3 * r, h, 3 * r);
