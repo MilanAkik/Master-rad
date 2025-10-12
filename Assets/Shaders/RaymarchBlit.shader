@@ -16,7 +16,8 @@ Shader "Custom/RaymarchBlit"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #include "UnityCG.cginc"
+            #include "UnityCG.cginc"		
+		    #include "noiseSimplex.cginc"
 
             sampler2D _MainTex;
 
@@ -46,7 +47,7 @@ Shader "Custom/RaymarchBlit"
                 o.uv = v.uv;
                 return o;
             }
-
+            /*
             // Signed Distance Functions
             float sdSphere(float3 p, float r) { return length(p) - r; }
 
@@ -198,12 +199,12 @@ Shader "Custom/RaymarchBlit"
                 }
                 return float4(0.0, 0.0, 0.0, 0.0); // background color
             }
-
+            */
             fixed4 frag(v2f i) : SV_Target
             {
                 // Convert screen UV to NDC (-1..1)
                 float2 uv = i.uv * 2.0 - 1.0;
-
+/*
                 // Clip-space ray
                 float4 rayClip = float4(uv, -1.0, 1.0);
 
@@ -238,7 +239,14 @@ Shader "Custom/RaymarchBlit"
                 // if(v1< 0.6) return float4(0.8,0.8,0.8,1.0);
                 // if(v1< 0.8) return float4(0.9,0.9,0.9,1.0);
                 // return float4(0.1,0.1,0.1,v1);
-                return fixed4(r,g,b,1.0);
+                */
+                float val1 = snoise(uv);
+                float val2 = snoise(uv*2.0f+0.1);
+                float val3 = snoise(uv*4.0f+0.2);
+                float val4 = snoise(uv*8.0f+0.4);
+                float val5 = snoise(uv*16.0f+0.8);
+                float val = val1/16.0f+val2/16.0f+val3/8.0f+val4/4.0f+val5/2.0f;
+                return fixed4(val,val,val,1.0);
             }
             ENDCG
         }
