@@ -13,12 +13,12 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 
     float2 uv = float2(id.x / (float) width, id.y / (float) height);
     
-    float value1 = snoise(uv * 0.5f);
-    float value2 = snoise(uv * 1.0f);
-    float value3 = snoise(uv * 2.0f);
-    float value4 = snoise(uv * 4.0f);
-    float value5 = snoise(uv * 8.0f);
-    float value = (value1 / 8.0f + value2 / 8.0f + value3 / 4.0f + value4 / 2.0f);
+    float value1 = snoise(uv * 0.25f);
+    float value2 = snoise(uv * 0.5f);
+    float value3 = snoise(uv * 1.0f);
+    float value4 = snoise(uv * 2.0f);
+    float value5 = snoise(uv * 4.0f);
+    float value = (value1 / 16.0f + value2 / 16.0f + value3 / 8.0f + value4 / 4.0f + value5 / 2.0f);
     
     value = saturate(value * 0.5f + 0.5f);
     //Result[int2(id.xy)] = float4(value, value, value, 1.0);
