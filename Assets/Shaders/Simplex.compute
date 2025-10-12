@@ -13,13 +13,27 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 
     float2 uv = float2(id.x / (float) width, id.y / (float) height);
     
-    float value1 = snoise(uv);
-    float value2 = snoise(uv * 2.0f);
-    float value3 = snoise(uv * 4.0f);
-    float value4 = snoise(uv * 8.0f);
-    float value5 = snoise(uv * 16.0f);
-    float value = 0.2f+(value1 / 16.0f + value2 / 16.0f + value3 / 8.0f + value4 / 4.0f + value5 / 2.0f);
-
-    value = saturate(value);
-    Result[int2(id.xy)] = float4(value, value, value, 1.0);
+    float value1 = snoise(uv * 0.5f);
+    float value2 = snoise(uv * 1.0f);
+    float value3 = snoise(uv * 2.0f);
+    float value4 = snoise(uv * 4.0f);
+    float value5 = snoise(uv * 8.0f);
+    float value = (value1 / 8.0f + value2 / 8.0f + value3 / 4.0f + value4 / 2.0f);
+    
+    value = saturate(value * 0.5f + 0.5f);
+    //Result[int2(id.xy)] = float4(value, value, value, 1.0);
+    for (float i = 0.05f; i < 1.01f; i += 0.05f)
+    {
+        if (value < i)
+        {
+            Result[int2(id.xy)] = float4(i, i, i, 1.0);
+            break;
+        }  
+    }
+        //else if (value < 0.5f)
+        //    Result[int2(id.xy)] = float4(1, 0, 0, 1.0);
+        //else if (value < 0.75f)
+        //    Result[int2(id.xy)] = float4(0, 1, 0, 1.0);
+        //else
+        //    Result[int2(id.xy)] = float4(0, 0, 1, 1.0);
 }
