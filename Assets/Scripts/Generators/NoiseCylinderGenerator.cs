@@ -63,7 +63,7 @@ namespace Assets.Scripts.Generators
                             var dist = Mathf.Sqrt(i * i + j * j);
                             var oldCol = tex.GetPixel(maxi + i, maxj + j);
                             var oldVal = oldCol.r;
-                            var newVal = oldVal * (dist/(float)radius);
+                            var newVal = oldVal * 0.8f * (dist/(float)radius);
                             tex.SetPixel(maxi + i, maxj + j, new Color(newVal, newVal, newVal, 1.0f));
                         }
                     }
