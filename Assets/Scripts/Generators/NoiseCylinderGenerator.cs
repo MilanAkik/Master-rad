@@ -29,6 +29,7 @@ namespace Assets.Scripts.Generators
             tex.ReadPixels(new Rect(0, 0, tex.width, tex.height), 0, 0);
             tex.Apply();
             RenderTexture.active = previous;
+
             Vector4[] res = new Vector4[count];
             for (int e = 0; e < count; e++)
             {
@@ -49,15 +50,22 @@ namespace Assets.Scripts.Generators
                     }
                 }
                 float x = ((float)maxi / (float)textureSize) * 2f - 1f;
-                float y = tex.GetPixel((maxi + 10) % textureSize, (maxj + 10) % textureSize).r;
+                float y = tex.GetPixel((maxi + 2) % textureSize, (maxj + 2) % textureSize).r;
                 float z = ((float)maxj / (float)textureSize) * 2f - 1f;
-                float r = max;
+                float r = tex.GetPixel((maxi + 5) % textureSize, (maxj + 5) % textureSize).r; ;
                 int radius = 8;
                 for (int i = -radius; i < radius+1; i++)
                 {
                     for (int j = -radius; j < radius+1; j++)
                     {
-                        tex.SetPixel(maxi+i, maxj+j, new Color(0, 0, 0, 0));
+                        if (i * i + j * j < radius * radius)
+                        {
+                            var dist = Mathf.Sqrt(i * i + j * j);
+                            var oldCol = tex.GetPixel(maxi + i, maxj + j);
+                            var oldVal = oldCol.r;
+                            var newVal = oldVal * (dist/(float)radius);
+                            tex.SetPixel(maxi + i, maxj + j, new Color(newVal, newVal, newVal, 1.0f));
+                        }
                     }
                 }
                 Debug.LogError(max);
