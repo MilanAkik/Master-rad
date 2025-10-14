@@ -66,8 +66,6 @@ public class CreateCilinders : MonoBehaviour
             cube.transform.localScale = new Vector3(r, h, r);
             cube.transform.parent = parentTransform;
             cube.name = $"Cylinder({x},{y},{z})";
-            //Renderer cubeRenderer = cube.GetComponent<Renderer>();
-            //if (cubeRenderer != null) cubeRenderer.material.color = Color.white;
         }
 
     }
