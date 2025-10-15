@@ -13,7 +13,8 @@ public class CylinderRenderer : MonoBehaviour
 
         if (raymarchMat != null)
         {
-            _cylinders[0] = new Vector4(1, 1, -1, 1);
+            _cylinders[0] = new Vector4(1, 0, 0, 1);
+            _cylinders[1] = new Vector4(0, 0.5f, 0.2f, 1);
             Camera cam = Camera.current ?? Camera.main;
 
             // Send matrices and camera position
@@ -21,7 +22,7 @@ public class CylinderRenderer : MonoBehaviour
             raymarchMat.SetMatrix("_CamInverseProjection", cam.projectionMatrix.inverse);
             raymarchMat.SetVector("_CamPos", cam.transform.position);
             raymarchMat.SetVectorArray("_Cylinders", _cylinders);
-            raymarchMat.SetInt("_CylinderCount", 1);
+            raymarchMat.SetInt("_CylinderCount", 2);
 
             Graphics.Blit(source, destination, raymarchMat);
         }

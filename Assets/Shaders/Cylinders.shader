@@ -103,7 +103,10 @@
                 float3 ro = _CamPos;
                 float xtime = sin(_Time.y);
                 float ytime = cos(_Time.y);
-                float4 col = raymarch(ro, rd, _Cylinders[0].xyz);
+                float4 first = _Cylinders[0];
+                float4 second = _Cylinders[1];
+                float4 mix = first*0.5f+second*0.5f;
+                float4 col = raymarch(ro, rd, float3(xtime, ytime, -0.8));
                 float4 sceneCol = tex2D(_MainTex, i.uv);
                 float alfa = col.w;
                 float r = (alfa) * col.x + (1-alfa) * sceneCol.x;
@@ -111,7 +114,7 @@
                 float b = (alfa) * col.z + (1-alfa) * sceneCol.z;
                 fixed4 res = alfa*col+(1-alfa)*sceneCol;
                 res.w=alfa;
-                return res;
+                return res*mix;
             }
             ENDCG
         }
