@@ -24,6 +24,12 @@
             float4x4 _CamToWorld;
             float4x4 _CamInverseProjection;
             float3 _CamPos;
+
+            // Light
+            float4 _LightColor;
+            float3 _LightPosition;
+
+            //Cylinders
             float4 _Cylinders[512];
             int _CylinderCount;
 
@@ -103,10 +109,7 @@
                 float3 ro = _CamPos;
                 float xtime = sin(_Time.y);
                 float ytime = cos(_Time.y);
-                float4 first = _Cylinders[0];
-                float4 second = _Cylinders[1];
-                float4 mix = first*0.5f+second*0.5f;
-                float4 col = raymarch(ro, rd, float3(xtime, ytime, -0.8));
+                float4 col = raymarch(ro, rd, _LightPosition);
                 float4 sceneCol = tex2D(_MainTex, i.uv);
                 float alfa = col.w;
                 float r = (alfa) * col.x + (1-alfa) * sceneCol.x;
@@ -114,7 +117,7 @@
                 float b = (alfa) * col.z + (1-alfa) * sceneCol.z;
                 fixed4 res = alfa*col+(1-alfa)*sceneCol;
                 res.w=alfa;
-                return res*mix;
+                return res*_LightColor;
             }
             ENDCG
         }

@@ -5,6 +5,8 @@ using UnityEngine;
 public class CylinderRenderer : MonoBehaviour
 {
     public Material raymarchMat;
+    public Color LightColor;
+    public Vector3 LightPosition;
 
     private Vector4[] _cylinders = new Vector4[512];
 
@@ -13,16 +15,19 @@ public class CylinderRenderer : MonoBehaviour
 
         if (raymarchMat != null)
         {
-            _cylinders[0] = new Vector4(1, 0, 0, 1);
-            _cylinders[1] = new Vector4(0, 0.5f, 0.2f, 1);
+            _cylinders[0] = new Vector4(1, 1, 1, 1);
             Camera cam = Camera.current ?? Camera.main;
 
             // Send matrices and camera position
             raymarchMat.SetMatrix("_CamToWorld", cam.cameraToWorldMatrix);
             raymarchMat.SetMatrix("_CamInverseProjection", cam.projectionMatrix.inverse);
             raymarchMat.SetVector("_CamPos", cam.transform.position);
+
+            raymarchMat.SetVector("_LightColor", FromColor(LightColor));
+            raymarchMat.SetVector("_LightPosition", LightPosition);
+
             raymarchMat.SetVectorArray("_Cylinders", _cylinders);
-            raymarchMat.SetInt("_CylinderCount", 2);
+            raymarchMat.SetInt("_CylinderCount", 1);
 
             Graphics.Blit(source, destination, raymarchMat);
         }
@@ -31,5 +36,7 @@ public class CylinderRenderer : MonoBehaviour
             Graphics.Blit(source, destination);
         }
     }
+
+    private Vector4 FromColor(Color color) => new Vector4(color.r, color.g, color.b, 1f);
 
 }
