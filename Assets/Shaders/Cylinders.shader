@@ -17,22 +17,22 @@
             #pragma fragment frag
             #include "UnityCG.cginc"		
 		    #include "noiseSimplex.cginc"
-
+            
             sampler2D _MainTex;
 
-            // Incoming from script
+            // Camera
             float4x4 _CamToWorld;
             float4x4 _CamInverseProjection;
             float3 _CamPos;
-
+            
             // Light
             float4 _LightColor;
             float3 _LightPosition;
-
-            //Cylinders
+            
+            // Cylinders
             float4 _Cylinders[512];
             int _CylinderCount;
-
+            
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -84,7 +84,7 @@
                         float3 n = getNormal(p);
                         float3 lightDir = normalize(lightPos);
                         float diff = max(0, dot(n, lightDir));
-                        return float4(diff.xxx,1.0);
+                        return float4(diff.xxx,0.95);
                     }
                     t += d;
                     if (t > MAX_DIST) break;
@@ -109,15 +109,14 @@
                 float3 ro = _CamPos;
                 float xtime = sin(_Time.y);
                 float ytime = cos(_Time.y);
-                float4 col = raymarch(ro, rd, _LightPosition);
+                float4 col = raymarch(ro, rd, _LightPosition)*_LightColor;
                 float4 sceneCol = tex2D(_MainTex, i.uv);
                 float alfa = col.w;
                 float r = (alfa) * col.x + (1-alfa) * sceneCol.x;
                 float g = (alfa) * col.y + (1-alfa) * sceneCol.y;
                 float b = (alfa) * col.z + (1-alfa) * sceneCol.z;
                 fixed4 res = alfa*col+(1-alfa)*sceneCol;
-                res.w=alfa;
-                return res*_LightColor;
+                return res;
             }
             ENDCG
         }

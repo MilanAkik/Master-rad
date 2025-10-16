@@ -18,14 +18,16 @@ public class CylinderRenderer : MonoBehaviour
             _cylinders[0] = new Vector4(1, 1, 1, 1);
             Camera cam = Camera.current ?? Camera.main;
 
-            // Send matrices and camera position
+            // Camera parameters
             raymarchMat.SetMatrix("_CamToWorld", cam.cameraToWorldMatrix);
             raymarchMat.SetMatrix("_CamInverseProjection", cam.projectionMatrix.inverse);
             raymarchMat.SetVector("_CamPos", cam.transform.position);
 
+            // Light parmeters
             raymarchMat.SetVector("_LightColor", FromColor(LightColor));
             raymarchMat.SetVector("_LightPosition", LightPosition);
 
+            // Culinder parameters
             raymarchMat.SetVectorArray("_Cylinders", _cylinders);
             raymarchMat.SetInt("_CylinderCount", 1);
 
