@@ -27,7 +27,8 @@ public class CylinderRenderer : MonoBehaviour
             raymarchMat.SetVector("_LightColor", FromColor(LightColor));
             raymarchMat.SetVector("_LightPosition", LightPosition);
 
-            // Culinder parameters
+            // Cylinder equation (((x-1)/(2)))^(2)+(((y-1)/(2)))^(2)<1
+            // Cylinder parameters
             raymarchMat.SetVectorArray("_Cylinders", _cylinders);
             raymarchMat.SetInt("_CylinderCount", 1);
 
