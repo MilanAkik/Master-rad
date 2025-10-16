@@ -84,7 +84,7 @@
                         float3 n = getNormal(p);
                         float3 lightDir = normalize(lightPos);
                         float diff = max(0, dot(n, lightDir));
-                        return float4(diff.xxx,0.95);
+                        return float4(diff.xxx,1.0);
                     }
                     t += d;
                     if (t > MAX_DIST) break;
@@ -109,7 +109,8 @@
                 float3 ro = _CamPos;
                 float xtime = sin(_Time.y);
                 float ytime = cos(_Time.y);
-                float4 col = raymarch(ro, rd, _LightPosition)*_LightColor;
+                float3 LightPos = _LightPosition + float3(xtime, 0, ytime);
+                float4 col = raymarch(ro, rd, LightPos)*_LightColor;
                 float4 sceneCol = tex2D(_MainTex, i.uv);
                 float alfa = col.w;
                 float r = (alfa) * col.x + (1-alfa) * sceneCol.x;
