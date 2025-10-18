@@ -32,7 +32,7 @@
             // Cylinders
             float4 _Cylinders[512];
             int _CylinderCount;
-            
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -159,7 +159,17 @@
                 // World-space ray
                 float3 rd = normalize(mul(_CamToWorld, float4(rayView.xyz, 0.0)).xyz);
                 float3 ro = _CamPos;
-                float dist = closestCylinder(ro, rd, float4(0,0,10,1));
+                // float dist = closestCylinder(ro, rd, float4(0,0,10,1));
+                float dist = 1;
+                for(int j=0; j<_CylinderCount; j++)
+                {
+                    dist += closestCylinder(ro, rd, _Cylinders[j]);
+                }
+                // for(int i=0; i<_CylinderCount; i++)
+                // {
+                //     dist += dists[i];
+                // }
+                dist = dist / _CylinderCount;
                 // dist = 5.0f;
                 return float4((dist/20.0f).xxx, 1.0);
 

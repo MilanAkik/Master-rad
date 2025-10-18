@@ -15,7 +15,9 @@ public class CylinderRenderer : MonoBehaviour
 
         if (raymarchMat != null)
         {
-            _cylinders[0] = new Vector4(1, 1, 1, 1);
+            _cylinders[0] = new Vector4( 0, 0, 3, 0.5f);
+            _cylinders[1] = new Vector4(-2, 0, 5, 0.5f);
+            _cylinders[2] = new Vector4( 2, 0, 4, 0.5f);
             Camera cam = Camera.current ?? Camera.main;
 
             // Camera parameters
@@ -30,7 +32,7 @@ public class CylinderRenderer : MonoBehaviour
             // Cylinder equation (((x-1)/(2)))^(2)+(((y-1)/(2)))^(2)<1
             // Cylinder parameters
             raymarchMat.SetVectorArray("_Cylinders", _cylinders);
-            raymarchMat.SetInt("_CylinderCount", 1);
+            raymarchMat.SetInt("_CylinderCount", 3);
 
             Graphics.Blit(source, destination, raymarchMat);
         }
