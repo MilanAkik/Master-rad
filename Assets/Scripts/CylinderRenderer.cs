@@ -15,9 +15,9 @@ public class CylinderRenderer : MonoBehaviour
 
         if (raymarchMat != null)
         {
-            _cylinders[0] = new Vector4( 0, 0, 3, 0.5f);
-            _cylinders[1] = new Vector4(-2, 0, 5, 0.5f);
-            _cylinders[2] = new Vector4( 2, 0, 4, 0.5f);
+            _cylinders[0] = new Vector4( 0, 0, 1, 0.25f);
+            _cylinders[1] = new Vector4(-2, 0, 3, 0.5f);
+            _cylinders[2] = new Vector4( 2, 0, 2, 0.75f);
             Camera cam = Camera.current ?? Camera.main;
 
             // Camera parameters

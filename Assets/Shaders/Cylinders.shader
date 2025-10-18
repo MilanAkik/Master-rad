@@ -124,7 +124,7 @@
                 bool v1out = (v1.y<-1 || v1.y>1);
                 bool v2out = (v2.y<-1 || v2.y>1);
                 if(v1out && v2out) return 0;
-                return d1;
+                return (d1+d2)*0.5f;
                 // return (d2+d1)/2;
                 // return distance(v1,v2);
                 float val = distance(ro, v2);
