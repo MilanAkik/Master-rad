@@ -114,6 +114,11 @@
                 float t2 = (-b-sqrt(disc))/(2*a);
                 float3 v1 = float3(a1*t1+a2, a5*t1+a6, a3*t1+a4);
                 float3 v2 = float3(a1*t2+a2, a5*t2+a6, a3*t2+a4);
+                // float d1 = dot(v1-ro, rd);
+                // float d2 = dot(v2-ro, rd);
+                // if(d1 < 1) return 1.0f;
+                // else if(d2 < 1) return 0.5f;
+                // return 0.0f;
                 // float d1 = distance(ro, v1);
                 // float d2 = distance(ro, v2);
                 if(v1.y<-1 || v1.y>1) return 0;
