@@ -92,6 +92,49 @@
                 return float4(0.0, 0.0, 0.0, 0.0); // background color
             }
 
+            float closestCylinder(float3 ro, float3 rd, float4 cylinder)
+            {
+                float3 dist = ro - rd;
+                float a1 = dist.x;
+                float a2 = rd.x;
+                float a3 = dist.z;
+                float a4 = rd.z;
+                float a5 = dist.y;
+                float a6 = rd.y;
+                float a7 = cylinder.w;
+                float a8 = cylinder.x;
+                float a9 = cylinder.w;
+                float a10 = cylinder.z;
+                float a = a7*a7*a2*a2+a9*a9*a1*a1;
+                float b = 2 * (a7*a7*a3*(a4-a10)+a9*a9*a1*(a2-a8));
+                float c = a7*a7*(a4-a10)*(a4-a10)+a9*a9*(a2-a8)*(a2-a8)-a7*a7*a9*a9;
+                float disc = b*b-4*a*c;
+                if(disc<0) return 0;
+                float t1 = (-b+sqrt(disc))/(2*a);
+                float t2 = (-b-sqrt(disc))/(2*a);
+                float3 v1 = float3(a1*t1+a2, a5*t1+a6, a3*t1+a4);
+                float3 v2 = float3(a1*t2+a2, a5*t2+a6, a3*t2+a4);
+                // float d1 = distance(ro, v1);
+                // float d2 = distance(ro, v2);
+                if(v1.y<-1 || v1.y>1) return 0;
+                // return distance(v1,v2);
+                float val = distance(ro, v2);
+                if(t1<t2) val = distance(ro, v1);
+                // if(val<1) return 0.1;
+                // if(val<2) return 0.2;
+                // if(val<3) return 0.3;
+                // if(val<4) return 0.4;
+                // if(val<5) return 0.5;
+                // if(val<6) return 0.6;
+                // if(val<7) return 0.7;
+                // if(val<8) return 0.8;
+                // if(val<9) return 0.9;
+                // return 1;
+                return val;
+                return abs((ro+t1*rd).z);
+                return distance(ro, ro+t1*rd);
+            }
+
             fixed4 frag(v2f i) : SV_Target
             {
                 // Convert screen UV to NDC (-1..1)
@@ -107,6 +150,10 @@
                 // World-space ray
                 float3 rd = normalize(mul(_CamToWorld, float4(rayView.xyz, 0.0)).xyz);
                 float3 ro = _CamPos;
+                float dist = closestCylinder(ro, rd, float4(0,0,10,1));
+                // dist = 5.0f;
+                return float4((dist/100.0f).xxx, 1.0);
+
                 float xtime = sin(_Time.y);
                 float ytime = cos(_Time.y);
                 float3 LightPos = _LightPosition + float3(xtime, 0, ytime);
