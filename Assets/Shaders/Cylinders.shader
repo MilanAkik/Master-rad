@@ -94,13 +94,13 @@
 
             float closestCylinder(float3 ro, float3 rd, float4 cylinder)
             {
-                float3 dist = ro - rd;
+                float3 dist = rd;
                 float a1 = dist.x;
-                float a2 = rd.x;
+                float a2 = ro.x;
                 float a3 = dist.y;
-                float a4 = rd.y;
+                float a4 = ro.y;
                 float a5 = dist.z;
-                float a6 = rd.z;
+                float a6 = ro.z;
                 float a7 = cylinder.w;
                 float a8 = cylinder.x;
                 float a9 = cylinder.w;
@@ -110,21 +110,25 @@
                 float c = a7*a7*(a6-a10)*(a6-a10)+a9*a9*(a2-a8)*(a2-a8)-a7*a7*a9*a9;
                 float disc = b*b-4*a*c;
                 if(disc<0) return 0;
+                // return 1;
                 float t1 = (-b+sqrt(disc))/(2*a);
                 float t2 = (-b-sqrt(disc))/(2*a);
                 float3 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 float3 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
                 // float d1 = dot(v1-ro, rd);
                 // float d2 = dot(v2-ro, rd);
-                // if(d1 > 11) return d1;
-                // else if(d2 > 11) return d2;
-                // return 0.0f;
+                // if(d1 >= 0) return d1;
+                // else if(d2 >= 0) return d2;
+                // return 0.1f;
                 float d1 = distance(v1, ro);
                 float d2 = distance(v2, ro);
                 bool v1out = (v1.y<-1 || v1.y>1);
                 bool v2out = (v2.y<-1 || v2.y>1);
                 if(v1out && v2out) return 0;
-                return (d1+d2)*0.5f;
+                // if(v1out) return 0.7;
+                // if(v2out) return 0.2;
+                // return 0;
+                return 10*exp((d1+d2)*-0.5f);
                 // return (d2+d1)/2;
                 // return distance(v1,v2);
                 float val = distance(ro, v2);
@@ -148,19 +152,24 @@
             {
                 // Convert screen UV to NDC (-1..1)
                 float2 uv = i.uv * 2.0 - 1.0;
-
                 // Clip-space ray
-                float4 rayClip = float4(uv, -1.0, 1.0);
-
+                float4 rayClip = float4(uv, 1.0, 1.0);
+                
+                // return rayClip;//float4(uv.x, 0, uv.y, 1);
                 // View-space ray
                 float4 rayView = mul(_CamInverseProjection, rayClip);
                 rayView /= rayView.w;
 
+                float3 worldPos = mul(_CamToWorld, float4(rayView.xyz, 0.0)).xyz;
+
                 // World-space ray
-                float3 rd = normalize(mul(_CamToWorld, float4(rayView.xyz, 0.0)).xyz);
+
                 float3 ro = _CamPos;
+                float3 rd = normalize(worldPos - ro);
+
+                // return float4(rd * 0.5f + 0.5f, 1.0f);
                 // float dist = closestCylinder(ro, rd, float4(0,0,10,1));
-                float dist = 1;
+                float dist = 0;
                 for(int j=0; j<_CylinderCount; j++)
                 {
                     dist += closestCylinder(ro, rd, _Cylinders[j]);
@@ -171,7 +180,7 @@
                 // }
                 dist = dist / _CylinderCount;
                 // dist = 5.0f;
-                return float4((dist/20.0f).xxx, 1.0);
+                return float4((dist/1.0f).xxx, 1.0);
 
                 float xtime = sin(_Time.y);
                 float ytime = cos(_Time.y);

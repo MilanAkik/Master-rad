@@ -1,4 +1,5 @@
 using NUnit.Framework.Internal;
+using System;
 using UnityEngine;
 
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
@@ -15,10 +16,18 @@ public class CylinderRenderer : MonoBehaviour
 
         if (raymarchMat != null)
         {
-            _cylinders[0] = new Vector4( 0, 0, 1, 0.25f);
-            _cylinders[1] = new Vector4(-2, 0, 3, 0.5f);
-            _cylinders[2] = new Vector4( 2, 0, 2, 0.75f);
+            _cylinders[0] = new Vector4( 0, 0, 2, 0.25f);
+            _cylinders[1] = new Vector4(-2, 0, 4, 0.5f);
+            _cylinders[2] = new Vector4( 2, 0, 3, 0.75f);
             Camera cam = Camera.current ?? Camera.main;
+            //Debug.LogError(cam.transform.position);
+            //Debug.LogError(cam.cameraToWorldMatrix);
+            //Debug.LogError(cam.projectionMatrix.inverse);
+            //var res = cam.projectionMatrix * new Vector4(-1, -1, -1, 1);
+            //res = res / res.w;
+            //var n = new Vector4(res.x, res.y, res.z, 0);
+            //var o = cam.cameraToWorldMatrix * n;
+            //Debug.LogError(o.normalized);
 
             // Camera parameters
             raymarchMat.SetMatrix("_CamToWorld", cam.cameraToWorldMatrix);
