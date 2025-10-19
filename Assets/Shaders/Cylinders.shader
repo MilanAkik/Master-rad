@@ -105,9 +105,15 @@
                 float a8 = cylinder.x;
                 float a9 = cylinder.w;
                 float a10 = cylinder.z;
-                float a = a7*a7*a5*a5+a9*a9*a1*a1;
-                float b = 2 * (a7*a7*a5*(a6-a10)+a9*a9*a1*(a2-a8));
-                float c = a7*a7*(a6-a10)*(a6-a10)+a9*a9*(a2-a8)*(a2-a8)-a7*a7*a9*a9;
+                float sqa7 = a7*a7;
+                float sqa5 = a5*a5;
+                float sqa9 = a9*a9;
+                float sqa1 = a1*a1;
+                float a6m10 = (a6-a10);
+                float a2m8 = (a2-a8);
+                float a = sqa7*sqa5+sqa9*sqa1;
+                float b = 2 * (sqa7*a5*a6m10+sqa9*a1*a2m8);
+                float c = sqa7*a6m10*a6m10+sqa9*a2m8*a2m8-sqa7*sqa9;
                 float disc = b*b-4*a*c;
                 if(disc<0) return 0;
                 // return 1;
@@ -183,17 +189,17 @@
                 // dist = 5.0f;
                 return float4((dist/1.0f).xxx, 1.0);
 
-                float xtime = sin(_Time.y);
-                float ytime = cos(_Time.y);
-                float3 LightPos = _LightPosition + float3(xtime, 0, ytime);
-                float4 col = raymarch(ro, rd, LightPos)*_LightColor;
-                float4 sceneCol = tex2D(_MainTex, i.uv);
-                float alfa = col.w;
-                float r = (alfa) * col.x + (1-alfa) * sceneCol.x;
-                float g = (alfa) * col.y + (1-alfa) * sceneCol.y;
-                float b = (alfa) * col.z + (1-alfa) * sceneCol.z;
-                fixed4 res = alfa*col+(1-alfa)*sceneCol;
-                return res;
+                // float xtime = sin(_Time.y);
+                // float ytime = cos(_Time.y);
+                // float3 LightPos = _LightPosition + float3(xtime, 0, ytime);
+                // float4 col = raymarch(ro, rd, LightPos)*_LightColor;
+                // float4 sceneCol = tex2D(_MainTex, i.uv);
+                // float alfa = col.w;
+                // float r = (alfa) * col.x + (1-alfa) * sceneCol.x;
+                // float g = (alfa) * col.y + (1-alfa) * sceneCol.y;
+                // float b = (alfa) * col.z + (1-alfa) * sceneCol.z;
+                // fixed4 res = alfa*col+(1-alfa)*sceneCol;
+                // return res;
             }
             ENDCG
         }
