@@ -44,6 +44,13 @@
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
             };
+
+            struct intersection
+            {
+                int count;
+                float4 first;
+                float4 second;
+            };
             
             // // Signed Distance Functions
             // float sdSphere(float3 p, float r) { return length(p) - r; }
