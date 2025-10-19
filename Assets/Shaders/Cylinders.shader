@@ -115,29 +115,20 @@
                 float c = sqa7*a6m10*a6m10+sqa9*a2m8*a2m8-sqa7*sqa9;
                 float disc = b*b-4*a*c;
                 intersection res;
-                if(disc<0){
-                    res.count = 0;
-                    res.first = float4(0,0,0,0);
-                    res.second = float4(0,0,0,0);
-                    return res;
-                }
-                // return 1;
+                res.count = 0;
+                res.first = float4(0,0,0,0);
+                res.second = float4(0,0,0,0);
+                if(disc<0) return res;
                 float t1 = (-b+sqrt(disc))/(2*a);
                 float t2 = (-b-sqrt(disc))/(2*a);
                 float3 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 float3 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
                 bool v1out = (v1.y<-1 || v1.y>1);
                 bool v2out = (v2.y<-1 || v2.y>1);
-                if(v1out && v2out){
-                    res.count = 0;
-                    res.first = float4(0,0,0,0);
-                    res.second = float4(0,0,0,0);
-                    return res;
-                }
+                if(v1out && v2out) return res;
                 if(t1==t2){
                     res.count = 1;
                     res.first = float4(v1,0);
-                    res.second = float4(0,0,0,0);
                     return res;
                 }
                 res.count = 2;
@@ -149,30 +140,11 @@
                 // if(d1 >= 0) return d1;
                 // else if(d2 >= 0) return d2;
                 // return 0.1f;
-                        // float d1 = distance(v1, ro);
-                        // float d2 = distance(v2, ro);
                 // if(v1out) return 0.7;
                 // if(v2out) return 0.2;
                 // return 0;
-                        // float m = max(d1,d2);
-                        // return m-(d1+d2)*0.51f;
                 // return (d2+d1)/2;
                 // return distance(v1,v2);
-                        // float val = distance(ro, v2);
-                        // if(t1<t2) val = distance(ro, v1);
-                // if(val<1) return 0.1;
-                // if(val<2) return 0.2;
-                // if(val<3) return 0.3;
-                // if(val<4) return 0.4;
-                // if(val<5) return 0.5;
-                // if(val<6) return 0.6;
-                // if(val<7) return 0.7;
-                // if(val<8) return 0.8;
-                // if(val<9) return 0.9;
-                // return 1;
-                        // return val;
-                        // return abs((ro+t1*rd).z);
-                        // return distance(ro, ro+t1*rd);
             }            
 
             v2f vert(appdata v)
