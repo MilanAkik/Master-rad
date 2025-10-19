@@ -205,9 +205,11 @@
                 // return float4(rd * 0.5f + 0.5f, 1.0f);
                 // float dist = closestCylinder(ro, rd, float4(0,0,10,1));
                 float dist = 0;
+                int hits = 0;
                 for(int j=0; j<_CylinderCount; j++)
                 {
                     intersection res = closestCylinder(ro, rd, _Cylinders[j]);
+                    if(res.count>0) hits++;
                     float d1 = distance(res.first.xyz, ro);
                     float d2 = distance(res.second.xyz, ro);
                     float m = max(d1,d2);
@@ -217,6 +219,10 @@
                 // {
                 //     dist += dists[i];
                 // }
+                if(hits==0){
+                    float4 sceneCol = tex2D(_MainTex, i.uv);
+                    return sceneCol;
+                }
                 dist = dist / _CylinderCount;
                 // dist = 5.0f;
                 return float4((dist/1.0f).xxx, 1.0);
@@ -225,7 +231,6 @@
                 // float ytime = cos(_Time.y);
                 // float3 LightPos = _LightPosition + float3(xtime, 0, ytime);
                 // float4 col = raymarch(ro, rd, LightPos)*_LightColor;
-                // float4 sceneCol = tex2D(_MainTex, i.uv);
                 // float alfa = col.w;
                 // float r = (alfa) * col.x + (1-alfa) * sceneCol.x;
                 // float g = (alfa) * col.y + (1-alfa) * sceneCol.y;
