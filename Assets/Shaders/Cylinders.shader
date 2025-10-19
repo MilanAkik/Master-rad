@@ -128,7 +128,8 @@
                 // if(v1out) return 0.7;
                 // if(v2out) return 0.2;
                 // return 0;
-                return 10*exp((d1+d2)*-0.5f);
+                float m = max(d1,d2);
+                return m-(d1+d2)*0.51f;
                 // return (d2+d1)/2;
                 // return distance(v1,v2);
                 float val = distance(ro, v2);
