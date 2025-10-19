@@ -53,44 +53,44 @@
                 return o;
             }
             
-            // Signed Distance Functions
-            float sdSphere(float3 p, float r) { return length(p) - r; }
+            // // Signed Distance Functions
+            // float sdSphere(float3 p, float r) { return length(p) - r; }
 
-            float SceneSDF(float3 p) { return sdSphere(p - float3(0,0,3), 1.0); }
+            // float SceneSDF(float3 p) { return sdSphere(p - float3(0,0,3), 1.0); }
 
-            float3 getNormal(float3 p)
-            {
-                float e = 0.001;
-                return normalize(float3(
-                    SceneSDF(p + float3(e,0,0)) - SceneSDF(p - float3(e,0,0)),
-                    SceneSDF(p + float3(0,e,0)) - SceneSDF(p - float3(0,e,0)),
-                    SceneSDF(p + float3(0,0,e)) - SceneSDF(p - float3(0,0,e))
-                ));
-            }
+            // float3 getNormal(float3 p)
+            // {
+            //     float e = 0.001;
+            //     return normalize(float3(
+            //         SceneSDF(p + float3(e,0,0)) - SceneSDF(p - float3(e,0,0)),
+            //         SceneSDF(p + float3(0,e,0)) - SceneSDF(p - float3(0,e,0)),
+            //         SceneSDF(p + float3(0,0,e)) - SceneSDF(p - float3(0,0,e))
+            //     ));
+            // }
 
-            float4 raymarch(float3 ro, float3 rd, float3 lightPos)
-            {
-                float t = 0.0;
-                const int MAX_STEPS = 128;
-                const float MAX_DIST = 50.0;
-                const float EPSILON = 0.001;
+            // float4 raymarch(float3 ro, float3 rd, float3 lightPos)
+            // {
+            //     float t = 0.0;
+            //     const int MAX_STEPS = 128;
+            //     const float MAX_DIST = 50.0;
+            //     const float EPSILON = 0.001;
 
-                for (int i = 0; i < MAX_STEPS; i++)
-                {
-                    float3 p = ro + rd * t;
-                    float d = SceneSDF(p);
-                    if (d < EPSILON)
-                    {
-                        float3 n = getNormal(p);
-                        float3 lightDir = normalize(lightPos);
-                        float diff = max(0, dot(n, lightDir));
-                        return float4(diff.xxx,1.0);
-                    }
-                    t += d;
-                    if (t > MAX_DIST) break;
-                }
-                return float4(0.0, 0.0, 0.0, 0.0); // background color
-            }
+            //     for (int i = 0; i < MAX_STEPS; i++)
+            //     {
+            //         float3 p = ro + rd * t;
+            //         float d = SceneSDF(p);
+            //         if (d < EPSILON)
+            //         {
+            //             float3 n = getNormal(p);
+            //             float3 lightDir = normalize(lightPos);
+            //             float diff = max(0, dot(n, lightDir));
+            //             return float4(diff.xxx,1.0);
+            //         }
+            //         t += d;
+            //         if (t > MAX_DIST) break;
+            //     }
+            //     return float4(0.0, 0.0, 0.0, 0.0); // background color
+            // }
 
             float closestCylinder(float3 ro, float3 rd, float4 cylinder)
             {
