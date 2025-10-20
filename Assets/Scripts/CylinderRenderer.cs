@@ -16,9 +16,9 @@ public class CylinderRenderer : MonoBehaviour
 
         if (raymarchMat != null)
         {
-            _cylinders[0] = new Vector4( 0, 0, 10, 1f);
-            _cylinders[1] = new Vector4(-2, 0, 20, 2f);
-            _cylinders[2] = new Vector4( 2, 0, 15, 3f);
+            _cylinders[0] = new Vector4( 0, -2, 10, 0.25f);
+            _cylinders[1] = new Vector4(-2, -0.5f, 20, 0.5f);
+            _cylinders[2] = new Vector4( 2, 1.5f, 15, 0.75f);
             Camera cam = Camera.current ?? Camera.main;
             //Debug.LogError(cam.transform.position);
             //Debug.LogError(cam.cameraToWorldMatrix);

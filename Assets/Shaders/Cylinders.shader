@@ -91,6 +91,17 @@
             //     return float4(0.0, 0.0, 0.0, 0.0); // background color
             // }
 
+            float getHeight(float radius, float f){
+                float r1 = radius;
+                if (r1 < f) return 0;
+                float a1 = 2 / (f - 1);
+                float a = a1 * a1;
+                float b = -a * (f + 1);
+                float c = 1 - a - b;
+                float h = 2.0f - a * r1 * r1 - b * r1 - c;
+                return h;
+            }
+
             intersection closestCylinder(float3 ro, float3 rd, float4 cylinder)
             {
                 float3 dist = rd;
@@ -100,9 +111,9 @@
                 float a4 = ro.y;
                 float a5 = dist.z;
                 float a6 = ro.z;
-                float a7 = cylinder.w;
+                float a7 = cylinder.w*2;
                 float a8 = cylinder.x;
-                float a9 = cylinder.w;
+                float a9 = cylinder.w*2;
                 float a10 = cylinder.z;
                 float sqa7 = a7*a7;
                 float sqa5 = a5*a5;
@@ -123,8 +134,10 @@
                 float t2 = (-b-sqrt(disc))/(2*a);
                 float3 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 float3 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
-                bool v1out = (v1.y<-1 && v2.y<-1);
-                bool v2out = (v1.y> 1 && v2.y> 1);
+                float h = getHeight(cylinder.w, 0.1);
+                float y = cylinder.y;
+                bool v1out = (v1.y< y && v2.y< y);
+                bool v2out = (v1.y> h+y && v2.y> h+y);
                 if(v1out || v2out) return res;
                 if(t1==t2){
                     res.count = 1;
