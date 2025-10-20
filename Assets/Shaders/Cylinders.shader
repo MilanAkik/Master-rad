@@ -123,9 +123,9 @@
                 float t2 = (-b-sqrt(disc))/(2*a);
                 float3 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 float3 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
-                bool v1out = (v1.y<-1 || v1.y>1);
-                bool v2out = (v2.y<-1 || v2.y>1);
-                if(v1out && v2out) return res;
+                bool v1out = (v1.y<-1 && v2.y<-1);
+                bool v2out = (v1.y> 1 && v2.y> 1);
+                if(v1out || v2out) return res;
                 if(t1==t2){
                     res.count = 1;
                     res.first = float4(v1,0);
