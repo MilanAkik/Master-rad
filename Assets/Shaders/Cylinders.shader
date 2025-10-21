@@ -126,12 +126,10 @@
                 }
                 else if(pos1 < 0) {
                     v1 = ro;
-                    // return twoIntersections(ro, v2);
                 }
                 else if(pos2 < 0) {
                     v2 = v1;
                     v1 = ro;
-                    //return twoIntersections(ro, v1);
                 }
                 else {
                     float d1 = distance(ro, v1);
@@ -141,7 +139,6 @@
                         v1 = v2;
                         v2 = tmp;
                     }
-                    // return twoIntersections(v1, v2);
                 }
                 if(v1out || v2out) return noIntersection();
                 if(t1==t2){
