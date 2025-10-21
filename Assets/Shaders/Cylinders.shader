@@ -115,29 +115,21 @@
                 float t2 = (-b-sqrt(disc))/(2*a);
                 float3 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 float3 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
-                float h = getHeight(cylinder.w, 0.1);
-                float y = cylinder.y;
-                bool v1out = (v1.y < y && v2.y < y);
-                bool v2out = (v1.y > h+y && v2.y > h+y);
+                float ymin = cylinder.y;
+                float ymax = ymin + getHeight(cylinder.w, 0.1);
+                bool v1out = (v1.y < ymin && v2.y < ymin);
+                bool v2out = (v1.y > ymax && v2.y > ymax);
                 float pos1 = dot(v1-ro, rd);
                 float pos2 = dot(v2-ro, rd);
+                if(pos1 < 0 && pos2 < 0){
+                    return noIntersection();
+                }
                 if(v1out || v2out) return noIntersection();
                 if(t1==t2){
                     if(pos1<0) return noIntersection();
                     else return oneIntersection(v1);
                 }
-                if(pos1 < 0 && pos2 < 0){
-                    return noIntersection();
-                }
                 return twoIntersections(v1,v2);
-                // if(d1 >= 0) return d1;
-                // else if(d2 >= 0) return d2;
-                // return 0.1f;
-                // if(v1out) return 0.7;
-                // if(v2out) return 0.2;
-                // return 0;
-                // return (d2+d1)/2;
-                // return distance(v1,v2);
             }            
 
             v2f vert(appdata v)
@@ -178,6 +170,7 @@
                     float d1 = distance(res.first.xyz, ro);
                     float d2 = distance(res.second.xyz, ro);
                     float m = max(d1,d2);
+                    // dist += distance(res.first.xyz,res.second.xyz);
                     dist += m-(d1+d2)*0.51f;
                 }
                 // for(int i=0; i<_CylinderCount; i++)
