@@ -114,10 +114,6 @@
                 float t2 = (-b-sqrt(disc))/(2*a);
                 float3 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 float3 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
-                float ymin = cylinder.y;
-                float ymax = ymin + getHeight(cylinder.w, 0.1);
-                bool v1out = (v1.y < ymin && v2.y < ymin);
-                bool v2out = (v1.y > ymax && v2.y > ymax);
                 float pos1 = dot(v1-ro, rd);
                 float pos2 = dot(v2-ro, rd);
                 // If-elseif-else that checks which of the intersections are behind camera
@@ -142,6 +138,8 @@
                 }
                 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
+                float ymin = cylinder.y;
+                float ymax = ymin + getHeight(cylinder.w, 0.1);
                 //3x3 of combinations of the positions
                 if(v1.y < ymin){
                     if(v2.y < ymin){
