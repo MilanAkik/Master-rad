@@ -139,7 +139,39 @@
                         v2 = tmp;
                     }
                 }
-                if(v1out || v2out) return noIntersection();
+                if(v1.y < ymin){
+                    if(v2.y < ymin){
+                        return noIntersection();
+                    }
+                    else if(v2.y > ymax) {
+
+                    }
+                    else {
+
+                    }
+                }
+                else if(v1.y > ymax) {
+                    if(v2.y < ymin){
+
+                    }
+                    else if(v2.y > ymax) {
+                        return noIntersection();
+                    }
+                    else {
+
+                    }
+                }
+                else {
+                    if(v2.y < ymin){
+
+                    }
+                    else if(v2.y > ymax) {
+
+                    }
+                    else {
+
+                    }
+                }
                 if(t1==t2) return oneIntersection(v1);
                 return twoIntersections(v1,v2);
             }            
