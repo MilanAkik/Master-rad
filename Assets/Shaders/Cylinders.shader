@@ -124,6 +124,15 @@
                 if(pos1 < 0 && pos2 < 0){
                     return noIntersection();
                 }
+                else if(pos1 < 0) {
+                    return twoIntersections(ro, v2);
+                }
+                else if(pos2 < 0) {
+                    return twoIntersections(ro, v1);
+                }
+                else {
+                    return twoIntersections(v1, v2);
+                }
                 if(v1out || v2out) return noIntersection();
                 if(t1==t2){
                     if(pos1<0) return noIntersection();
