@@ -89,12 +89,11 @@
 
             intersection closestCylinder(float3 ro, float3 rd, float4 cylinder)
             {
-                float3 dist = rd;
-                float a1 = dist.x;
+                float a1 = rd.x;
                 float a2 = ro.x;
-                float a3 = dist.y;
+                float a3 = rd.y;
                 float a4 = ro.y;
-                float a5 = dist.z;
+                float a5 = rd.z;
                 float a6 = ro.z;
                 float a7 = cylinder.w*2;
                 float a8 = cylinder.x;
