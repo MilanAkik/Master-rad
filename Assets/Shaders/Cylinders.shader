@@ -136,20 +136,24 @@
                 float3 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
                 float h = getHeight(cylinder.w, 0.1);
                 float y = cylinder.y;
-                bool v1out = (v1.y< y && v2.y< y);
-                bool v2out = (v1.y> h+y && v2.y> h+y);
+                bool v1out = (v1.y < y && v2.y < y);
+                bool v2out = (v1.y > h+y && v2.y > h+y);
+                float pos1 = dot(v1-ro, rd);
+                float pos2 = dot(v2-ro, rd);
                 if(v1out || v2out) return res;
                 if(t1==t2){
+                    if(pos1<0) return res;
                     res.count = 1;
                     res.first = float4(v1,0);
+                    return res;
+                }
+                if(pos1 < 0 && pos2 < 0){
                     return res;
                 }
                 res.count = 2;
                 res.first = float4(v1,0);
                 res.second = float4(v2,0);
                 return res;
-                // float d1 = dot(v1-ro, rd);
-                // float d2 = dot(v2-ro, rd);
                 // if(d1 >= 0) return d1;
                 // else if(d2 >= 0) return d2;
                 // return 0.1f;
