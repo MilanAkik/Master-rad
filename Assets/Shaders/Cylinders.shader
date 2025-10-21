@@ -63,6 +63,30 @@
                 return h;
             }
 
+            intersection noIntersection(){
+                intersection res;
+                res.count = 0;
+                res.first = float4(0,0,0,0);
+                res.second = float4(0,0,0,0);
+                return res;
+            }
+
+            intersection oneIntersection(float3 point1){
+                intersection res;
+                res.count = 1;
+                res.first = float4(point1,0);
+                res.second = float4(0,0,0,0);
+                return res;
+            }
+
+            intersection twoIntersections(float3 point1, float3 point2){
+                intersection res;
+                res.count = 2;
+                res.first = float4(point1,0);
+                res.second = float4(point2,0);
+                return res;
+            }
+
             intersection closestCylinder(float3 ro, float3 rd, float4 cylinder)
             {
                 float3 dist = rd;
@@ -86,11 +110,7 @@
                 float b = 2 * (sqa7*a5*a6m10+sqa9*a1*a2m8);
                 float c = sqa7*a6m10*a6m10+sqa9*a2m8*a2m8-sqa7*sqa9;
                 float disc = b*b-4*a*c;
-                intersection res;
-                res.count = 0;
-                res.first = float4(0,0,0,0);
-                res.second = float4(0,0,0,0);
-                if(disc<0) return res;
+                if(disc<0) return noIntersection();
                 float t1 = (-b+sqrt(disc))/(2*a);
                 float t2 = (-b-sqrt(disc))/(2*a);
                 float3 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
@@ -101,20 +121,15 @@
                 bool v2out = (v1.y > h+y && v2.y > h+y);
                 float pos1 = dot(v1-ro, rd);
                 float pos2 = dot(v2-ro, rd);
-                if(v1out || v2out) return res;
+                if(v1out || v2out) return noIntersection();
                 if(t1==t2){
-                    if(pos1<0) return res;
-                    res.count = 1;
-                    res.first = float4(v1,0);
-                    return res;
+                    if(pos1<0) return noIntersection();
+                    else return oneIntersection(v1);
                 }
                 if(pos1 < 0 && pos2 < 0){
-                    return res;
+                    return noIntersection();
                 }
-                res.count = 2;
-                res.first = float4(v1,0);
-                res.second = float4(v2,0);
-                return res;
+                return twoIntersections(v1,v2);
                 // if(d1 >= 0) return d1;
                 // else if(d2 >= 0) return d2;
                 // return 0.1f;
