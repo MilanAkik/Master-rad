@@ -125,21 +125,23 @@
                     return noIntersection();
                 }
                 else if(pos1 < 0) {
-                    v1 = ro;
+                    t1 = 0;
                 }
                 else if(pos2 < 0) {
-                    v2 = v1;
-                    v1 = ro;
+                    t2 = t1;
+                    t1 = 0;
                 }
                 else {
                     float d1 = distance(ro, v1);
                     float d2 = distance(ro, v2);
                     if(d1>d2){
-                        float3 tmp = v1;
-                        v1 = v2;
-                        v2 = tmp;
+                        float tmp = t1;
+                        t1 = t2;
+                        t2 = tmp;
                     }
                 }
+                v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
+                v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
                 //3x3 of combinations of the positions
                 if(v1.y < ymin){
                     if(v2.y < ymin){
