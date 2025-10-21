@@ -158,20 +158,13 @@
                 float2 uv = i.uv * 2.0 - 1.0;
                 // Clip-space ray
                 float4 rayClip = float4(uv, 1.0, 1.0);
-                
-                // return rayClip;//float4(uv.x, 0, uv.y, 1);
                 // View-space ray
                 float4 rayView = mul(_CamInverseProjection, rayClip);
                 rayView /= rayView.w;
-
                 float3 worldPos = mul(_CamToWorld, float4(rayView.xyz, 0.0)).xyz;
-
                 // World-space ray
-
                 float3 ro = _CamPos;
                 float3 rd = normalize(worldPos - ro);
-
-                // return float4(rd * 0.5f + 0.5f, 1.0f);
                 // float dist = closestCylinder(ro, rd, float4(0,0,10,1));
                 float dist = 0;
                 int hits = 0;
@@ -185,10 +178,6 @@
                     // dist += distance(res.first.xyz,res.second.xyz);
                     dist += m-(d1+d2)*0.51f;
                 }
-                // for(int i=0; i<_CylinderCount; i++)
-                // {
-                //     dist += dists[i];
-                // }
                 if(hits==0){
                     float4 sceneCol = tex2D(_MainTex, i.uv);
                     return sceneCol;
