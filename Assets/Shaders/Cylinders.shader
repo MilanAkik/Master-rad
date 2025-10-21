@@ -141,10 +141,7 @@
                     }
                 }
                 if(v1out || v2out) return noIntersection();
-                if(t1==t2){
-                    if(pos1<0) return noIntersection();
-                    else return oneIntersection(v1);
-                }
+                if(t1==t2) return oneIntersection(v1);
                 return twoIntersections(v1,v2);
             }            
 
