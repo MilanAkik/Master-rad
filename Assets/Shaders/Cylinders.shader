@@ -120,6 +120,7 @@
                 bool v2out = (v1.y > ymax && v2.y > ymax);
                 float pos1 = dot(v1-ro, rd);
                 float pos2 = dot(v2-ro, rd);
+                // If-elseif-else that checks which of the intersections are behind camera
                 if(pos1 < 0 && pos2 < 0){
                     return noIntersection();
                 }
@@ -139,6 +140,7 @@
                         v2 = tmp;
                     }
                 }
+                //3x3 of combinations of the positions
                 if(v1.y < ymin){
                     if(v2.y < ymin){
                         return noIntersection();
