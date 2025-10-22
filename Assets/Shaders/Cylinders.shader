@@ -3,6 +3,7 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _DensityNoise ("Density noise 3d texture", 3D) = "white" {}
     }
     SubShader
     {
@@ -19,6 +20,7 @@
 		    #include "noiseSimplex.cginc"
             
             sampler2D _MainTex;
+            sampler3D _DensityNoise;
 
             // Camera
             float4x4 _CamToWorld;
