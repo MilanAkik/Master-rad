@@ -166,9 +166,6 @@
                     else if(v2.y > ymax) {
                         t2=(ymax-a4)/a3;
                     }
-                    else {
-                        //Nothing since it is between ymin and ymax in both intersections
-                    }
                 }
                 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
@@ -197,7 +194,6 @@
                 // World-space ray
                 float3 ro = _CamPos;
                 float3 rd = normalize(worldPos - ro);
-                // float dist = closestCylinder(ro, rd, float4(0,0,10,1));
                 float dist = 0;
                 int hits = 0;
                 intersection closest;
@@ -216,11 +212,9 @@
                     }
                 }
                 if(hits==0)return tex2D(_MainTex, i.uv);
-
                 // dist = dist / _CylinderCount;
-                // dist = 5.0f;
-                return float4((1-exp(-0.1*closestDistance)).x, 1, distance(closest.first.xyz,closest.second.xyz), 1.0);
-
+                float lengthInside = distance(closest.first.xyz,closest.second.xyz);
+                return float4(1-exp(-0.1*closestDistance), 1, lengthInside, 1.0);
                 // float xtime = sin(_Time.y);
                 // float ytime = cos(_Time.y);
                 // float3 LightPos = _LightPosition + float3(xtime, 0, ytime);
