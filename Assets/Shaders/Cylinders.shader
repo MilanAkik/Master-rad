@@ -146,34 +146,32 @@
                         return noIntersection();
                     }
                     else if(v2.y > ymax) {
-
+                        t2=(ymax-a4)/a3;
                     }
-                    else {
-
-                    }
+                    t1=(ymin-a4)/a3;
                 }
                 else if(v1.y > ymax) {
-                    if(v2.y < ymin){
-
-                    }
-                    else if(v2.y > ymax) {
+                    if(v2.y > ymax){
                         return noIntersection();
                     }
-                    else {
-
+                    else if(v2.y < ymin) {
+                        t2=(ymin-a4)/a3;
                     }
+                    t1=(ymax-a4)/a3;
                 }
                 else {
                     if(v2.y < ymin){
-
+                        t2=(ymin-a4)/a3;
                     }
                     else if(v2.y > ymax) {
-
+                        t2=(ymax-a4)/a3;
                     }
                     else {
-
+                        //Nothing since it is between ymin and ymax in both intersections
                     }
                 }
+                v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
+                v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
                 if(t1==t2) return oneIntersection(v1);
                 return twoIntersections(v1,v2);
             }            
@@ -202,23 +200,29 @@
                 // float dist = closestCylinder(ro, rd, float4(0,0,10,1));
                 float dist = 0;
                 int hits = 0;
+                intersection closest;
+                float closestDistance = 1000000;
                 for(int j=0; j<_CylinderCount; j++)
                 {
                     intersection res = closestCylinder(ro, rd, _Cylinders[j]);
-                    if(res.count>0) hits++;
-                    float d1 = distance(res.first.xyz, ro);
-                    float d2 = distance(res.second.xyz, ro);
-                    float m = max(d1,d2);
+                    if(res.count>0){
+                        hits++;
+                        if(distance(ro, res.first)<closestDistance){
+                            closest = res;
+                            closestDistance = distance(ro, res.first);
+                        }
+                    }
+                    // float d1 = distance(res.first.xyz, ro);
+                    // float d2 = distance(res.second.xyz, ro);
+                    // float m = max(d1,d2);
                     // dist += distance(res.first.xyz,res.second.xyz);
-                    dist += m-(d1+d2)*0.51f;
+                    // dist += m-(d1+d2)*0.51f;
                 }
-                if(hits==0){
-                    float4 sceneCol = tex2D(_MainTex, i.uv);
-                    return sceneCol;
-                }
-                dist = dist / _CylinderCount;
+                if(hits==0)return tex2D(_MainTex, i.uv);
+
+                // dist = dist / _CylinderCount;
                 // dist = 5.0f;
-                return float4((dist/1.0f).xxx, 1.0);
+                return float4((1-exp(-0.1*closestDistance)).xxx, 1.0);
 
                 // float xtime = sin(_Time.y);
                 // float ytime = cos(_Time.y);
