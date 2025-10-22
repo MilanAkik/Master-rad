@@ -207,22 +207,19 @@
                     intersection res = closestCylinder(ro, rd, _Cylinders[j]);
                     if(res.count>0){
                         hits++;
-                        if(distance(ro, res.first)<closestDistance){
+                        float4 p = res.first;
+                        if(p.x == ro.x && p.y == ro.y && p.z == ro.z) p=res.second;
+                        if(distance(ro, p)<closestDistance){
                             closest = res;
-                            closestDistance = distance(ro, res.first);
+                            closestDistance = distance(ro, p);
                         }
                     }
-                    // float d1 = distance(res.first.xyz, ro);
-                    // float d2 = distance(res.second.xyz, ro);
-                    // float m = max(d1,d2);
-                    // dist += distance(res.first.xyz,res.second.xyz);
-                    // dist += m-(d1+d2)*0.51f;
                 }
                 if(hits==0)return tex2D(_MainTex, i.uv);
 
                 // dist = dist / _CylinderCount;
                 // dist = 5.0f;
-                return float4((1-exp(-0.1*closestDistance)).xxx, 1.0);
+                return float4((1-exp(-0.1*closestDistance)).x, 1, distance(closest.first.xyz,closest.second.xyz), 1.0);
 
                 // float xtime = sin(_Time.y);
                 // float ytime = cos(_Time.y);
