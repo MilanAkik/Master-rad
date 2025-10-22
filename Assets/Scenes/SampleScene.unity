@@ -273,6 +273,8 @@ MonoBehaviour:
   raymarchMat: {fileID: 2100000, guid: 19e8804431024704688f65e5139b0e6d, type: 2}
   LightColor: {r: 1, g: 0, b: 0, a: 0}
   LightPosition: {x: 1, y: 1, z: -0.6}
+  radiusMultiplier: 2
+  heightMultiplier: 2
 --- !u!1 &1926647031
 GameObject:
   m_ObjectHideFlags: 0

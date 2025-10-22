@@ -32,6 +32,10 @@
             // Cylinders
             float4 _Cylinders[512];
             int _CylinderCount;
+            
+            //Cylinder shape parameters
+            float _RadiusMultiplier;
+            float _HeightMultiplier;
 
             struct appdata
             {
@@ -95,9 +99,9 @@
                 float a4 = ro.y;
                 float a5 = rd.z;
                 float a6 = ro.z;
-                float a7 = cylinder.w*2;
+                float a7 = cylinder.w*_RadiusMultiplier;
                 float a8 = cylinder.x;
-                float a9 = cylinder.w*2;
+                float a9 = cylinder.w*_RadiusMultiplier;
                 float a10 = cylinder.z;
                 float sqa7 = a7*a7;
                 float sqa5 = a5*a5;
@@ -139,7 +143,7 @@
                 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
                 float ymin = cylinder.y;
-                float ymax = ymin + getHeight(cylinder.w, 0.1);
+                float ymax = ymin + _HeightMultiplier * getHeight(cylinder.w, 0.1);
                 //3x3 of combinations of the positions
                 if(v1.y < ymin){
                     if(v2.y < ymin){

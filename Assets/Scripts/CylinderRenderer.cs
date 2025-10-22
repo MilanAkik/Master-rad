@@ -6,8 +6,14 @@ using UnityEngine;
 public class CylinderRenderer : MonoBehaviour
 {
     public Material raymarchMat;
+    
+    //Light parameters
     public Color LightColor;
     public Vector3 LightPosition;
+
+    //Cylinder shape parameters
+    public float radiusMultiplier = 1;
+    public float heightMultiplier = 1;
 
     private Vector4[] _cylinders = new Vector4[512];
 
@@ -30,10 +36,13 @@ public class CylinderRenderer : MonoBehaviour
             raymarchMat.SetVector("_LightColor", FromColor(LightColor));
             raymarchMat.SetVector("_LightPosition", LightPosition);
 
-            // Cylinder equation (((x-1)/(2)))^(2)+(((y-1)/(2)))^(2)<1
             // Cylinder parameters
             raymarchMat.SetVectorArray("_Cylinders", _cylinders);
             raymarchMat.SetInt("_CylinderCount", 3);
+
+            //Cylinder shape parameters
+            raymarchMat.SetFloat("_RadiusMultiplier", radiusMultiplier);
+            raymarchMat.SetFloat("_HeightMultiplier", heightMultiplier);
 
             Graphics.Blit(source, destination, raymarchMat);
         }
