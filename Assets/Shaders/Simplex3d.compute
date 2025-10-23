@@ -1,7 +1,7 @@
 ﻿#pragma kernel CSMain
 #include "noiseSimplex.cginc"
 
-RWTexture2D<float4> Result;
+RWTexture3D<float4> Result;
 
 uint width;
 uint height;
@@ -12,7 +12,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 {
     if (id.x >= width || id.y >= height || id.z >= depth) return;
 
-    float3 uv = float3(id.x / (float) width, id.y / (float) height.id.z / (float) depth);
+    float3 uv = float3(id.x / (float) width, id.y / (float) height, id.z / (float) depth);
     
     float value1 = snoise(uv * 0.25f);
     float value2 = snoise(uv * 0.5f);
@@ -22,5 +22,5 @@ void CSMain(uint3 id : SV_DispatchThreadID)
     float value = (value1 / 16.0f + value2 / 16.0f + value3 / 8.0f + value4 / 4.0f + value5 / 2.0f);
     
     value = saturate(value * 0.5f + 0.5f);
-    Result[int2(id.xy)] = float4(value, value, value, 1.0);
+    Result[int3(id.xyz)] = float4(value, value, value, 1.0);
 }
