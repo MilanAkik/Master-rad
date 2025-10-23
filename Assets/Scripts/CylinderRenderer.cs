@@ -48,9 +48,9 @@ public class CylinderRenderer : MonoBehaviour
 
         if (raymarchMat != null)
         {
-            _cylinders[0] = new Vector4( 0, -2, 10, 0.25f);
-            _cylinders[1] = new Vector4(-2, -0.5f, 20, 0.5f);
-            _cylinders[2] = new Vector4( 2, 1.5f, 15, 0.75f);
+            _cylinders[0] = new Vector4( 0, -2, 5, 0.25f);
+            _cylinders[1] = new Vector4(-2, -0.5f, 10, 0.5f);
+            _cylinders[2] = new Vector4( 2, 1.5f, 7, 0.75f);
             Camera cam = Camera.current ?? Camera.main;
             
             // Camera parameters
@@ -72,6 +72,10 @@ public class CylinderRenderer : MonoBehaviour
 
             //Density parameters
             raymarchMat.SetTexture("_DensityNoise", resultTexture);
+
+            //Area parameters
+            raymarchMat.SetVector("_areaMin", new Vector3(-3, -5, 0));
+            raymarchMat.SetVector("_areaMax", new Vector3( 3,  5, 15));
 
             Graphics.Blit(source, destination, raymarchMat);
         }
