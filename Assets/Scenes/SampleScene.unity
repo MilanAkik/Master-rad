@@ -271,10 +271,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   raymarchMat: {fileID: 2100000, guid: 19e8804431024704688f65e5139b0e6d, type: 2}
-  LightColor: {r: 1, g: 0, b: 0, a: 0}
-  LightPosition: {x: 1, y: 1, z: -0.6}
-  radiusMultiplier: 2
-  heightMultiplier: 2
+  LightColor: {r: 0, g: 0, b: 0, a: 0}
+  LightPosition: {x: 0, y: 0, z: 0}
+  radiusMultiplier: 1
+  heightMultiplier: 1
+  computeShader: {fileID: 7200000, guid: 347d913f3ac6e9d439a5cc7f208deed4, type: 3}
+  DensityResolution: 100
 --- !u!1 &1926647031
 GameObject:
   m_ObjectHideFlags: 0

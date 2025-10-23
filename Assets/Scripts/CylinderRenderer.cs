@@ -1,6 +1,5 @@
-using NUnit.Framework.Internal;
-using System;
 using UnityEngine;
+using static UnityEngine.FilterMode;
 
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
 public class CylinderRenderer : MonoBehaviour
@@ -15,7 +14,34 @@ public class CylinderRenderer : MonoBehaviour
     public float radiusMultiplier = 1;
     public float heightMultiplier = 1;
 
+    //Density shader parameters
+    public ComputeShader computeShader;
+    public int DensityResolution = 256;
+    private RenderTexture resultTexture;
+
     private Vector4[] _cylinders = new Vector4[512];
+
+    private void OnValidate()
+    {
+        resultTexture = new RenderTexture(DensityResolution, DensityResolution, 0)
+        {
+            enableRandomWrite = true,
+            volumeDepth = DensityResolution,
+            dimension = UnityEngine.Rendering.TextureDimension.Tex3D,
+            filterMode = Point
+        };
+        resultTexture.Create();
+
+        int kernel = computeShader.FindKernel("CSMain");
+        computeShader.SetInt("width", DensityResolution);
+        computeShader.SetInt("height", DensityResolution);
+        computeShader.SetInt("depth", DensityResolution);
+        computeShader.SetTexture(kernel, "Result", resultTexture);
+
+        computeShader.Dispatch(kernel, DensityResolution / 8, DensityResolution / 8, DensityResolution / 8);
+
+        var tmp = resultTexture.depth;
+    }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
@@ -43,6 +69,9 @@ public class CylinderRenderer : MonoBehaviour
             //Cylinder shape parameters
             raymarchMat.SetFloat("_RadiusMultiplier", radiusMultiplier);
             raymarchMat.SetFloat("_HeightMultiplier", heightMultiplier);
+
+            //Density parameters
+            raymarchMat.SetTexture("_DensityNoise", resultTexture);
 
             Graphics.Blit(source, destination, raymarchMat);
         }

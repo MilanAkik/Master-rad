@@ -187,8 +187,17 @@
                 return o;
             }
 
+            float mapToZeroOne(float n){
+                return (n-(-10.0f))/(10.0f-(-10.0f));
+            }
+
+            float3 map3ToZeroOne(float3 a){
+                return float3(mapToZeroOne(a.x), mapToZeroOne(a.y), mapToZeroOne(a.z));
+            }
+
             fixed4 frag(v2f i) : SV_Target
             {
+                // return tex3D(_DensityNoise, float3(i.uv.x, i.uv.y, abs(sin(_Time.y)*0.5)));
                 // Convert screen UV to NDC (-1..1)
                 float2 uv = i.uv * 2.0 - 1.0;
                 // Clip-space ray
@@ -218,6 +227,9 @@
                     }
                 }
                 if(hits==0)return tex2D(_MainTex, i.uv);
+                float3 coords = float3(frac(closest.first.x), frac(closest.first.y), frac(closest.first.z));
+                float val = tex3D(_DensityNoise, coords);
+                return float4(val, val, val, 1.0f);
                 // dist = dist / _CylinderCount;
                 float lengthInside = distance(closest.first.xyz,closest.second.xyz);
                 return float4(1-exp(-0.1*closestDistance), 1, lengthInside, 1.0);
