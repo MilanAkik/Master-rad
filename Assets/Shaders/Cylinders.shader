@@ -234,9 +234,7 @@
                     }
                 }
                 if(hits==0)return tex2D(_MainTex, i.uv);
-                float3 coords = float3(frac(closest.first.x), frac(closest.first.y), frac(closest.first.z));
-                coords = map3ToZeroOne(closest.first.xyz);
-                // if(coords.x<0 || coords.x>0.5) return float4(1,0,0,1);
+                float3 coords = map3ToZeroOne(closest.first.xyz);
                 float val = tex3D(_DensityNoise, coords.xyz);
                 return float4(val, val, val, 1.0f);
                 float lengthInside = distance(closest.first.xyz,closest.second.xyz);

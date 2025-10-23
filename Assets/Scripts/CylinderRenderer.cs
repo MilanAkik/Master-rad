@@ -19,6 +19,10 @@ public class CylinderRenderer : MonoBehaviour
     public int DensityResolution = 256;
     private RenderTexture resultTexture;
 
+    //Area parameters
+    public Vector3 areaMin = new Vector3(-10, -10, -10);
+    public Vector3 areaMax = new Vector3( 10,  10,  10);
+
     private Vector4[] _cylinders = new Vector4[512];
 
     private void OnValidate()
@@ -74,8 +78,8 @@ public class CylinderRenderer : MonoBehaviour
             raymarchMat.SetTexture("_DensityNoise", resultTexture);
 
             //Area parameters
-            raymarchMat.SetVector("_areaMin", new Vector3(-3, -5, 0));
-            raymarchMat.SetVector("_areaMax", new Vector3( 3,  5, 15));
+            raymarchMat.SetVector("_areaMin", areaMin);
+            raymarchMat.SetVector("_areaMax", areaMax);
 
             Graphics.Blit(source, destination, raymarchMat);
         }

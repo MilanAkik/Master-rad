@@ -276,7 +276,9 @@ MonoBehaviour:
   radiusMultiplier: 1
   heightMultiplier: 1
   computeShader: {fileID: 7200000, guid: 347d913f3ac6e9d439a5cc7f208deed4, type: 3}
-  DensityResolution: 512
+  DensityResolution: 128
+  areaMin: {x: -10, y: -10, z: -10}
+  areaMax: {x: 10, y: 10, z: 10}
 --- !u!1 &1926647031
 GameObject:
   m_ObjectHideFlags: 0
