@@ -76,6 +76,7 @@ public class CylinderRenderer : MonoBehaviour
 
             //Density parameters
             raymarchMat.SetTexture("_DensityNoise", resultTexture);
+            raymarchMat.SetInt("_DensityNoiseSize", DensityResolution);
 
             //Area parameters
             raymarchMat.SetVector("_areaMin", areaMin);

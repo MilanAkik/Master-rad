@@ -20,18 +20,17 @@
 		    #include "noiseSimplex.cginc"
             
             sampler2D _MainTex;
-            sampler3D _DensityNoise;
 
-            // Camera
+            // Camera parameters
             float4x4 _CamToWorld;
             float4x4 _CamInverseProjection;
             float3 _CamPos;
             
-            // Light
+            // Light parameters
             float4 _LightColor;
             float3 _LightPosition;
             
-            // Cylinders
+            // Cylinders parameters
             float4 _Cylinders[512];
             int _CylinderCount;
             
@@ -39,9 +38,13 @@
             float _RadiusMultiplier;
             float _HeightMultiplier;
 
-            //Area
+            //Area parameters
             float3 _areaMin;
             float3 _areaMax;
+
+            //Density noise parameters
+            sampler3D _DensityNoise;
+            int _DensityNoiseSize;
 
             struct appdata
             {
