@@ -68,7 +68,7 @@ namespace Assets.Scripts.Generators
                         }
                     }
                 }
-                res[e] = new Vector4(2f*x, y-1f, 2f*z+8f, r);
+                res[e] = new Vector4(2f*x, 1f-y, 2f*z+8f, r);
             }
             return res;
         }
