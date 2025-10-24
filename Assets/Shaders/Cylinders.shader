@@ -265,13 +265,15 @@
                         }
                     }
                 }
-                if(hits==0)return tex2D(_MainTex, i.uv);
+                float4 skyColor = tex2D(_MainTex, i.uv);
+                if(hits==0)return skyColor;
                 float val = 0;
-                for(int i=0; i<100; i++){
-                    float dv = rd*i*0.01f;
-                    val += denistyAtPoint(closest.first.xyz + dv);
+                float dv = rd*0.1f;
+                for(int i=0; i<5; i++){
+                    val += denistyAtPoint(closest.first.xyz + i * dv);
                 }
-                val = val/100;
+                val = val/5;
+                return (1,1,1,1)*val+skyColor*(1-val);
                 return float4(val, val, val, 1.0f);
                 // float lengthInside = distance(closest.first.xyz,closest.second.xyz);
                 // return float4(1-exp(-0.1*closestDistance), 1, lengthInside, 1.0);
