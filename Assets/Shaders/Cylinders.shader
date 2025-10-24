@@ -267,11 +267,11 @@
                 }
                 if(hits==0)return tex2D(_MainTex, i.uv);
                 float val = 0;
-                for(int i=0; i<10; i++){
-                    float dv = rd*i*0.1f;
+                for(int i=0; i<100; i++){
+                    float dv = rd*i*0.01f;
                     val += denistyAtPoint(closest.first.xyz + dv);
                 }
-                val = val/10;
+                val = val/100;
                 return float4(val, val, val, 1.0f);
                 // float lengthInside = distance(closest.first.xyz,closest.second.xyz);
                 // return float4(1-exp(-0.1*closestDistance), 1, lengthInside, 1.0);
