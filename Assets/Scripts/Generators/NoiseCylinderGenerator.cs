@@ -68,6 +68,10 @@ namespace Assets.Scripts.Generators
                         }
                     }
                 }
+                if (x == 0) x = 0.001f;
+                if (y == 0) y = 0.001f;
+                if (z == 0) z = 0.001f;
+                if (r == 0) r = 0.001f;
                 res[e] = new Vector4(2f*x, 1f-y, 2f*z+8f, r);
             }
             return res;
