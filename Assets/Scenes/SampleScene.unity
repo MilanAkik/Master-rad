@@ -274,11 +274,14 @@ MonoBehaviour:
   LightColor: {r: 0, g: 0, b: 0, a: 0}
   LightPosition: {x: 0, y: 0, z: 0}
   radiusMultiplier: 1
-  heightMultiplier: 1
+  heightMultiplier: 0.5
   computeShader: {fileID: 7200000, guid: 347d913f3ac6e9d439a5cc7f208deed4, type: 3}
   DensityResolution: 256
-  areaMin: {x: -10, y: -10, z: -10}
-  areaMax: {x: 10, y: 10, z: 10}
+  areaMin: {x: -2, y: -2, z: -2}
+  areaMax: {x: 2, y: 2, z: 2}
+  CylinderCount: 50
+  RandomSeed: 1234
+  generator: {fileID: 11400000, guid: b0ca920605c390d41a39262dd4e40fbb, type: 2}
 --- !u!1 &1926647031
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,3 +1,4 @@
+using Assets.Scripts.Generators;
 using UnityEngine;
 using static UnityEngine.FilterMode;
 
@@ -23,6 +24,10 @@ public class CylinderRenderer : MonoBehaviour
     public Vector3 areaMin = new Vector3(-10, -10, -10);
     public Vector3 areaMax = new Vector3( 10,  10,  10);
 
+    //Cylinder parameters
+    public int CylinderCount = 3;
+    public int RandomSeed = 1234;
+    [SerializeField] private CylinderGenerator generator;
     private Vector4[] _cylinders = new Vector4[512];
 
     private void OnValidate()
@@ -45,6 +50,11 @@ public class CylinderRenderer : MonoBehaviour
         computeShader.Dispatch(kernel, DensityResolution / 8, DensityResolution / 8, DensityResolution / 8);
 
         var tmp = resultTexture.depth;
+        var cyl = generator.getCylinders(CylinderCount, RandomSeed);
+        for (int i = 0; i < cyl.Length; i++)
+        {
+            _cylinders[i] = cyl[i];
+        }
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
@@ -52,9 +62,9 @@ public class CylinderRenderer : MonoBehaviour
 
         if (raymarchMat != null)
         {
-            _cylinders[0] = new Vector4( 0, -2, 5, 0.25f);
-            _cylinders[1] = new Vector4(-2, -0.5f, 10, 0.5f);
-            _cylinders[2] = new Vector4( 2, 1.5f, 7, 0.75f);
+            //_cylinders[0] = new Vector4( 0, -2, 5, 0.25f);
+            //_cylinders[1] = new Vector4(-2, -0.5f, 10, 0.5f);
+            //_cylinders[2] = new Vector4( 2, 1.5f, 7, 0.75f);
             Camera cam = Camera.current ?? Camera.main;
             
             // Camera parameters
@@ -68,7 +78,7 @@ public class CylinderRenderer : MonoBehaviour
 
             // Cylinder parameters
             raymarchMat.SetVectorArray("_Cylinders", _cylinders);
-            raymarchMat.SetInt("_CylinderCount", 3);
+            raymarchMat.SetInt("_CylinderCount", CylinderCount);
 
             //Cylinder shape parameters
             raymarchMat.SetFloat("_RadiusMultiplier", radiusMultiplier);

@@ -68,10 +68,7 @@ namespace Assets.Scripts.Generators
                         }
                     }
                 }
-                Debug.LogError(max);
-                Debug.LogError(maxi);
-                Debug.LogError(maxj);
-                res[e] = new Vector4(x, y, z, r);
+                res[e] = new Vector4(2f*x, y-1f, 2f*z+8f, r);
             }
             return res;
         }
