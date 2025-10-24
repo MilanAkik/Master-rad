@@ -206,6 +206,35 @@
                 );
             }
 
+            float denistyAtPoint(float3 p){
+                float3 coords = map3ToZeroOne(p);
+                float resol = 1 / (float)_DensityNoiseSize;
+                float dx1 = fmod(coords.x, resol);
+                float dx = dx1 / resol;
+                float dy1 = fmod(coords.y, resol);
+                float dy = dy1 / resol;
+                float dz1 = fmod(coords.z, resol);
+                float dz = dz1 / resol;
+                float c000 = tex3D(_DensityNoise, coords);
+                float c100 = tex3D(_DensityNoise, coords+float3(resol,0,0));
+                float c001 = tex3D(_DensityNoise, coords+float3(0,0,resol));
+                float c101 = tex3D(_DensityNoise, coords+float3(resol,0,resol));
+                float c010 = tex3D(_DensityNoise, coords+float3(0,resol,0));
+                float c110 = tex3D(_DensityNoise, coords+float3(resol,resol,0));
+                float c011 = tex3D(_DensityNoise, coords+float3(0,resol,resol));
+                float c111 = tex3D(_DensityNoise, coords+float3(resol,resol,resol));
+                float c00 = c000 * (1-dx) + c100 * dx;
+                float c01 = c001 * (1-dx) + c101 * dx;
+                float c10 = c010 * (1-dx) + c110 * dx;
+                float c11 = c011 * (1-dx) + c111 * dx;
+                float c0 = c00 * (1-dy) + c10 * dy;
+                float c1 = c01 * (1-dy) + c11 * dy;
+                float val = tex3D(_DensityNoise, coords);
+                val = c0 * (1-dz) + c1 * dz;
+                return val;
+                return val;
+            }
+
             fixed4 frag(v2f i) : SV_Target
             {
                 // Convert screen UV to NDC (-1..1)
@@ -237,11 +266,10 @@
                     }
                 }
                 if(hits==0)return tex2D(_MainTex, i.uv);
-                float3 coords = map3ToZeroOne(closest.first.xyz);
-                float val = tex3D(_DensityNoise, coords.xyz);
+                float val = denistyAtPoint(closest.first.xyz);
                 return float4(val, val, val, 1.0f);
-                float lengthInside = distance(closest.first.xyz,closest.second.xyz);
-                return float4(1-exp(-0.1*closestDistance), 1, lengthInside, 1.0);
+                // float lengthInside = distance(closest.first.xyz,closest.second.xyz);
+                // return float4(1-exp(-0.1*closestDistance), 1, lengthInside, 1.0);
                 // float xtime = sin(_Time.y);
                 // float ytime = cos(_Time.y);
                 // float3 LightPos = _LightPosition + float3(xtime, 0, ytime);
