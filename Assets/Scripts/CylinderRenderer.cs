@@ -12,8 +12,11 @@ public class CylinderRenderer : MonoBehaviour
     public Vector3 LightPosition;
 
     //Cylinder shape parameters
+    [Range(0.1f, 5.0f)]
     public float radiusMultiplier = 1;
+    [Range(0.1f, 5.0f)]
     public float heightMultiplier = 1;
+    [Range(0.1f, 0.9f)]
     public float radiusThreshold = 0.1f;
 
     //Density shader parameters
@@ -26,9 +29,12 @@ public class CylinderRenderer : MonoBehaviour
     public Vector3 areaMax = new Vector3( 10,  10,  10);
 
     //Cylinder parameters
+    [Range(1, 128)]
     public int CylinderCount = 3;
+    [Range(1,10000)]
     public int RandomSeed = 1234;
-    [SerializeField] private CylinderGenerator generator;
+    [SerializeField]
+    private CylinderGenerator generator;
     private Vector4[] _cylinders = new Vector4[512];
 
     private void OnValidate()

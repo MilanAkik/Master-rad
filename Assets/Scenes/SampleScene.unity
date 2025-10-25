@@ -229,7 +229,7 @@ MonoBehaviour:
   LightPosition: {x: 0, y: 0, z: 0}
   radiusMultiplier: 1
   heightMultiplier: 0.5
-  radiusThreshold: 0.7
+  radiusThreshold: 0.1
   computeShader: {fileID: 7200000, guid: 347d913f3ac6e9d439a5cc7f208deed4, type: 3}
   DensityResolution: 256
   areaMin: {x: -2, y: -2, z: -2}
