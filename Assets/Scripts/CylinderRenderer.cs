@@ -5,30 +5,42 @@ using static UnityEngine.FilterMode;
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
 public class CylinderRenderer : MonoBehaviour
 {
+    //Material parameters
+    [Header("Material")]
     public Material raymarchMat;
-    
+    [Space(5)]
+
     //Light parameters
+    [Header("Light")]
     public Color LightColor;
     public Vector3 LightPosition;
+    [Space(5)]
 
     //Cylinder shape parameters
+    [Header("Cylinder shape")]
     [Range(0.1f, 5.0f)]
     public float radiusMultiplier = 1;
     [Range(0.1f, 5.0f)]
     public float heightMultiplier = 1;
     [Range(0.1f, 0.9f)]
     public float radiusThreshold = 0.1f;
+    [Space(5)]
 
     //Density shader parameters
+    [Header("Density shader")]
     public ComputeShader computeShader;
     public int DensityResolution = 256;
     private RenderTexture resultTexture;
+    [Space(5)]
 
     //Area parameters
+    [Header("Area")]
     public Vector3 areaMin = new Vector3(-10, -10, -10);
     public Vector3 areaMax = new Vector3( 10,  10,  10);
+    [Space(5)]
 
     //Cylinder parameters
+    [Header("Cylinder")]
     [Range(1, 128)]
     public int CylinderCount = 3;
     [Range(1,10000)]
