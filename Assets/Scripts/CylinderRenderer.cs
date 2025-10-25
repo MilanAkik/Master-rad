@@ -14,6 +14,7 @@ public class CylinderRenderer : MonoBehaviour
     //Cylinder shape parameters
     public float radiusMultiplier = 1;
     public float heightMultiplier = 1;
+    public float radiusThreshold = 0.1f;
 
     //Density shader parameters
     public ComputeShader computeShader;
@@ -83,6 +84,7 @@ public class CylinderRenderer : MonoBehaviour
             //Cylinder shape parameters
             raymarchMat.SetFloat("_RadiusMultiplier", radiusMultiplier);
             raymarchMat.SetFloat("_HeightMultiplier", heightMultiplier);
+            raymarchMat.SetFloat("_RadiusThreshold", radiusThreshold);
 
             //Density parameters
             raymarchMat.SetTexture("_DensityNoise", resultTexture);

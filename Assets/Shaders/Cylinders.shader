@@ -37,6 +37,7 @@
             //Cylinder shape parameters
             float _RadiusMultiplier;
             float _HeightMultiplier;
+            float _RadiusThreshold;
 
             //Area parameters
             float3 _areaMin;
@@ -65,12 +66,12 @@
                 float4 second;
             };
             
-            float getHeight(float radius, float f){
+            float getHeight(float radius){
                 float r1 = radius;
-                if (r1 < f) return 0;
-                float a1 = 2 / (f - 1);
+                if (r1 < _RadiusThreshold) return 0;
+                float a1 = 2 / (_RadiusThreshold - 1);
                 float a = a1 * a1;
-                float b = -a * (f + 1);
+                float b = -a * (_RadiusThreshold + 1);
                 float c = 1 - a - b;
                 float h = 2.0f - a * r1 * r1 - b * r1 - c;
                 return _HeightMultiplier * h;
@@ -152,7 +153,7 @@
                 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
                 float ymin = cylinder.y;
-                float ymax = ymin + getHeight(cylinder.w, 0.1f);
+                float ymax = ymin + getHeight(cylinder.w);
                 //3x3 of combinations of the positions
                 if(v1.y < ymin){
                     if(v2.y < ymin){
@@ -276,7 +277,7 @@
                     float3 currPoint = closest.first.xyz + i * dv;
                     float den = denistyAtPoint(currPoint);
                     float4 cyl = _Cylinders[closestIndex];
-                    float halfheight = getHeight(cyl.w, 0.1f)/2.0f;
+                    float halfheight = getHeight(cyl.w)/2.0f;
                     float middle = cyl.y + halfheight;
                     float dist = abs(currPoint.y - middle)/halfheight;
                     val += den;
