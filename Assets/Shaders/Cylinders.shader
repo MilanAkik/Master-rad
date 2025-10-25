@@ -250,6 +250,7 @@
                 float3 rd = normalize(worldPos - ro);
                 float dist = 0;
                 int hits = 0;
+                float steps = 20;
                 intersection closest;
                 float closestDistance = 1000000;
                 int closestIndex = 0;
@@ -271,8 +272,14 @@
                 if(hits==0)return skyColor;
                 float val = 0;
                 float dv = rd*0.1f;
-                for(int i=0; i<5; i++){
-                    val += denistyAtPoint(closest.first.xyz + i * dv);
+                for(int i=0; i<steps; i++){
+                    float3 currPoint = closest.first.xyz + i * dv;
+                    float den = denistyAtPoint(currPoint);
+                    float4 cyl = _Cylinders[closestIndex];
+                    float halfheight = getHeight(cyl.w, 0.1f)/2.0f;
+                    float middle = cyl.y + halfheight;
+                    float dist = abs(currPoint.y - middle)/halfheight;
+                    val += den;
                 }
                 val = val/5;
                 return (1,1,1,1)*val+skyColor*(1-val);
