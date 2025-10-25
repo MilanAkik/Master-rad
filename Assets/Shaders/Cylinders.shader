@@ -281,7 +281,7 @@
                     float dist = abs(currPoint.y - middle)/halfheight;
                     val += den;
                 }
-                val = val/5;
+                val = val/steps;
                 return (1,1,1,1)*val+skyColor*(1-val);
                 return float4(val, val, val, 1.0f);
                 // float lengthInside = distance(closest.first.xyz,closest.second.xyz);
