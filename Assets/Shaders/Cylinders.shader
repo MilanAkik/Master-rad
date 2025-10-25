@@ -73,7 +73,7 @@
                 float b = -a * (f + 1);
                 float c = 1 - a - b;
                 float h = 2.0f - a * r1 * r1 - b * r1 - c;
-                return h;
+                return _HeightMultiplier * h;
             }
 
             intersection noIntersection(){
@@ -152,7 +152,7 @@
                 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
                 float ymin = cylinder.y;
-                float ymax = ymin + _HeightMultiplier * getHeight(cylinder.w, 0.1);
+                float ymax = ymin + getHeight(cylinder.w, 0.1f);
                 //3x3 of combinations of the positions
                 if(v1.y < ymin){
                     if(v2.y < ymin){
@@ -252,6 +252,7 @@
                 int hits = 0;
                 intersection closest;
                 float closestDistance = 1000000;
+                int closestIndex = 0;
                 for(int j=0; j<_CylinderCount; j++)
                 {
                     intersection res = closestCylinder(ro, rd, _Cylinders[j]);
@@ -262,6 +263,7 @@
                         if(distance(ro, p)<closestDistance){
                             closest = res;
                             closestDistance = distance(ro, p);
+                            closestIndex = j;
                         }
                     }
                 }
