@@ -49,7 +49,7 @@ public class CylinderRenderer : MonoBehaviour
     private CylinderGenerator generator;
     private Vector4[] _cylinders = new Vector4[512];
 
-    private void OnValidate()
+    private void Setup()
     {
         resultTexture = new RenderTexture(DensityResolution, DensityResolution, 0)
         {
@@ -75,6 +75,10 @@ public class CylinderRenderer : MonoBehaviour
             _cylinders[i] = cyl[i];
         }
     }
+
+    private void OnValidate() => Setup();
+
+    private void Start() => Setup();
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
