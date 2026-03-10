@@ -1,4 +1,4 @@
-﻿Shader "Custom/RaymarchBlit"
+﻿Shader "Custom/Cylinders"
 {
     Properties
     {
