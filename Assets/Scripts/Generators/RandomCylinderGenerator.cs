@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Models;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.Generators
@@ -7,10 +8,10 @@ namespace Assets.Scripts.Generators
     [CreateAssetMenu(menuName = "CylinderGenerator/Random")]
     public class RandomCylinderGenerator : CylinderGenerator
     {
-        public override Vector4[] getCylinders(params object[] objects)
+        public override Vector4[] getCylinders(GeneratorParameters parameters)
         {
-            int count = (int)objects[0];
-            int seed = (int)objects[1];
+            int count = parameters.CylinderCount;
+            int seed = parameters.RandomSeed;
             var prevState = Random.state;
             Random.InitState(seed);
             Vector4[] res = new Vector4[count];

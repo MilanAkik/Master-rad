@@ -1,4 +1,5 @@
 using Assets.Scripts.Generators;
+using Assets.Scripts.Models;
 using UnityEngine;
 using static UnityEngine.FilterMode;
 
@@ -69,7 +70,8 @@ public class CylinderRenderer : MonoBehaviour
         computeShader.Dispatch(kernel, DensityResolution / 8, DensityResolution / 8, DensityResolution / 8);
 
         var tmp = resultTexture.depth;
-        var cyl = generator.getCylinders(CylinderCount, RandomSeed);
+        var generatorParameters = new GeneratorParameters { CylinderCount = CylinderCount, RandomSeed = RandomSeed };
+        var cyl = generator.getCylinders(generatorParameters);
         for (int i = 0; i < cyl.Length; i++)
         {
             _cylinders[i] = cyl[i];

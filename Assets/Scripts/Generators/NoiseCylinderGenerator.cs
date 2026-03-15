@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Models;
+using UnityEngine;
 using static UnityEngine.FilterMode;
 
 namespace Assets.Scripts.Generators
@@ -9,10 +10,10 @@ namespace Assets.Scripts.Generators
         public ComputeShader computeShader;
         public int textureSize = 128;
         private RenderTexture resultTexture;
-        public override Vector4[] getCylinders(params object[] objects)
+        public override Vector4[] getCylinders(GeneratorParameters parameters)
         {
-            int count = (int)objects[0];
-            int seed = (int)objects[1];
+            int count = parameters.CylinderCount;
+            int seed = parameters.RandomSeed;
             resultTexture = new RenderTexture(textureSize, textureSize, 0) { enableRandomWrite=true, filterMode=Point};
             resultTexture.Create();
 
