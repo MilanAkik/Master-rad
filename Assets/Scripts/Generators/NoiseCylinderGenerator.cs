@@ -1,6 +1,6 @@
 ﻿using Assets.Scripts.Models;
+using Assets.Scripts.Utilities;
 using UnityEngine;
-using static UnityEngine.FilterMode;
 
 namespace Assets.Scripts.Generators
 {
@@ -14,15 +14,7 @@ namespace Assets.Scripts.Generators
         {
             int count = parameters.CylinderCount;
             int seed = parameters.RandomSeed;
-            resultTexture = new RenderTexture(textureSize, textureSize, 0) { enableRandomWrite=true, filterMode=Point};
-            resultTexture.Create();
-
-            int kernel = computeShader.FindKernel("CSMain");
-            computeShader.SetInt("width", textureSize);
-            computeShader.SetInt("height", textureSize);
-            computeShader.SetTexture(kernel, "Result", resultTexture);
-
-            computeShader.Dispatch(kernel, textureSize / 8, textureSize / 8, 1);
+            resultTexture = ComputeShaderUtilities.ComputeTexture2d(computeShader, "CSMain", textureSize, textureSize);
 
             RenderTexture previous = RenderTexture.active;
             RenderTexture.active = resultTexture;
