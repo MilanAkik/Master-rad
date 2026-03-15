@@ -21,7 +21,7 @@ namespace Assets.Scripts.Generators
                 var y = Random.Range(-0.5f, 0.5f);
                 var r = Random.Range(0.01f, 0.99f);
                 var z = Random.Range(-1.0f, 1.0f);
-                res[i] = new Vector4(x, y, z, r);
+                res[i] = new Vector4(x, y, z+5.0f, r);
             }
             Random.state = prevState;
             return res;
