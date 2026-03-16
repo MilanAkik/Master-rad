@@ -54,7 +54,6 @@ public class CylinderRenderer : MonoBehaviour
     {
         resultTexture = TextureUtilities.CreateRenderTexture(DensityResolution, DensityResolution, DensityResolution);
         resultTexture = ComputeShaderUtilities.ComputeTexture3d(computeShader, "CSMain", DensityResolution, DensityResolution, DensityResolution, resultTexture);
-        
         var tmp = resultTexture.depth;
         var generatorParameters = new GeneratorParameters { CylinderCount = CylinderCount, RandomSeed = RandomSeed };
         var cyl = generator.getCylinders(generatorParameters);
@@ -70,12 +69,8 @@ public class CylinderRenderer : MonoBehaviour
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-
         if (raymarchMat != null)
         {
-            //_cylinders[0] = new Vector4( 0, -2, 5, 0.25f);
-            //_cylinders[1] = new Vector4(-2, -0.5f, 10, 0.5f);
-            //_cylinders[2] = new Vector4( 2, 1.5f, 7, 0.75f);
             Camera cam = Camera.current ?? Camera.main;
             
             // Camera parameters
