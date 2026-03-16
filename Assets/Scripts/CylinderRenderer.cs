@@ -1,7 +1,7 @@
 using Assets.Scripts.Generators;
 using Assets.Scripts.Models;
+using Assets.Scripts.Utilities;
 using UnityEngine;
-using static UnityEngine.FilterMode;
 
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
 public class CylinderRenderer : MonoBehaviour
@@ -52,14 +52,7 @@ public class CylinderRenderer : MonoBehaviour
 
     private void Setup()
     {
-        resultTexture = new RenderTexture(DensityResolution, DensityResolution, 0)
-        {
-            enableRandomWrite = true,
-            volumeDepth = DensityResolution,
-            dimension = UnityEngine.Rendering.TextureDimension.Tex3D,
-            filterMode = Point
-        };
-        resultTexture.Create();
+        resultTexture = TextureUtilities.CreateRenderTexture(DensityResolution, DensityResolution, DensityResolution);
 
         int kernel = computeShader.FindKernel("CSMain");
         computeShader.SetInt("width", DensityResolution);
