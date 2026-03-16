@@ -1,3 +1,4 @@
+using Assets.Scripts.Utilities;
 using UnityEngine;
 
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
@@ -9,17 +10,8 @@ public class SimplexBlit : MonoBehaviour
 
     private void OnValidate()
     {
-        resultTexture = new RenderTexture(textureSize, textureSize, 0);
-        resultTexture.enableRandomWrite = true;
-        resultTexture.filterMode = FilterMode.Point;
-        resultTexture.Create();
-
-        int kernel = computeShader.FindKernel("CSMain");
-        computeShader.SetInt("width", textureSize);
-        computeShader.SetInt("height", textureSize);
-        computeShader.SetTexture(kernel, "Result", resultTexture);
-
-        computeShader.Dispatch(kernel, textureSize / 8, textureSize / 8, 1);
+        resultTexture = TextureUtilities.CreateRenderTexture(textureSize, textureSize);
+        resultTexture = ComputeShaderUtilities.ComputeTexture2d(computeShader, "CSMain", textureSize, textureSize, resultTexture);
     }
 
     void OnRenderImage(RenderTexture src, RenderTexture dest)
