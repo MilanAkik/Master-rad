@@ -53,15 +53,8 @@ public class CylinderRenderer : MonoBehaviour
     private void Setup()
     {
         resultTexture = TextureUtilities.CreateRenderTexture(DensityResolution, DensityResolution, DensityResolution);
-
-        int kernel = computeShader.FindKernel("CSMain");
-        computeShader.SetInt("width", DensityResolution);
-        computeShader.SetInt("height", DensityResolution);
-        computeShader.SetInt("depth", DensityResolution);
-        computeShader.SetTexture(kernel, "Result", resultTexture);
-
-        computeShader.Dispatch(kernel, DensityResolution / 8, DensityResolution / 8, DensityResolution / 8);
-
+        resultTexture = ComputeShaderUtilities.ComputeTexture3d(computeShader, "CSMain", DensityResolution, DensityResolution, DensityResolution, resultTexture);
+        
         var tmp = resultTexture.depth;
         var generatorParameters = new GeneratorParameters { CylinderCount = CylinderCount, RandomSeed = RandomSeed };
         var cyl = generator.getCylinders(generatorParameters);
