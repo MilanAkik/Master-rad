@@ -1,9 +1,8 @@
 using UnityEditor;
 using Random = UnityEngine.Random;
 using UnityEngine;
-using System;
 using Assets.Scripts.Generators;
-using System.Collections.Generic;
+using Assets.Scripts.Models;
 
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
 public class CreateCilinders : MonoBehaviour
@@ -45,7 +44,8 @@ public class CreateCilinders : MonoBehaviour
         var parentTransform = gameObject.transform;
         var parentPosition = parentTransform.position;
         var parentScale = parentTransform.localScale / 2;
-        var vectors = generator.getCylinders(count, seed);
+        var generatorParameters = new GeneratorParameters { CylinderCount = count, RandomSeed = seed };
+        var vectors = generator.getCylinders(generatorParameters);
         var f = 0.1f;
         foreach (var vec in vectors)
         {

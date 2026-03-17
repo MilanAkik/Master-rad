@@ -1,6 +1,7 @@
 using Assets.Scripts.Generators;
+using Assets.Scripts.Models;
+using Assets.Scripts.Utilities;
 using UnityEngine;
-using static UnityEngine.FilterMode;
 
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
 public class CylinderRenderer : MonoBehaviour
@@ -51,25 +52,11 @@ public class CylinderRenderer : MonoBehaviour
 
     private void Setup()
     {
-        resultTexture = new RenderTexture(DensityResolution, DensityResolution, 0)
-        {
-            enableRandomWrite = true,
-            volumeDepth = DensityResolution,
-            dimension = UnityEngine.Rendering.TextureDimension.Tex3D,
-            filterMode = Point
-        };
-        resultTexture.Create();
-
-        int kernel = computeShader.FindKernel("CSMain");
-        computeShader.SetInt("width", DensityResolution);
-        computeShader.SetInt("height", DensityResolution);
-        computeShader.SetInt("depth", DensityResolution);
-        computeShader.SetTexture(kernel, "Result", resultTexture);
-
-        computeShader.Dispatch(kernel, DensityResolution / 8, DensityResolution / 8, DensityResolution / 8);
-
+        resultTexture = TextureUtilities.CreateRenderTexture(DensityResolution, DensityResolution, DensityResolution);
+        resultTexture = ComputeShaderUtilities.ComputeTexture3d(computeShader, "CSMain", DensityResolution, DensityResolution, DensityResolution, resultTexture);
         var tmp = resultTexture.depth;
-        var cyl = generator.getCylinders(CylinderCount, RandomSeed);
+        var generatorParameters = new GeneratorParameters { CylinderCount = CylinderCount, RandomSeed = RandomSeed };
+        var cyl = generator.getCylinders(generatorParameters);
         for (int i = 0; i < cyl.Length; i++)
         {
             _cylinders[i] = cyl[i];
@@ -82,12 +69,8 @@ public class CylinderRenderer : MonoBehaviour
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-
         if (raymarchMat != null)
         {
-            //_cylinders[0] = new Vector4( 0, -2, 5, 0.25f);
-            //_cylinders[1] = new Vector4(-2, -0.5f, 10, 0.5f);
-            //_cylinders[2] = new Vector4( 2, 1.5f, 7, 0.75f);
             Camera cam = Camera.current ?? Camera.main;
             
             // Camera parameters
