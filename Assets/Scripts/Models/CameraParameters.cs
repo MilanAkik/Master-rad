@@ -13,5 +13,8 @@ namespace Assets.Scripts.Models
             CamInverseProjection = camInverseProjection;
             CamPos = camPos;
         }
+
+        public CameraParameters(Camera camera)
+            : this(camera.cameraToWorldMatrix, camera.projectionMatrix.inverse, camera.transform.position) { }
     }
 }
