@@ -72,32 +72,18 @@ public class CylinderRenderer : MonoBehaviour
         if (raymarchMat != null)
         {
             Camera cam = Camera.current ?? Camera.main;
-            
-            // Camera parameters
-            raymarchMat.SetMatrix("_CamToWorld", cam.cameraToWorldMatrix);
-            raymarchMat.SetMatrix("_CamInverseProjection", cam.projectionMatrix.inverse);
-            raymarchMat.SetVector("_CamPos", cam.transform.position);
-
-            // Light parmeters
-            raymarchMat.SetVector("_LightColor", FromColor(LightColor));
-            raymarchMat.SetVector("_LightPosition", LightPosition);
-
-            // Cylinder parameters
-            raymarchMat.SetVectorArray("_Cylinders", _cylinders);
-            raymarchMat.SetInt("_CylinderCount", CylinderCount);
-
-            //Cylinder shape parameters
-            raymarchMat.SetFloat("_RadiusMultiplier", radiusMultiplier);
-            raymarchMat.SetFloat("_HeightMultiplier", heightMultiplier);
-            raymarchMat.SetFloat("_RadiusThreshold", radiusThreshold);
-
-            //Density parameters
-            raymarchMat.SetTexture("_DensityNoise", resultTexture);
-            raymarchMat.SetInt("_DensityNoiseSize", DensityResolution);
-
-            //Area parameters
-            raymarchMat.SetVector("_areaMin", areaMin);
-            raymarchMat.SetVector("_areaMax", areaMax);
+            var cameraParameters = new CameraParameters(cam);
+            var lightParameters = new LightParameters(FromColor(LightColor), LightPosition);
+            var cylinderParameters = new CylinderParameters(_cylinders, CylinderCount);
+            var shapeParameters = new ShapeParameters(radiusMultiplier, heightMultiplier, radiusThreshold);
+            var densityParameters = new DensityParameters(resultTexture, DensityResolution);
+            var areaParameters = new AreaParameters(areaMin, areaMax);
+            MaterialParametrizer.Parametrize(raymarchMat, cameraParameters);
+            MaterialParametrizer.Parametrize(raymarchMat, lightParameters);
+            MaterialParametrizer.Parametrize(raymarchMat, cylinderParameters);
+            MaterialParametrizer.Parametrize(raymarchMat, shapeParameters);
+            MaterialParametrizer.Parametrize(raymarchMat, densityParameters);
+            MaterialParametrizer.Parametrize(raymarchMat, areaParameters);
 
             Graphics.Blit(source, destination, raymarchMat);
         }
