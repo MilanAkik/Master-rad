@@ -71,19 +71,18 @@ public class CylinderRenderer : MonoBehaviour
     {
         if (raymarchMat != null)
         {
-            Camera cam = Camera.current ?? Camera.main;
-            var cameraParameters = new CameraParameters(cam);
+            var cameraParameters = new CameraParameters(Camera.current ?? Camera.main);
             var lightParameters = new LightParameters(FromColor(LightColor), LightPosition);
             var cylinderParameters = new CylinderParameters(_cylinders, CylinderCount);
             var shapeParameters = new ShapeParameters(radiusMultiplier, heightMultiplier, radiusThreshold);
             var densityParameters = new DensityParameters(resultTexture, DensityResolution);
             var areaParameters = new AreaParameters(areaMin, areaMax);
-            MaterialParametrizer.Parametrize(raymarchMat, cameraParameters);
-            MaterialParametrizer.Parametrize(raymarchMat, lightParameters);
-            MaterialParametrizer.Parametrize(raymarchMat, cylinderParameters);
-            MaterialParametrizer.Parametrize(raymarchMat, shapeParameters);
-            MaterialParametrizer.Parametrize(raymarchMat, densityParameters);
-            MaterialParametrizer.Parametrize(raymarchMat, areaParameters);
+            raymarchMat.Parametrize(cameraParameters);
+            raymarchMat.Parametrize(lightParameters);
+            raymarchMat.Parametrize(cylinderParameters);
+            raymarchMat.Parametrize(shapeParameters);
+            raymarchMat.Parametrize(densityParameters);
+            raymarchMat.Parametrize(areaParameters);
 
             Graphics.Blit(source, destination, raymarchMat);
         }
