@@ -4,12 +4,12 @@ namespace Assets.Scripts.Models
 {
     public class LightParameters
     {
-        Vector4 LightColor { get; set; }
-        Vector3 LightPos { get; set; }
-        public LightParameters(Vector4 lightColor, Vector3 lightPos)
+        public Vector4 LightColor { get; set; }
+        public Vector3 LightPosition { get; set; }
+        public LightParameters(Vector4 lightColor, Vector3 lightPosition)
         {
             LightColor = lightColor;
-            LightPos = lightPos;
+            LightPosition = lightPosition;
         }
     }
 }
