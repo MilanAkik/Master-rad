@@ -1,12 +1,15 @@
 using UnityEngine;
 
-public class AreaParameters
+namespace Assets.Scripts.Models
 {
-    public Vector3 AreaMin { get; set; }
-    public Vector3 AreaMax { get; set; }
-    public AreaParameters(Vector3 areaMin, Vector3 areaMax)
+    public class AreaParameters
     {
-        AreaMin = areaMin;
-        AreaMax = areaMax;        
+        public Vector3 AreaMin { get; set; }
+        public Vector3 AreaMax { get; set; }
+        public AreaParameters(Vector3 areaMin, Vector3 areaMax)
+        {
+            AreaMin = areaMin;
+            AreaMax = areaMax;
+        }
     }
 }

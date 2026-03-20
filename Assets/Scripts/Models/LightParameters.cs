@@ -1,12 +1,15 @@
 using UnityEngine;
 
-public class LightParameters
+namespace Assets.Scripts.Models
 {
-    Vector4 LightColor { get; set; }
-    Vector3 LightPos { get; set; }
-    public LightParameters(Vector4 lightColor, Vector3 lightPos)
+    public class LightParameters
     {
-        LightColor = lightColor;
-        LightPos = lightPos;
+        Vector4 LightColor { get; set; }
+        Vector3 LightPos { get; set; }
+        public LightParameters(Vector4 lightColor, Vector3 lightPos)
+        {
+            LightColor = lightColor;
+            LightPos = lightPos;
+        }
     }
 }

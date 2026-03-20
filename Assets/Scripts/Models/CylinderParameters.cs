@@ -1,12 +1,16 @@
 using UnityEngine;
 
-public class CylinderParameters
+
+namespace Assets.Scripts.Models
 {
-    public Vector4[] Cylinders { get; set; }
-    public int CylinderCount { get; set; }
-    public CylinderParameters(Vector4[] cylinders, int cylinderCount)
+    public class CylinderParameters
     {
-        Cylinders = cylinders;
-        CylinderCount = cylinderCount;
+        public Vector4[] Cylinders { get; set; }
+        public int CylinderCount { get; set; }
+        public CylinderParameters(Vector4[] cylinders, int cylinderCount)
+        {
+            Cylinders = cylinders;
+            CylinderCount = cylinderCount;
+        }
     }
 }
