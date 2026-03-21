@@ -11,5 +11,8 @@ namespace Assets.Scripts.Models
             LightColor = lightColor;
             LightPosition = lightPosition;
         }
+        public LightParameters(Color lightColor, Vector3 lightPosition) : this(FromColor(lightColor), lightPosition) { }
+
+        private static Vector4 FromColor(Color color) => new Vector4(color.r, color.g, color.b, 1f);
     }
 }

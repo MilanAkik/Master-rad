@@ -72,7 +72,7 @@ public class CylinderRenderer : MonoBehaviour
         if (raymarchMat != null)
         {
             var cameraParameters = new CameraParameters(Camera.current ?? Camera.main);
-            var lightParameters = new LightParameters(FromColor(LightColor), LightPosition);
+            var lightParameters = new LightParameters(LightColor, LightPosition);
             var cylinderParameters = new CylinderParameters(_cylinders, CylinderCount);
             var shapeParameters = new ShapeParameters(radiusMultiplier, heightMultiplier, radiusThreshold);
             var densityParameters = new DensityParameters(resultTexture, DensityResolution);
@@ -91,7 +91,4 @@ public class CylinderRenderer : MonoBehaviour
             Graphics.Blit(source, destination);
         }
     }
-
-    private Vector4 FromColor(Color color) => new Vector4(color.r, color.g, color.b, 1f);
-
 }
