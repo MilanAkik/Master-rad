@@ -5,7 +5,7 @@ namespace Assets.Scripts.Utilities
 {
     public class TextureUtilities
     {
-        public static RenderTexture CreateRenderTexture(int width, int height)
+        public static RenderTexture CreateRenderTexture2d(int width, int height)
         {
             RenderTexture texture = new RenderTexture(width, height, 0) {
                 enableRandomWrite = true,
@@ -15,7 +15,7 @@ namespace Assets.Scripts.Utilities
             return texture;
         }
 
-        public static RenderTexture CreateRenderTexture(int width, int height, int depth)
+        public static RenderTexture CreateRenderTexture3d(int width, int height, int depth)
         {
             RenderTexture texture = new RenderTexture(width, height, 0)
             {

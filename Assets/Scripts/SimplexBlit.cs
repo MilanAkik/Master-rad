@@ -10,7 +10,7 @@ public class SimplexBlit : MonoBehaviour
 
     private void OnValidate()
     {
-        resultTexture = TextureUtilities.CreateRenderTexture(textureSize, textureSize);
+        resultTexture = TextureUtilities.CreateRenderTexture2d(textureSize, textureSize);
         resultTexture = ComputeShaderUtilities.ComputeTexture2d(computeShader, "CSMain", textureSize, textureSize, resultTexture);
     }
 

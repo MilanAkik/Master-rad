@@ -52,7 +52,7 @@ public class CylinderRenderer : MonoBehaviour
 
     private void Setup()
     {
-        resultTexture = TextureUtilities.CreateRenderTexture(DensityResolution, DensityResolution, DensityResolution);
+        resultTexture = TextureUtilities.CreateRenderTexture3d(DensityResolution, DensityResolution, DensityResolution);
         resultTexture = ComputeShaderUtilities.ComputeTexture3d(computeShader, "CSMain", DensityResolution, DensityResolution, DensityResolution, resultTexture);
         var tmp = resultTexture.depth;
         var generatorParameters = new GeneratorParameters { CylinderCount = CylinderCount, RandomSeed = RandomSeed };
