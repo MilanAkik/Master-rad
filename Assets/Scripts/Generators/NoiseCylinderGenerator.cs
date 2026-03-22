@@ -14,7 +14,7 @@ namespace Assets.Scripts.Generators
         {
             int count = parameters.CylinderCount;
             int seed = parameters.RandomSeed;
-            resultTexture = TextureUtilities.CreateRenderTexture(textureSize, textureSize);
+            resultTexture = TextureUtilities.CreateRenderTexture2d(textureSize, textureSize);
             resultTexture = ComputeShaderUtilities.ComputeTexture2d(computeShader, "CSMain", textureSize, textureSize, resultTexture);
 
             RenderTexture previous = RenderTexture.active;

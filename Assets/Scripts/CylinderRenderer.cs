@@ -52,7 +52,7 @@ public class CylinderRenderer : MonoBehaviour
 
     private void Setup()
     {
-        resultTexture = TextureUtilities.CreateRenderTexture(DensityResolution, DensityResolution, DensityResolution);
+        resultTexture = TextureUtilities.CreateRenderTexture3d(DensityResolution, DensityResolution, DensityResolution);
         resultTexture = ComputeShaderUtilities.ComputeTexture3d(computeShader, "CSMain", DensityResolution, DensityResolution, DensityResolution, resultTexture);
         var tmp = resultTexture.depth;
         var generatorParameters = new GeneratorParameters { CylinderCount = CylinderCount, RandomSeed = RandomSeed };
@@ -71,33 +71,18 @@ public class CylinderRenderer : MonoBehaviour
     {
         if (raymarchMat != null)
         {
-            Camera cam = Camera.current ?? Camera.main;
-            
-            // Camera parameters
-            raymarchMat.SetMatrix("_CamToWorld", cam.cameraToWorldMatrix);
-            raymarchMat.SetMatrix("_CamInverseProjection", cam.projectionMatrix.inverse);
-            raymarchMat.SetVector("_CamPos", cam.transform.position);
-
-            // Light parmeters
-            raymarchMat.SetVector("_LightColor", FromColor(LightColor));
-            raymarchMat.SetVector("_LightPosition", LightPosition);
-
-            // Cylinder parameters
-            raymarchMat.SetVectorArray("_Cylinders", _cylinders);
-            raymarchMat.SetInt("_CylinderCount", CylinderCount);
-
-            //Cylinder shape parameters
-            raymarchMat.SetFloat("_RadiusMultiplier", radiusMultiplier);
-            raymarchMat.SetFloat("_HeightMultiplier", heightMultiplier);
-            raymarchMat.SetFloat("_RadiusThreshold", radiusThreshold);
-
-            //Density parameters
-            raymarchMat.SetTexture("_DensityNoise", resultTexture);
-            raymarchMat.SetInt("_DensityNoiseSize", DensityResolution);
-
-            //Area parameters
-            raymarchMat.SetVector("_areaMin", areaMin);
-            raymarchMat.SetVector("_areaMax", areaMax);
+            var cameraParameters = new CameraParameters(Camera.current ?? Camera.main);
+            var lightParameters = new LightParameters(LightColor, LightPosition);
+            var cylinderParameters = new CylinderParameters(_cylinders, CylinderCount);
+            var shapeParameters = new ShapeParameters(radiusMultiplier, heightMultiplier, radiusThreshold);
+            var densityParameters = new DensityParameters(resultTexture, DensityResolution);
+            var areaParameters = new AreaParameters(areaMin, areaMax);
+            raymarchMat.Parametrize(cameraParameters);
+            raymarchMat.Parametrize(lightParameters);
+            raymarchMat.Parametrize(cylinderParameters);
+            raymarchMat.Parametrize(shapeParameters);
+            raymarchMat.Parametrize(densityParameters);
+            raymarchMat.Parametrize(areaParameters);
 
             Graphics.Blit(source, destination, raymarchMat);
         }
@@ -106,7 +91,4 @@ public class CylinderRenderer : MonoBehaviour
             Graphics.Blit(source, destination);
         }
     }
-
-    private Vector4 FromColor(Color color) => new Vector4(color.r, color.g, color.b, 1f);
-
 }
