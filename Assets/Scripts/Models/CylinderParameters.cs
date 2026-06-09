@@ -8,8 +8,8 @@ namespace Assets.Scripts.Models
     {
         [SerializeField] private Vector4[] cylinders;
         [SerializeField] private int cylinderCount;
-        public Vector4[] Cylinders => cylinders;
-        public int CylinderCount => cylinderCount;
+        public Vector4[] Cylinders { get{ return cylinders; } set { cylinders = value; } }
+        public int CylinderCount => cylinders.Length;
 
         public CylinderParameters(Vector4[] cylinders, int cylinderCount)
         {
