@@ -236,6 +236,19 @@
                 return val;
             }
 
+            uint pcg(uint v)
+            {
+                uint state = v * 747796405u + 2891336453u;
+                uint word  = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+                return (word >> 22u) ^ word;
+            }
+
+            float3 random3(uint seed)
+            {
+                uint3 h = uint3( pcg(seed), pcg(seed + 1u), pcg(seed + 2u) );
+                return float3(h) * (1.0 / float(0xffffffffu));
+            }
+
             fixed4 frag(v2f i) : SV_Target
             {
                 // Convert screen UV to NDC (-1..1)
@@ -283,6 +296,7 @@
                     val += den;
                 }
                 val = val/steps;
+                return float4(random3(closestIndex), 1.0f);
                 return (1,1,1,1)*val+skyColor*(1-val);
                 return float4(val, val, val, 1.0f);
                 // float lengthInside = distance(closest.first.xyz,closest.second.xyz);
