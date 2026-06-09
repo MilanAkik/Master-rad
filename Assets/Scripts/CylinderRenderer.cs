@@ -6,6 +6,12 @@ using UnityEngine;
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
 public class CylinderRenderer : MonoBehaviour
 {
+    [Header("Shared Config (ScriptableObject — same asset in all scenes)")]
+    public CloudConfigScriptable cloudConfigScriptable;
+
+    [Header("Local Override (per-scene, no shared asset needed)")]
+    public CloudConfig cloudConfig;
+
     //Material parameters
     [Header("Material")]
     public Material raymarchMat;
@@ -61,6 +67,14 @@ public class CylinderRenderer : MonoBehaviour
         {
             _cylinders[i] = cyl[i];
         }
+        if (cloudConfigScriptable != null)
+        {
+            cloudConfigScriptable.cloudConfig.CylinderParameters.Cylinders = _cylinders;
+        }
+        else
+        {
+            cloudConfig.CylinderParameters.Cylinders = _cylinders;
+        }
     }
 
     private void OnValidate() => Setup();
@@ -71,12 +85,20 @@ public class CylinderRenderer : MonoBehaviour
     {
         if (raymarchMat != null)
         {
+            CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
+
             var cameraParameters = new CameraParameters(Camera.current ?? Camera.main);
-            var lightParameters = new LightParameters(LightColor, LightPosition);
-            var cylinderParameters = new CylinderParameters(_cylinders, CylinderCount);
-            var shapeParameters = new ShapeParameters(radiusMultiplier, heightMultiplier, radiusThreshold);
-            var densityParameters = new DensityParameters(resultTexture, DensityResolution);
-            var areaParameters = new AreaParameters(areaMin, areaMax);
+            //var lightParameters = new LightParameters(LightColor, LightPosition);
+            //var cylinderParameters = new CylinderParameters(_cylinders, CylinderCount);
+            //var shapeParameters = new ShapeParameters(radiusMultiplier, heightMultiplier, radiusThreshold);
+            //var densityParameters = new DensityParameters(resultTexture, DensityResolution);
+            //var areaParameters = new AreaParameters(areaMin, areaMax);
+            //var cameraParameters = cfg.CameraParameters;
+            var lightParameters = cfg.LightParameters;
+            var cylinderParameters = cfg.CylinderParameters;
+            var shapeParameters = cfg.ShapeParameters;
+            var densityParameters = cfg.DensityParameters;
+            var areaParameters = cfg.AreaParameters;
             raymarchMat.Parametrize(cameraParameters);
             raymarchMat.Parametrize(lightParameters);
             raymarchMat.Parametrize(cylinderParameters);
