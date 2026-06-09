@@ -2,14 +2,18 @@ using UnityEngine;
 
 namespace Assets.Scripts.Models
 {
+    [System.Serializable]
     public class DensityParameters
     {
-        public RenderTexture DensityNoise { get; set; }
-        public int DensityNoiseSize { get; set; }
+        [SerializeField] private RenderTexture densityNoise;
+        [SerializeField] private int densityNoiseSize;
+        public RenderTexture DensityNoise => densityNoise;
+        public int DensityNoiseSize => densityNoiseSize;
+
         public DensityParameters(RenderTexture densityNoise, int densityNoiseSize)
         {
-            DensityNoise = densityNoise;
-            DensityNoiseSize = densityNoiseSize;
+            this.densityNoise = densityNoise;
+            this.densityNoiseSize = densityNoiseSize;
         }
     }
 }

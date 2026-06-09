@@ -2,14 +2,18 @@ using UnityEngine;
 
 namespace Assets.Scripts.Models
 {
+    [System.Serializable]
     public class LightParameters
     {
-        public Vector4 LightColor { get; set; }
-        public Vector3 LightPosition { get; set; }
+        [SerializeField] private Vector4 lightColor = new Vector4(1f, 1f, 1f, 1f);
+        [SerializeField] private Vector3 lightPosition = Vector3.zero;
+        public Vector4 LightColor => lightColor;
+        public Vector3 LightPosition => lightPosition;
+
         public LightParameters(Vector4 lightColor, Vector3 lightPosition)
         {
-            LightColor = lightColor;
-            LightPosition = lightPosition;
+            this.lightColor = lightColor;
+            this.lightPosition = lightPosition;
         }
         public LightParameters(Color lightColor, Vector3 lightPosition) : this(FromColor(lightColor), lightPosition) { }
 

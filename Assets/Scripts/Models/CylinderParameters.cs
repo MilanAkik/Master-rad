@@ -3,14 +3,18 @@ using UnityEngine;
 
 namespace Assets.Scripts.Models
 {
+    [System.Serializable]
     public class CylinderParameters
     {
-        public Vector4[] Cylinders { get; set; }
-        public int CylinderCount { get; set; }
+        [SerializeField] private Vector4[] cylinders;
+        [SerializeField] private int cylinderCount;
+        public Vector4[] Cylinders => cylinders;
+        public int CylinderCount => cylinderCount;
+
         public CylinderParameters(Vector4[] cylinders, int cylinderCount)
         {
-            Cylinders = cylinders;
-            CylinderCount = cylinderCount;
+            this.cylinders = cylinders;
+            this.cylinderCount = cylinderCount;
         }
     }
 }
