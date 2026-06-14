@@ -3,6 +3,16 @@ using Assets.Scripts.Models;
 
 public static class MaterialParametrizer
 {
+    public static void Parametrize(this Material material, CloudConfig cloudConfig)
+    {
+        material.Parametrize(cloudConfig.CameraParameters);
+        material.Parametrize(cloudConfig.LightParameters);
+        material.Parametrize(cloudConfig.CylinderParameters);
+        material.Parametrize(cloudConfig.ShapeParameters);
+        material.Parametrize(cloudConfig.DensityParameters);
+        material.Parametrize(cloudConfig.AreaParameters);
+    }
+
     public static void Parametrize(this Material material, CameraParameters cameraParameters)
     {
         material.SetMatrix("_CamToWorld", cameraParameters.CamToWorld);

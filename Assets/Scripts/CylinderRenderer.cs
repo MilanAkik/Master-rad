@@ -100,14 +100,13 @@ public class CylinderRenderer : MonoBehaviour
             //var shapeParameters = cfg.ShapeParameters;
             //var densityParameters = cfg.DensityParameters;
             //var areaParameters = cfg.AreaParameters;
-            raymarchMat.Parametrize(cfg.CameraParameters);
-            raymarchMat.Parametrize(cfg.LightParameters);
-            raymarchMat.Parametrize(cfg.CylinderParameters);
-            raymarchMat.Parametrize(cfg.ShapeParameters);
-            raymarchMat.Parametrize(cfg.DensityParameters);
-            raymarchMat.Parametrize(cfg.AreaParameters);
-            Graphics.Blit(source, destination, raymarchMat);
-
+            //raymarchMat.Parametrize(cfg.CameraParameters);
+            //raymarchMat.Parametrize(cfg.LightParameters);
+            //raymarchMat.Parametrize(cfg.CylinderParameters);
+            //raymarchMat.Parametrize(cfg.ShapeParameters);
+            //raymarchMat.Parametrize(cfg.DensityParameters);
+            //raymarchMat.Parametrize(cfg.AreaParameters);
+            raymarchMat.Parametrize(cfg);
             Graphics.Blit(source, destination, raymarchMat);
         }
         else
