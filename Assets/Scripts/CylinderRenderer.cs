@@ -16,6 +16,8 @@ public class CylinderRenderer : MonoBehaviour
 
     [Space(5)]
     private RenderTexture resultTexture;
+    private Camera _camera;
+    private Matrix4x4 _lastProjectionMatrix;
 
     private void Setup()
     {
@@ -25,19 +27,32 @@ public class CylinderRenderer : MonoBehaviour
         resultTexture = TextureUtilities.CreateRenderTexture3d(densityResolution, densityResolution, densityResolution);
         resultTexture = ComputeShaderUtilities.ComputeTexture3d(computeShader, "CSMain", densityResolution, densityResolution, densityResolution, resultTexture);
         var tmp = resultTexture.depth;
+        _camera = GetComponent<Camera>();
+        _lastProjectionMatrix = _camera.projectionMatrix;
+        cfg.CameraParameters = new CameraParameters(_camera);
+        raymarchMat.Parametrize(cfg);
     }
 
     private void OnValidate() => Setup();
 
     private void Start() => Setup();
 
+    private void LateUpdate()
+    {
+        bool transformChanged = transform.hasChanged;
+        bool projectionChanged = _camera.projectionMatrix != _lastProjectionMatrix;
+        if (!transformChanged && !projectionChanged) return;
+        CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
+        if (transformChanged) transform.hasChanged = false;
+        if (projectionChanged) _lastProjectionMatrix = _camera.projectionMatrix;
+        cfg.CameraParameters = new CameraParameters(_camera);
+        raymarchMat.Parametrize(cfg);
+    }
+
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         if (raymarchMat != null)
         {
-            CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
-            cfg.CameraParameters = new CameraParameters(Camera.current ?? Camera.main);
-            raymarchMat.Parametrize(cfg);
             Graphics.Blit(source, destination, raymarchMat);
         }
         else
