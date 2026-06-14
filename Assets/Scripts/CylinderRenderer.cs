@@ -46,7 +46,7 @@ public class CylinderRenderer : MonoBehaviour
         if (transformChanged) transform.hasChanged = false;
         if (projectionChanged) _lastProjectionMatrix = _camera.projectionMatrix;
         cfg.CameraParameters = new CameraParameters(_camera);
-        raymarchMat.Parametrize(cfg);
+        raymarchMat.Parametrize(cfg.CameraParameters);
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
