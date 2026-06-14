@@ -12,69 +12,23 @@ public class CylinderRenderer : MonoBehaviour
     [Header("Local Override (per-scene, no shared asset needed)")]
     public CloudConfig cloudConfig;
 
-    //Material parameters
     [Header("Material")]
     public Material raymarchMat;
-    [Space(5)]
 
-    //Light parameters
-    [Header("Light")]
-    public Color LightColor;
-    public Vector3 LightPosition;
     [Space(5)]
-
-    //Cylinder shape parameters
-    [Header("Cylinder shape")]
-    [Range(0.1f, 5.0f)]
-    public float radiusMultiplier = 1;
-    [Range(0.1f, 5.0f)]
-    public float heightMultiplier = 1;
-    [Range(0.1f, 0.9f)]
-    public float radiusThreshold = 0.1f;
-    [Space(5)]
-
-    //Density shader parameters
-    [Header("Density shader")]
-    public ComputeShader computeShader;
-    public int DensityResolution = 256;
     private RenderTexture resultTexture;
-    [Space(5)]
-
-    //Area parameters
-    [Header("Area")]
-    public Vector3 areaMin = new Vector3(-10, -10, -10);
-    public Vector3 areaMax = new Vector3( 10,  10,  10);
-    [Space(5)]
-
-    //Cylinder parameters
-    [Header("Cylinder")]
-    [Range(1, 128)]
-    public int CylinderCount = 3;
-    [Range(1,10000)]
-    public int RandomSeed = 1234;
-    [SerializeField]
-    private CylinderGenerator generator;
-    private Vector4[] _cylinders = new Vector4[512];
 
     private void Setup()
     {
-        resultTexture = TextureUtilities.CreateRenderTexture3d(DensityResolution, DensityResolution, DensityResolution);
-        resultTexture = ComputeShaderUtilities.ComputeTexture3d(computeShader, "CSMain", DensityResolution, DensityResolution, DensityResolution, resultTexture);
+        CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
+        var densityResolution = cfg.DensityParameters.DensityNoiseSize;
+        var computeShader = cfg.DensityParameters.DensityShader;
+        resultTexture = TextureUtilities.CreateRenderTexture3d(densityResolution, densityResolution, densityResolution);
+        resultTexture = ComputeShaderUtilities.ComputeTexture3d(computeShader, "CSMain", densityResolution, densityResolution, densityResolution, resultTexture);
         var tmp = resultTexture.depth;
-        var generatorParameters = new GeneratorParameters { CylinderCount = CylinderCount, RandomSeed = RandomSeed };
-        var cyl = generator.getCylinders(generatorParameters);
-        for (int i = 0; i < cyl.Length; i++)
-        {
-            _cylinders[i] = cyl[i];
-        }
-        if (cloudConfigScriptable != null)
-        {
-            cloudConfigScriptable.cloudConfig.CylinderParameters.Cylinders = _cylinders;
-        }
-        else
-        {
-            cloudConfig.CylinderParameters.Cylinders = _cylinders;
-        }
+        var generatorParameters = cfg.CylinderParameters.GeneratorParameters;
+        var cyl = cfg.CylinderParameters.Generator.getCylinders(generatorParameters);
+        cfg.CylinderParameters.Cylinders = cyl;
     }
 
     private void OnValidate() => Setup();

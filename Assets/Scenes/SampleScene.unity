@@ -224,7 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9e1773cc71c64047bdfdcc0cce13468, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cloudConfigScriptable: {fileID: 0}
+  cloudConfigScriptable: {fileID: 11400000, guid: d70fd631d65340248a89bef3719dbc43, type: 2}
   cloudConfig:
     areaParameters:
       areaMin: {x: 0, y: 0, z: 0}
@@ -266,6 +266,7 @@ MonoBehaviour:
         e33: 1.6671666
       camPos: {x: 0, y: 0, z: 0}
     cylinderParameters:
+      generator: {fileID: 0}
       cylinders:
       - {x: -2, y: 0.10196078, z: 7.4375, w: 0.83137256}
       - {x: -2, y: 0.16862744, z: 6.3125, w: 0.6784314}
@@ -783,6 +784,7 @@ MonoBehaviour:
     densityParameters:
       densityNoise: {fileID: 0}
       densityNoiseSize: 0
+      densityShader: {fileID: 0}
     lightParameters:
       lightColor: {x: 0, y: 0, z: 0, w: 0}
       lightPosition: {x: 0, y: 0, z: 0}
@@ -791,18 +793,6 @@ MonoBehaviour:
       heightMultiplier: 1
       radiusThreshold: 0.2
   raymarchMat: {fileID: 2100000, guid: 19e8804431024704688f65e5139b0e6d, type: 2}
-  LightColor: {r: 0, g: 0, b: 0, a: 0}
-  LightPosition: {x: 0, y: 0, z: 0}
-  radiusMultiplier: 1
-  heightMultiplier: 0.5
-  radiusThreshold: 0.1
-  computeShader: {fileID: 7200000, guid: 347d913f3ac6e9d439a5cc7f208deed4, type: 3}
-  DensityResolution: 256
-  areaMin: {x: -2, y: -2, z: -2}
-  areaMax: {x: 2, y: 2, z: 2}
-  CylinderCount: 50
-  RandomSeed: 1234
-  generator: {fileID: 11400000, guid: b0ca920605c390d41a39262dd4e40fbb, type: 2}
 --- !u!1 &1926647031
 GameObject:
   m_ObjectHideFlags: 0
