@@ -33,7 +33,15 @@ public class CylinderRenderer : MonoBehaviour
         raymarchMat.Parametrize(cfg);
     }
 
-    private void OnValidate() => Setup();
+    private void OnValidate()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.delayCall += () =>
+        {
+            if (this != null) UpdateMaterial();
+        };
+#endif
+    }
 
     private void Start() => Setup();
 
@@ -47,6 +55,12 @@ public class CylinderRenderer : MonoBehaviour
         if (projectionChanged) _lastProjectionMatrix = _camera.projectionMatrix;
         cfg.CameraParameters = new CameraParameters(_camera);
         raymarchMat.Parametrize(cfg.CameraParameters);
+    }
+
+    private void UpdateMaterial()
+    {
+        CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
+        raymarchMat.Parametrize(cfg);
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
