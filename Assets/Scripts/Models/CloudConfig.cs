@@ -14,7 +14,7 @@ namespace Assets.Scripts.Models
         [SerializeField] private ShapeParameters shapeParameters;
 
         public AreaParameters AreaParameters => areaParameters;
-        public CameraParameters CameraParameters => cameraParameters;
+        public CameraParameters CameraParameters { get => cameraParameters; set => cameraParameters = value; }
         public CylinderParameters CylinderParameters => cylinderParameters;
         public DensityParameters DensityParameters => densityParameters;
         public LightParameters LightParameters => lightParameters;

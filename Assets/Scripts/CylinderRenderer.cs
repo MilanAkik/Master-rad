@@ -88,23 +88,25 @@ public class CylinderRenderer : MonoBehaviour
             CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
 
             var cameraParameters = new CameraParameters(Camera.current ?? Camera.main);
+            cfg.CameraParameters = cameraParameters;
             //var lightParameters = new LightParameters(LightColor, LightPosition);
             //var cylinderParameters = new CylinderParameters(_cylinders, CylinderCount);
             //var shapeParameters = new ShapeParameters(radiusMultiplier, heightMultiplier, radiusThreshold);
             //var densityParameters = new DensityParameters(resultTexture, DensityResolution);
             //var areaParameters = new AreaParameters(areaMin, areaMax);
             //var cameraParameters = cfg.CameraParameters;
-            var lightParameters = cfg.LightParameters;
-            var cylinderParameters = cfg.CylinderParameters;
-            var shapeParameters = cfg.ShapeParameters;
-            var densityParameters = cfg.DensityParameters;
-            var areaParameters = cfg.AreaParameters;
-            raymarchMat.Parametrize(cameraParameters);
-            raymarchMat.Parametrize(lightParameters);
-            raymarchMat.Parametrize(cylinderParameters);
-            raymarchMat.Parametrize(shapeParameters);
-            raymarchMat.Parametrize(densityParameters);
-            raymarchMat.Parametrize(areaParameters);
+            //var lightParameters = cfg.LightParameters;
+            //var cylinderParameters = cfg.CylinderParameters;
+            //var shapeParameters = cfg.ShapeParameters;
+            //var densityParameters = cfg.DensityParameters;
+            //var areaParameters = cfg.AreaParameters;
+            raymarchMat.Parametrize(cfg.CameraParameters);
+            raymarchMat.Parametrize(cfg.LightParameters);
+            raymarchMat.Parametrize(cfg.CylinderParameters);
+            raymarchMat.Parametrize(cfg.ShapeParameters);
+            raymarchMat.Parametrize(cfg.DensityParameters);
+            raymarchMat.Parametrize(cfg.AreaParameters);
+            Graphics.Blit(source, destination, raymarchMat);
 
             Graphics.Blit(source, destination, raymarchMat);
         }
