@@ -18,41 +18,42 @@ MonoBehaviour:
       areaMax: {x: 10, y: 10, z: 10}
     cameraParameters:
       camToWorld:
-        e00: 0
+        e00: 1
         e01: 0
         e02: 0
         e03: 0
         e10: 0
-        e11: 0
+        e11: 1
         e12: 0
         e13: 0
-        e20: 0
-        e21: 0
-        e22: 0
-        e23: 0
+        e20: -0
+        e21: -0
+        e22: -1
+        e23: -0
         e30: 0
         e31: 0
         e32: 0
-        e33: 0
+        e33: 1
       camInverseProjection:
-        e00: 0
+        e00: 1.0906552
         e01: 0
         e02: 0
         e03: 0
         e10: 0
-        e11: 0
+        e11: 0.57735026
         e12: 0
         e13: 0
-        e20: 0
-        e21: 0
-        e22: 0
-        e23: 0
+        e20: -0
+        e21: -0
+        e22: -0.000000059568897
+        e23: -1
         e30: 0
         e31: 0
-        e32: 0
-        e33: 0
+        e32: -1.6661667
+        e33: 1.6671666
       camPos: {x: 0, y: 0, z: 0}
     cylinderParameters:
+      generator: {fileID: 11400000, guid: 3044fab94c2477544b1b28847818f3f7, type: 2}
       cylinders:
       - {x: -2, y: 0.10196078, z: 7.4375, w: 0.83137256}
       - {x: -2, y: 0.16862744, z: 6.3125, w: 0.6784314}
@@ -569,11 +570,12 @@ MonoBehaviour:
       cylinderCount: 0
     densityParameters:
       densityNoise: {fileID: 0}
-      densityNoiseSize: 1
+      densityNoiseSize: 256
+      densityShader: {fileID: 7200000, guid: 347d913f3ac6e9d439a5cc7f208deed4, type: 3}
     lightParameters:
       lightColor: {x: 0, y: 0, z: 0, w: 0}
       lightPosition: {x: 0, y: 0, z: 0}
     shapeParameters:
       radiusMultiplier: 1
-      heightMultiplier: 1
+      heightMultiplier: 0.5
       radiusThreshold: 0.2
