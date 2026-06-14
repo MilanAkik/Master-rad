@@ -1,4 +1,3 @@
-using Assets.Scripts.Generators;
 using Assets.Scripts.Models;
 using Assets.Scripts.Utilities;
 using UnityEngine;
@@ -26,9 +25,6 @@ public class CylinderRenderer : MonoBehaviour
         resultTexture = TextureUtilities.CreateRenderTexture3d(densityResolution, densityResolution, densityResolution);
         resultTexture = ComputeShaderUtilities.ComputeTexture3d(computeShader, "CSMain", densityResolution, densityResolution, densityResolution, resultTexture);
         var tmp = resultTexture.depth;
-        var generatorParameters = cfg.CylinderParameters.GeneratorParameters;
-        var cyl = cfg.CylinderParameters.Generator.getCylinders(generatorParameters);
-        cfg.CylinderParameters.Cylinders = cyl;
     }
 
     private void OnValidate() => Setup();
