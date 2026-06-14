@@ -86,26 +86,7 @@ public class CylinderRenderer : MonoBehaviour
         if (raymarchMat != null)
         {
             CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
-
-            var cameraParameters = new CameraParameters(Camera.current ?? Camera.main);
-            cfg.CameraParameters = cameraParameters;
-            //var lightParameters = new LightParameters(LightColor, LightPosition);
-            //var cylinderParameters = new CylinderParameters(_cylinders, CylinderCount);
-            //var shapeParameters = new ShapeParameters(radiusMultiplier, heightMultiplier, radiusThreshold);
-            //var densityParameters = new DensityParameters(resultTexture, DensityResolution);
-            //var areaParameters = new AreaParameters(areaMin, areaMax);
-            //var cameraParameters = cfg.CameraParameters;
-            //var lightParameters = cfg.LightParameters;
-            //var cylinderParameters = cfg.CylinderParameters;
-            //var shapeParameters = cfg.ShapeParameters;
-            //var densityParameters = cfg.DensityParameters;
-            //var areaParameters = cfg.AreaParameters;
-            //raymarchMat.Parametrize(cfg.CameraParameters);
-            //raymarchMat.Parametrize(cfg.LightParameters);
-            //raymarchMat.Parametrize(cfg.CylinderParameters);
-            //raymarchMat.Parametrize(cfg.ShapeParameters);
-            //raymarchMat.Parametrize(cfg.DensityParameters);
-            //raymarchMat.Parametrize(cfg.AreaParameters);
+            cfg.CameraParameters = new CameraParameters(Camera.current ?? Camera.main);
             raymarchMat.Parametrize(cfg);
             Graphics.Blit(source, destination, raymarchMat);
         }
