@@ -1,8 +1,14 @@
+using UnityEngine;
+
 namespace Assets.Scripts.Models
 {
-    public record GeneratorParameters
+    [System.Serializable]
+    public class GeneratorParameters
     {
-        public int CylinderCount { get; set; }
-        public int RandomSeed { get; set; }
+        [SerializeField] private int cylinderCount;
+        [SerializeField] private int randomSeed;
+
+        public int CylinderCount { get => cylinderCount; set => cylinderCount = value; }
+        public int RandomSeed { get => randomSeed; set => randomSeed = value; }
     }
 }
