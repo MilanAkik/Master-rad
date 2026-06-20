@@ -8,13 +8,14 @@ public class CylinderRenderer : MonoBehaviour
     [Header("Shared Config (ScriptableObject — same asset in all scenes)")]
     public CloudConfigScriptable cloudConfigScriptable;
 
+    [Space(5)]
     [Header("Local Override (per-scene, no shared asset needed)")]
     public CloudConfig cloudConfig;
 
+    [Space(5)]
     [Header("Material")]
     public Material raymarchMat;
 
-    [Space(5)]
     private RenderTexture resultTexture;
     private Camera _camera;
     private Matrix4x4 _lastProjectionMatrix;
@@ -38,10 +39,7 @@ public class CylinderRenderer : MonoBehaviour
     private void OnValidate()
     {
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.delayCall += () =>
-        {
-            if (this != null) UpdateMaterial();
-        };
+        UnityEditor.EditorApplication.delayCall += () => { if (this != null) UpdateMaterial(); };
 #endif
     }
 
