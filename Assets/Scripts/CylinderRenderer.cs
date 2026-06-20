@@ -50,11 +50,14 @@ public class CylinderRenderer : MonoBehaviour
         bool transformChanged = transform.hasChanged;
         bool projectionChanged = _camera.projectionMatrix != _lastProjectionMatrix;
         if (!transformChanged && !projectionChanged) return;
-        CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
         if (transformChanged) transform.hasChanged = false;
         if (projectionChanged) _lastProjectionMatrix = _camera.projectionMatrix;
-        cfg.CameraParameters = new CameraParameters(_camera);
-        raymarchMat.Parametrize(cfg.CameraParameters);
+        if (transformChanged || projectionChanged)
+        {
+            CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
+            cfg.CameraParameters = new CameraParameters(_camera);
+            raymarchMat.Parametrize(cfg.CameraParameters);
+        }
     }
 
     private void UpdateMaterial()
