@@ -19,6 +19,8 @@ public class CylinderRenderer : MonoBehaviour
     private Camera _camera;
     private Matrix4x4 _lastProjectionMatrix;
 
+    private CloudConfig CloudConfig => cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
+
     private void Setup()
     {
         CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
@@ -54,7 +56,7 @@ public class CylinderRenderer : MonoBehaviour
         if (projectionChanged) _lastProjectionMatrix = _camera.projectionMatrix;
         if (transformChanged || projectionChanged)
         {
-            CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
+            CloudConfig cfg = CloudConfig;
             cfg.CameraParameters = new CameraParameters(_camera);
             raymarchMat.Parametrize(cfg.CameraParameters);
         }
@@ -62,7 +64,7 @@ public class CylinderRenderer : MonoBehaviour
 
     private void UpdateMaterial()
     {
-        CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
+        CloudConfig cfg = CloudConfig;
         raymarchMat.Parametrize(cfg);
     }
 
