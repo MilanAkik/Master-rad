@@ -2,6 +2,8 @@
 using UnityEditor;
 using UnityEngine;
 
+using static EditorUtilities;
+
 namespace Assets.Scripts.Utilities
 {
     [CustomPropertyDrawer(typeof(ShapeParameters))]
@@ -10,15 +12,15 @@ namespace Assets.Scripts.Utilities
         public override void OnGUI(Rect pos, SerializedProperty prop, GUIContent label)
         {
             EditorGUI.BeginProperty(pos, label, prop);
-            EditorGUI.PropertyField(EditorUtilities.GetPropertyPosition(pos, 0), prop.FindPropertyRelative("radiusMultiplier"), new GUIContent("Radius multiplier"));
-            EditorGUI.PropertyField(EditorUtilities.GetPropertyPosition(pos, 1), prop.FindPropertyRelative("heightMultiplier"), new GUIContent("Height multiplier"));
-            EditorGUI.PropertyField(EditorUtilities.GetPropertyPosition(pos, 2), prop.FindPropertyRelative("radiusThreshold"), new GUIContent("Radius threshold"));
+            DrawField(pos, 0, prop, "radiusMultiplier", "Radius multiplier");
+            DrawField(pos, 1, prop, "heightMultiplier", "Height multiplier");
+            DrawField(pos, 2, prop, "radiusThreshold", "Radius threshold");
             EditorGUI.EndProperty();
         }
 
         public override float GetPropertyHeight(SerializedProperty prop, GUIContent label)
         {
-            return 3 * EditorGUIUtility.singleLineHeight;
+            return 3 * (EditorGUIUtility.singleLineHeight + 100f);
         }
 
     }
