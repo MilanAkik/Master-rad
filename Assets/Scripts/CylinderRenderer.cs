@@ -1,5 +1,4 @@
 using Assets.Scripts.Models;
-using Assets.Scripts.Utilities;
 using UnityEngine;
 
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
@@ -16,7 +15,6 @@ public class CylinderRenderer : MonoBehaviour
     [Header("Material")]
     public Material raymarchMat;
 
-    private RenderTexture resultTexture;
     private Camera _camera;
     private Matrix4x4 _lastProjectionMatrix;
 
@@ -24,14 +22,9 @@ public class CylinderRenderer : MonoBehaviour
 
     private void Setup()
     {
-        CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
-        var densityResolution = cfg.DensityParameters.DensityNoiseSize;
-        var computeShader = cfg.DensityParameters.DensityShader;
-        resultTexture = TextureUtilities.CreateRenderTexture3d(densityResolution, densityResolution, densityResolution);
-        resultTexture = ComputeShaderUtilities.ComputeTexture3d(computeShader, "CSMain", densityResolution, densityResolution, densityResolution, resultTexture);
-        var tmp = resultTexture.depth;
         _camera = GetComponent<Camera>();
         _lastProjectionMatrix = _camera.projectionMatrix;
+        CloudConfig cfg = cloudConfigScriptable != null ? cloudConfigScriptable.cloudConfig : cloudConfig;
         cfg.CameraParameters = new CameraParameters(_camera);
         raymarchMat.Parametrize(cfg);
     }
