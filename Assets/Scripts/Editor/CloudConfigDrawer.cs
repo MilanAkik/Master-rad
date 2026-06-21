@@ -5,18 +5,25 @@ using UnityEngine;
 namespace Assets.Scripts.Utilities
 {
     [CustomPropertyDrawer(typeof(ShapeParameters))]
-    public class CloudConfigDrawer : PropertyDrawer
+    public class ShapeParametersDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect pos, SerializedProperty prop, GUIContent label)
         {
             EditorGUI.BeginProperty(pos, label, prop);
-            EditorGUI.PropertyField( pos, prop.FindPropertyRelative("radiusMultiplier"), new GUIContent("Radius Multiplier"));
+            EditorGUI.PropertyField(GetPropertyPosition(pos, 0), prop.FindPropertyRelative("radiusMultiplier"), new GUIContent("Radius multiplier"));
+            EditorGUI.PropertyField(GetPropertyPosition(pos, 1), prop.FindPropertyRelative("heightMultiplier"), new GUIContent("Height multiplier"));
+            EditorGUI.PropertyField(GetPropertyPosition(pos, 2), prop.FindPropertyRelative("radiusThreshold"), new GUIContent("Radius threshold"));
             EditorGUI.EndProperty();
         }
 
         public override float GetPropertyHeight(SerializedProperty prop, GUIContent label)
         {
-            return EditorGUIUtility.singleLineHeight;
+            return 3 * EditorGUIUtility.singleLineHeight;
+        }
+
+        private Rect GetPropertyPosition(Rect pos, int index)
+        {
+            return new Rect(pos.x, pos.y + index * EditorGUIUtility.singleLineHeight, pos.width, EditorGUIUtility.singleLineHeight);
         }
     }
 
