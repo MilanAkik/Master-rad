@@ -20,7 +20,7 @@ namespace Assets.Scripts.Utilities
 
         public override float GetPropertyHeight(SerializedProperty prop, GUIContent label)
         {
-            return 3 * (EditorGUIUtility.singleLineHeight + 100f);
+            return 3 * (EditorUtilities.fieldHeight + EditorUtilities.padding);
         }
 
     }
