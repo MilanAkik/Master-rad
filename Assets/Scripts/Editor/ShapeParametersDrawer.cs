@@ -12,15 +12,21 @@ namespace Assets.Scripts.Utilities
         public override void OnGUI(Rect pos, SerializedProperty prop, GUIContent label)
         {
             EditorGUI.BeginProperty(pos, label, prop);
-            DrawField(pos, 0, prop, "radiusMultiplier", "Radius multiplier");
-            DrawField(pos, 1, prop, "heightMultiplier", "Height multiplier");
-            DrawField(pos, 2, prop, "radiusThreshold", "Radius threshold");
+            prop.isExpanded = EditorGUI.Foldout( new Rect(pos.x, pos.y, pos.width, EditorUtilities.fieldHeight), prop.isExpanded, label, toggleOnLabelClick: true);
+            if (prop.isExpanded)
+            {
+                EditorGUI.indentLevel++;
+                DrawField(pos, 1, prop, "radiusMultiplier", "Radius multiplier");
+                DrawField(pos, 2, prop, "heightMultiplier", "Height multiplier");
+                DrawField(pos, 3, prop, "radiusThreshold", "Radius threshold");
+                EditorGUI.indentLevel--;
+            }
             EditorGUI.EndProperty();
         }
 
         public override float GetPropertyHeight(SerializedProperty prop, GUIContent label)
         {
-            return 3 * (EditorUtilities.fieldHeight + EditorUtilities.padding);
+            return fieldHeight + (prop.isExpanded ? 3 * (fieldHeight + padding) : 0);
         }
 
     }
