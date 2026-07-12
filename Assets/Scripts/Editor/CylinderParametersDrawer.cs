@@ -1,0 +1,46 @@
+using Assets.Scripts.Models;
+using UnityEditor;
+using UnityEngine;
+
+using static Assets.Scripts.Editor.EditorUtilities;
+
+namespace Assets.Scripts.Editor
+{
+    [CustomPropertyDrawer(typeof(CylinderParameters))]
+    public class CylinderParametersDrawer : PropertyDrawer
+    {
+        public override void OnGUI(Rect pos, SerializedProperty prop, GUIContent label)
+        {
+            EditorGUI.BeginProperty(pos, label, prop);
+
+            prop.isExpanded = EditorGUI.Foldout(
+                new Rect(pos.x, pos.y, pos.width, fieldHeight),
+                prop.isExpanded,
+                label,
+                toggleOnLabelClick: true);
+
+            if (prop.isExpanded)
+            {
+                EditorGUI.indentLevel++;
+
+                var generatorParametersProp = prop.FindPropertyRelative("generatorParameters");
+                var cylinderCountProp = generatorParametersProp.FindPropertyRelative("cylinderCount");
+                var randomSeedProp = generatorParametersProp.FindPropertyRelative("randomSeed");
+                var generatorProp = prop.FindPropertyRelative("generator");
+
+                EditorGUI.PropertyField(GetPropertyPosition(pos, 1), cylinderCountProp, new GUIContent("Cylinder count"));
+                EditorGUI.PropertyField(GetPropertyPosition(pos, 2), randomSeedProp, new GUIContent("Random seed"));
+                EditorGUI.PropertyField(GetPropertyPosition(pos, 3), generatorProp, new GUIContent("Generator"));
+
+                EditorGUI.indentLevel--;
+            }
+
+            EditorGUI.EndProperty();
+        }
+
+        public override float GetPropertyHeight(SerializedProperty prop, GUIContent label)
+        {
+            return fieldHeight + (prop.isExpanded ? 3 * (fieldHeight + padding) : 0);
+        }
+    }
+}
