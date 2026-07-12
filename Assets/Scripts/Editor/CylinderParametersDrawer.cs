@@ -24,25 +24,13 @@ namespace Assets.Scripts.Editor
                 EditorGUI.indentLevel++;
 
                 var generatorParametersProp = prop.FindPropertyRelative("generatorParameters");
+                var cylinderCountProp = generatorParametersProp.FindPropertyRelative("cylinderCount");
+                var randomSeedProp = generatorParametersProp.FindPropertyRelative("randomSeed");
                 var generatorProp = prop.FindPropertyRelative("generator");
 
-                var generatorParametersPosition = GetPropertyPosition(pos, 1);
-                var generatorParametersHeight = EditorGUI.GetPropertyHeight(generatorParametersProp, includeChildren: true);
-                generatorParametersPosition.height = generatorParametersHeight;
-
-                EditorGUI.PropertyField(
-                    generatorParametersPosition,
-                    generatorParametersProp,
-                    new GUIContent("Generator parameters"),
-                    includeChildren: true);
-
-                var generatorPosition = new Rect(
-                    pos.x,
-                    generatorParametersPosition.y + generatorParametersHeight + padding,
-                    pos.width,
-                    fieldHeight);
-
-                EditorGUI.PropertyField(generatorPosition, generatorProp, new GUIContent("Generator"));
+                EditorGUI.PropertyField(GetPropertyPosition(pos, 1), cylinderCountProp, new GUIContent("Cylinder count"));
+                EditorGUI.PropertyField(GetPropertyPosition(pos, 2), randomSeedProp, new GUIContent("Random seed"));
+                EditorGUI.PropertyField(GetPropertyPosition(pos, 3), generatorProp, new GUIContent("Generator"));
 
                 EditorGUI.indentLevel--;
             }
@@ -52,15 +40,7 @@ namespace Assets.Scripts.Editor
 
         public override float GetPropertyHeight(SerializedProperty prop, GUIContent label)
         {
-            if (!prop.isExpanded)
-            {
-                return fieldHeight;
-            }
-
-            var generatorParametersProp = prop.FindPropertyRelative("generatorParameters");
-            var generatorParametersHeight = EditorGUI.GetPropertyHeight(generatorParametersProp, includeChildren: true);
-
-            return fieldHeight + generatorParametersHeight + fieldHeight + (2 * padding);
+            return fieldHeight + (prop.isExpanded ? 3 * (fieldHeight + padding) : 0);
         }
     }
 }
