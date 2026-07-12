@@ -2,9 +2,9 @@
 using UnityEditor;
 using UnityEngine;
 
-using static EditorUtilities;
+using static Assets.Scripts.Editor.EditorUtilities;
 
-namespace Assets.Scripts.Utilities
+namespace Assets.Scripts.Editor
 {
     [CustomPropertyDrawer(typeof(ShapeParameters))]
     public class ShapeParametersDrawer : PropertyDrawer
