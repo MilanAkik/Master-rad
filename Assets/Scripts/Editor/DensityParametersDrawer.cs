@@ -22,9 +22,8 @@ namespace Assets.Scripts.Editor
             if (prop.isExpanded)
             {
                 EditorGUI.indentLevel++;
-                DrawField(pos, 1, prop, "densityNoise", "Density noise");
-                DrawField(pos, 2, prop, "densityNoiseSize", "Density noise size");
-                DrawField(pos, 3, prop, "densityShader", "Density shader");
+                DrawField(pos, 1, prop, "densityNoiseSize", "Density noise size");
+                DrawField(pos, 2, prop, "densityShader", "Density shader");
                 EditorGUI.indentLevel--;
             }
 
@@ -33,7 +32,7 @@ namespace Assets.Scripts.Editor
 
         public override float GetPropertyHeight(SerializedProperty prop, GUIContent label)
         {
-            return fieldHeight + (prop.isExpanded ? 3 * (fieldHeight + padding) : 0);
+            return fieldHeight + (prop.isExpanded ? 2 * (fieldHeight + padding) : 0);
         }
     }
 }
