@@ -119,6 +119,43 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!84 &393466613
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 1
+  m_Height: 1
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 0
+  m_ColorFormat: 4
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 1
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 3
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -224,11 +261,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9e1773cc71c64047bdfdcc0cce13468, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cloudConfigScriptable: {fileID: 11400000, guid: d70fd631d65340248a89bef3719dbc43, type: 2}
+  cloudConfigScriptable: {fileID: 0}
   cloudConfig:
     areaParameters:
-      areaMin: {x: 0, y: 0, z: 0}
-      areaMax: {x: 0, y: 0, z: 0}
+      areaMin: {x: -10, y: -10, z: -10}
+      areaMax: {x: 10, y: 10, z: 10}
     cameraParameters:
       camToWorld:
         e00: 1
@@ -267,15 +304,15 @@ MonoBehaviour:
       camPos: {x: 0, y: 0, z: 0}
     cylinderParameters:
       generatorParameters:
-        cylinderCount: 1
+        cylinderCount: 50
         randomSeed: 1234
       generator: {fileID: 11400000, guid: b0ca920605c390d41a39262dd4e40fbb, type: 2}
     densityParameters:
-      densityNoise: {fileID: 0}
-      densityNoiseSize: 0
-      densityShader: {fileID: 0}
+      densityNoise: {fileID: 393466613}
+      densityNoiseSize: 512
+      densityShader: {fileID: 7200000, guid: 347d913f3ac6e9d439a5cc7f208deed4, type: 3}
     lightParameters:
-      lightColor: {x: 0, y: 0, z: 0, w: 0}
+      lightColor: {x: 1, y: 1, z: 1, w: 0}
       lightPosition: {x: 0, y: 0, z: 0}
     shapeParameters:
       radiusMultiplier: 1
