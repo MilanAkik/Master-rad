@@ -275,9 +275,10 @@
                         hits++;
                         float4 p = res.first;
                         if(p.x == ro.x && p.y == ro.y && p.z == ro.z) p=res.second;
-                        if(distance(ro, p)<closestDistance){
+                        float currDist = distance(ro, p);
+                        if(currDist<closestDistance){
                             closest = res;
-                            closestDistance = distance(ro, p);
+                            closestDistance = currDist;
                             closestIndex = j;
                         }
                     }
