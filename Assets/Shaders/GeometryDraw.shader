@@ -284,33 +284,7 @@
                 }
                 float4 skyColor = tex2D(_MainTex, i.uv);
                 if(hits==0)return skyColor;
-                float val = 0;
-                float dv = rd*0.1f;
-                for(int i=0; i<steps; i++){
-                    float3 currPoint = closest.first.xyz + i * dv;
-                    float den = denistyAtPoint(currPoint);
-                    float4 cyl = _Cylinders[closestIndex];
-                    float halfheight = getHeight(cyl.w)/2.0f;
-                    float middle = cyl.y + halfheight;
-                    float dist = abs(currPoint.y - middle)/halfheight;
-                    val += den;
-                }
-                val = val/steps;
                 return float4(random3(closestIndex), 1.0f);
-                return (1,1,1,1)*val+skyColor*(1-val);
-                return float4(val, val, val, 1.0f);
-                // float lengthInside = distance(closest.first.xyz,closest.second.xyz);
-                // return float4(1-exp(-0.1*closestDistance), 1, lengthInside, 1.0);
-                // float xtime = sin(_Time.y);
-                // float ytime = cos(_Time.y);
-                // float3 LightPos = _LightPosition + float3(xtime, 0, ytime);
-                // float4 col = raymarch(ro, rd, LightPos)*_LightColor;
-                // float alfa = col.w;
-                // float r = (alfa) * col.x + (1-alfa) * sceneCol.x;
-                // float g = (alfa) * col.y + (1-alfa) * sceneCol.y;
-                // float b = (alfa) * col.z + (1-alfa) * sceneCol.z;
-                // fixed4 res = alfa*col+(1-alfa)*sceneCol;
-                // return res;
             }
             ENDCG
         }
