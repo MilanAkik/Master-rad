@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 25160903}
   - component: {fileID: 25160902}
   - component: {fileID: 25160901}
+  - component: {fileID: 25160904}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -205,12 +206,119 @@ Transform:
   m_GameObject: {fileID: 25160900}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &25160904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 25160900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9e1773cc71c64047bdfdcc0cce13468, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cloudConfigScriptable: {fileID: 0}
+  cloudConfig:
+    areaParameters:
+      areaMin: {x: -10, y: -10, z: -10}
+      areaMax: {x: 10, y: 10, z: 10}
+    cameraParameters:
+      camToWorld:
+        e00: 1
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 1
+        e12: 0
+        e13: 0
+        e20: -0
+        e21: -0
+        e22: -1
+        e23: -0
+        e30: 0
+        e31: 0
+        e32: 0
+        e33: 1
+      camInverseProjection:
+        e00: 1.0576906
+        e01: 0
+        e02: 0
+        e03: 0
+        e10: 0
+        e11: 0.57735026
+        e12: 0
+        e13: 0
+        e20: -0
+        e21: -0
+        e22: -0.000000059568897
+        e23: -1
+        e30: 0
+        e31: 0
+        e32: -1.6661667
+        e33: 1.6671666
+      camPos: {x: 0, y: 0, z: 0}
+    cylinderParameters:
+      generatorParameters:
+        cylinderCount: 50
+        randomSeed: 1234
+      generator: {fileID: 11400000, guid: b0ca920605c390d41a39262dd4e40fbb, type: 2}
+    densityParameters:
+      densityNoise: {fileID: 31306506}
+      densityNoiseSize: 256
+      densityShader: {fileID: 7200000, guid: 347d913f3ac6e9d439a5cc7f208deed4, type: 3}
+    lightParameters:
+      lightColor: {x: 1, y: 1, z: 1, w: 0}
+      lightPosition: {x: 0, y: 0, z: 0}
+    shapeParameters:
+      radiusMultiplier: 1
+      heightMultiplier: 1
+      radiusThreshold: 0.2
+  raymarchMat: {fileID: 2100000, guid: 2fa222c9538e12a41a969ed0e7adc30e, type: 2}
+--- !u!84 &31306506
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 1
+  m_Height: 1
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 0
+  m_ColorFormat: 4
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 1
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 3
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &1226074091
 GameObject:
   m_ObjectHideFlags: 0
