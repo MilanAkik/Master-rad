@@ -29,11 +29,25 @@ namespace Assets.Scripts.Generators
 
         public override Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters)
         {
-            var res = new Matrix4x4[parameters.CylinderCount];
-            for (int i = 0; i < parameters.CylinderCount; i++)
+            int count = parameters.CylinderCount;
+            int seed = parameters.RandomSeed;
+            var res = new Matrix4x4[count];
+            var prevState = Random.state;
+            Random.InitState(seed);
+            for (int i = 0; i < count; i++)
             {
-                res[i] = Matrix4x4.zero;
+                var x = Random.Range(-1.0f, 1.0f);
+                var y = Random.Range(-0.5f, 0.5f);
+                var r = Random.Range(0.01f, 0.99f);
+                var z = Random.Range(-1.0f, 1.0f);
+                res[i] = new Matrix4x4(
+                    new Vector4(x, y, z + 5.0f, r),
+                    new Vector4(1,0,0,0),
+                    Vector4.zero,
+                    Vector4.zero
+                );
             }
+            Random.state = prevState;
             return res;
         }
     }
