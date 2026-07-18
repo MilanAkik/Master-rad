@@ -11,6 +11,7 @@ public static class MaterialParametrizer
     private static int PropertyId_LightPosition = Shader.PropertyToID("_LightPosition");
 
     private static int PropertyId_Cylinders = Shader.PropertyToID("_Cylinders");
+    private static int PropertyId_CylinderMatrices = Shader.PropertyToID("_CylinderMatrices");
     private static int PropertyId_CylinderCount = Shader.PropertyToID("_CylinderCount");
 
     private static int PropertyId_RadiusMultiplier = Shader.PropertyToID("_RadiusMultiplier");
@@ -49,6 +50,7 @@ public static class MaterialParametrizer
     public static void Parametrize(this Material material, CylinderParameters cylinderParameters)
     {
         material.SetVectorArray(PropertyId_Cylinders, cylinderParameters.Cylinders);
+        material.SetMatrixArray(PropertyId_CylinderMatrices, new Matrix4x4[cylinderParameters.CylinderCount]);
         material.SetInt(PropertyId_CylinderCount, cylinderParameters.CylinderCount);
     }
 
