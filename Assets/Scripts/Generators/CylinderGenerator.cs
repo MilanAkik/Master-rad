@@ -6,5 +6,6 @@ namespace Assets.Scripts.Generators
     public abstract class CylinderGenerator : ScriptableObject, ICylinderGenerator
     {
         public abstract Vector4[] getCylinders(GeneratorParameters parameters);
+        public abstract Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters);
     }
 }

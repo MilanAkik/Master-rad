@@ -70,5 +70,7 @@ namespace Assets.Scripts.Generators
             }
             return res;
         }
+
+        public override Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters) => new Matrix4x4[parameters.CylinderCount];
     }
 }
