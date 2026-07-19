@@ -32,6 +32,7 @@
             
             // Cylinders parameters
             float4 _Cylinders[512];
+            float4x4 _CylinderMatrices[512];
             int _CylinderCount;
             
             //Cylinder shape parameters
@@ -270,7 +271,8 @@
                 int closestIndex = 0;
                 for(int j=0; j<_CylinderCount; j++)
                 {
-                    intersection res = closestCylinder(ro, rd, _Cylinders[j]);
+                    // intersection res = closestCylinder(ro, rd, _Cylinders[j]);
+                    intersection res = closestCylinder(ro, rd, _CylinderMatrices[j][0]);
                     if(res.count>0){
                         hits++;
                         float4 p = res.first;
@@ -289,7 +291,8 @@
                 for(int i=0; i<steps; i++){
                     float3 currPoint = closest.first.xyz + i * dv;
                     float den = denistyAtPoint(currPoint);
-                    float4 cyl = _Cylinders[closestIndex];
+                    float4 cyl = _CylinderMatrices[closestIndex][0];
+                    // float4 cyl = _Cylinders[closestIndex];
                     float halfheight = getHeight(cyl.w)/2.0f;
                     float middle = cyl.y + halfheight;
                     float dist = abs(currPoint.y - middle)/halfheight;
