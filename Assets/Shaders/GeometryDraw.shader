@@ -99,9 +99,9 @@
                 float a4 = ro.y;
                 float a5 = rd.z;
                 float a6 = ro.z;
-                float a7 = cylinder[0][3]*_RadiusMultiplier;
+                float a7 = cylinder[0][3];
                 float a8 = cylinder[0][0];
-                float a9 = cylinder[0][3]*_RadiusMultiplier;
+                float a9 = cylinder[0][3];
                 float a10 = cylinder[0][2];
                 float sqa7 = a7*a7;
                 float sqa5 = a5*a5;

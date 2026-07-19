@@ -10,6 +10,7 @@ namespace Assets.Scripts.Generators
         public ComputeShader computeShader;
         public int textureSize = 128;
         private RenderTexture resultTexture;
+        private const float _RadiusMultiplier = 1.0f;
         private const float _RadiusThreshold = 0.2f;
         private const float _HeightMultiplier = 1.0f;
 
@@ -137,7 +138,7 @@ namespace Assets.Scripts.Generators
                 z = 2f * z + 8f;
                 float h = getHeight(r);
                 res[e] = new Matrix4x4(
-                    new Vector4(x, y, z, r),
+                    new Vector4(x, y, z, r * _RadiusMultiplier),
                     new Vector4(h, 0, 0, 0),
                     Vector4.zero,
                     Vector4.zero

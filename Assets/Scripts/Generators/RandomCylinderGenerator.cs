@@ -9,6 +9,7 @@ namespace Assets.Scripts.Generators
     public class RandomCylinderGenerator : CylinderGenerator
     {
 
+        private const float _RadiusMultiplier = 1.0f;
         private const float _RadiusThreshold = 0.2f;
         private const float _HeightMultiplier = 1.0f;
 
@@ -46,7 +47,7 @@ namespace Assets.Scripts.Generators
                 var r = Random.Range(0.01f, 0.99f);
                 var h = getHeight(r);
                 res[i] = new Matrix4x4(
-                    new Vector4(x, y, z + 5.0f, r),
+                    new Vector4(x, y, z + 5.0f, r * _RadiusMultiplier),
                     new Vector4(h,0,0,0),
                     Vector4.zero,
                     Vector4.zero
