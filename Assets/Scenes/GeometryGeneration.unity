@@ -269,6 +269,9 @@ MonoBehaviour:
       generatorParameters:
         cylinderCount: 50
         randomSeed: 1234
+        radiusMultiplier: 1
+        radiusThreshold: 0.2
+        heightMultiplier: 1
       generator: {fileID: 11400000, guid: b0ca920605c390d41a39262dd4e40fbb, type: 2}
     densityParameters:
       densityNoise: {fileID: 31306506}

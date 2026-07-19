@@ -7,8 +7,14 @@ namespace Assets.Scripts.Models
     {
         [SerializeField] private int cylinderCount;
         [SerializeField] private int randomSeed;
+        [SerializeField] private float radiusMultiplier;
+        [SerializeField] private float radiusThreshold;
+        [SerializeField] private float heightMultiplier;
 
         public int CylinderCount { get => cylinderCount; set => cylinderCount = value; }
         public int RandomSeed { get => randomSeed; set => randomSeed = value; }
+        public float RadiusMultiplier { get => radiusMultiplier; set => radiusMultiplier = value; }
+        public float RadiusThreshold { get => radiusThreshold; set => radiusThreshold = value; }
+        public float HeightMultiplier { get => heightMultiplier; set => heightMultiplier = value; }
     }
 }
