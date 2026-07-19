@@ -67,17 +67,6 @@
                 float4 second;
             };
             
-            float getHeight(float radius){
-                float r1 = radius;
-                if (r1 < _RadiusThreshold) return 0;
-                float a1 = 2 / (_RadiusThreshold - 1);
-                float a = a1 * a1;
-                float b = -a * (_RadiusThreshold + 1);
-                float c = 1 - a - b;
-                float h = 2.0f - a * r1 * r1 - b * r1 - c;
-                return _HeightMultiplier * h;
-            }
-
             intersection noIntersection(){
                 intersection res;
                 res.count = 0;
@@ -154,7 +143,7 @@
                 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
                 float ymin = cylinder[0][1];
-                float ymax = ymin + getHeight(cylinder[0][3]);
+                float ymax = ymin + cylinder[1][0];
                 //3x3 of combinations of the positions
                 if(v1.y < ymin){
                     if(v2.y < ymin){
