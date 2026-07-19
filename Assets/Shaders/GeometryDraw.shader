@@ -230,7 +230,17 @@
                 int closestIndex = 0;
                 for(int j=0; j<_CylinderCount; j++)
                 {
-                    intersection res = closestCylinder(ro, rd, _Cylinders[j]);
+                    // float x = _Cylinders[j].x;
+                    // float x = _CylinderMatrices[j][0][0];
+                    // float y = _Cylinders[j].y;
+                    // float y = _CylinderMatrices[j][0][1];
+                    // float z = _Cylinders[j].z;
+                    // float z = _CylinderMatrices[j][0][2];
+                    // float w = _Cylinders[j].w;
+                    // float w = _CylinderMatrices[j][0][3];
+                    // intersection res = closestCylinder(ro, rd, float4(x,y,z,w));
+                    intersection res = closestCylinder(ro, rd, _CylinderMatrices[j][0]);
+                    // intersection res = closestCylinder(ro, rd, _Cylinders[j]);
                     if(res.count>0){
                         hits++;
                         float4 p = res.first;
