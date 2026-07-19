@@ -10,9 +10,6 @@ namespace Assets.Scripts.Generators
         public ComputeShader computeShader;
         public int textureSize = 128;
         private RenderTexture resultTexture;
-        private const float _RadiusMultiplier = 1.0f;
-        private const float _RadiusThreshold = 0.2f;
-        private const float _HeightMultiplier = 1.0f;
 
         public override Vector4[] getCylinders(GeneratorParameters parameters)
         {
@@ -136,9 +133,9 @@ namespace Assets.Scripts.Generators
                 x = 2f * x;
                 y = 1f - y;
                 z = 2f * z + 8f;
-                float h = getHeight(r);
+                float h = getHeight(r, parameters);
                 res[e] = new Matrix4x4(
-                    new Vector4(x, y, z, r * _RadiusMultiplier),
+                    new Vector4(x, y, z, r * parameters.RadiusMultiplier),
                     new Vector4(h, 0, 0, 0),
                     Vector4.zero,
                     Vector4.zero
@@ -147,16 +144,16 @@ namespace Assets.Scripts.Generators
             return res;
         }
 
-        private float getHeight(float radius)
+        private float getHeight(float radius, GeneratorParameters parameters)
         {
             float r1 = radius;
-            if (r1 < _RadiusThreshold) return 0;
-            float a1 = 2 / (_RadiusThreshold - 1);
+            if (r1 < parameters.RadiusThreshold) return 0;
+            float a1 = 2 / (parameters.RadiusThreshold - 1);
             float a = a1 * a1;
-            float b = -a * (_RadiusThreshold + 1);
+            float b = -a * (parameters.RadiusThreshold + 1);
             float c = 1 - a - b;
             float h = 2.0f - a * r1 * r1 - b * r1 - c;
-            return _HeightMultiplier * h;
+            return parameters.HeightMultiplier * h;
         }
     }
 }

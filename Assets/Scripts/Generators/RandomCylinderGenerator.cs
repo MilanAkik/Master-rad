@@ -9,10 +9,6 @@ namespace Assets.Scripts.Generators
     public class RandomCylinderGenerator : CylinderGenerator
     {
 
-        private const float _RadiusMultiplier = 1.0f;
-        private const float _RadiusThreshold = 0.2f;
-        private const float _HeightMultiplier = 1.0f;
-
         public override Vector4[] getCylinders(GeneratorParameters parameters)
         {
             int count = parameters.CylinderCount;
@@ -45,9 +41,9 @@ namespace Assets.Scripts.Generators
                 var y = Random.Range(-0.5f, 0.5f);
                 var z = Random.Range(-1.0f, 1.0f);
                 var r = Random.Range(0.01f, 0.99f);
-                var h = getHeight(r);
+                var h = getHeight(r, parameters);
                 res[i] = new Matrix4x4(
-                    new Vector4(x, y, z + 5.0f, r * _RadiusMultiplier),
+                    new Vector4(x, y, z + 5.0f, r * parameters.RadiusMultiplier),
                     new Vector4(h,0,0,0),
                     Vector4.zero,
                     Vector4.zero
@@ -57,16 +53,16 @@ namespace Assets.Scripts.Generators
             return res;
         }
 
-        private float getHeight(float radius)
+        private float getHeight(float radius, GeneratorParameters parameters)
         {
             float r1 = radius;
-            if (r1 < _RadiusThreshold) return 0;
-            float a1 = 2 / (_RadiusThreshold - 1);
+            if (r1 < parameters.RadiusThreshold) return 0;
+            float a1 = 2 / (parameters.RadiusThreshold - 1);
             float a = a1 * a1;
-            float b = -a * (_RadiusThreshold + 1);
+            float b = -a * (parameters.RadiusThreshold + 1);
             float c = 1 - a - b;
             float h = 2.0f - a * r1 * r1 - b * r1 - c;
-            return _HeightMultiplier * h;
+            return parameters.HeightMultiplier * h;
         }
     }
 }
