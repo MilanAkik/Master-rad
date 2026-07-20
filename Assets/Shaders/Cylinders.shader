@@ -102,7 +102,7 @@
                 return res;
             }
 
-            intersection closestCylinder(float3 ro, float3 rd, float4 cylinder)
+            intersection closestCylinder(float3 ro, float3 rd, float4x4 cylinder)
             {
                 float a1 = rd.x;
                 float a2 = ro.x;
@@ -110,10 +110,10 @@
                 float a4 = ro.y;
                 float a5 = rd.z;
                 float a6 = ro.z;
-                float a7 = cylinder.w*_RadiusMultiplier;
-                float a8 = cylinder.x;
-                float a9 = cylinder.w*_RadiusMultiplier;
-                float a10 = cylinder.z;
+                float a7 = cylinder[0][3]*_RadiusMultiplier;
+                float a8 = cylinder[0][0];
+                float a9 = cylinder[0][3]*_RadiusMultiplier;
+                float a10 = cylinder[0][2];
                 float sqa7 = a7*a7;
                 float sqa5 = a5*a5;
                 float sqa9 = a9*a9;
@@ -153,8 +153,8 @@
                 }
                 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
-                float ymin = cylinder.y;
-                float ymax = ymin + getHeight(cylinder.w);
+                float ymin = cylinder[0][1];
+                float ymax = ymin + cylinder[1][0];
                 //3x3 of combinations of the positions
                 if(v1.y < ymin){
                     if(v2.y < ymin){
@@ -272,7 +272,7 @@
                 for(int j=0; j<_CylinderCount; j++)
                 {
                     // intersection res = closestCylinder(ro, rd, _Cylinders[j]);
-                    intersection res = closestCylinder(ro, rd, _CylinderMatrices[j][0]);
+                    intersection res = closestCylinder(ro, rd, _CylinderMatrices[j]);
                     if(res.count>0){
                         hits++;
                         float4 p = res.first;
@@ -291,10 +291,10 @@
                 for(int i=0; i<steps; i++){
                     float3 currPoint = closest.first.xyz + i * dv;
                     float den = denistyAtPoint(currPoint);
-                    float4 cyl = _CylinderMatrices[closestIndex][0];
+                    float4x4 cyl = _CylinderMatrices[closestIndex];
                     // float4 cyl = _Cylinders[closestIndex];
-                    float halfheight = getHeight(cyl.w)/2.0f;
-                    float middle = cyl.y + halfheight;
+                    float halfheight = getHeight(cyl[0][3])/2.0f;
+                    float middle = cyl[0][1] + halfheight;
                     float dist = abs(currPoint.y - middle)/halfheight;
                     val += den;
                 }
