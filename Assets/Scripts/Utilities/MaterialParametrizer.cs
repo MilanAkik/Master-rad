@@ -50,7 +50,6 @@ public static class MaterialParametrizer
 
     public static void Parametrize(this Material material, CylinderParameters cylinderParameters)
     {
-        material.SetVectorArray(PropertyId_Cylinders, cylinderParameters.Cylinders);
         material.SetMatrixArray(PropertyId_CylinderMatrices, cylinderParameters.CylinderMatrices.Select(x=>x.transpose).ToList());
         material.SetInt(PropertyId_CylinderCount, cylinderParameters.CylinderCount);
     }

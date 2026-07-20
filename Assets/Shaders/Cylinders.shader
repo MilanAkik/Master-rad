@@ -31,7 +31,6 @@
             float3 _LightPosition;
             
             // Cylinders parameters
-            float4 _Cylinders[512];
             float4x4 _CylinderMatrices[512];
             int _CylinderCount;
             
