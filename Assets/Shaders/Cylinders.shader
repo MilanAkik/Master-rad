@@ -65,17 +65,6 @@
                 float4 first;
                 float4 second;
             };
-            
-            float getHeight(float radius){
-                float r1 = radius;
-                if (r1 < _RadiusThreshold) return 0;
-                float a1 = 2 / (_RadiusThreshold - 1);
-                float a = a1 * a1;
-                float b = -a * (_RadiusThreshold + 1);
-                float c = 1 - a - b;
-                float h = 2.0f - a * r1 * r1 - b * r1 - c;
-                return _HeightMultiplier * h;
-            }
 
             intersection noIntersection(){
                 intersection res;
@@ -109,9 +98,9 @@
                 float a4 = ro.y;
                 float a5 = rd.z;
                 float a6 = ro.z;
-                float a7 = cylinder[0][3]*_RadiusMultiplier;
+                float a7 = cylinder[0][3];
                 float a8 = cylinder[0][0];
-                float a9 = cylinder[0][3]*_RadiusMultiplier;
+                float a9 = cylinder[0][3];
                 float a10 = cylinder[0][2];
                 float sqa7 = a7*a7;
                 float sqa5 = a5*a5;
@@ -292,7 +281,7 @@
                     float den = denistyAtPoint(currPoint);
                     float4x4 cyl = _CylinderMatrices[closestIndex];
                     // float4 cyl = _Cylinders[closestIndex];
-                    float halfheight = getHeight(cyl[0][3])/2.0f;
+                    float halfheight = cyl[1][0]/2.0f;
                     float middle = cyl[0][1] + halfheight;
                     float dist = abs(currPoint.y - middle)/halfheight;
                     val += den;
