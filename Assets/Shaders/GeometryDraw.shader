@@ -31,14 +31,9 @@
             float3 _LightPosition;
             
             // Cylinders parameters
-            float4 _Cylinders[512];
+            float4x4 _CylinderMatrices[512];
             int _CylinderCount;
             
-            //Cylinder shape parameters
-            float _RadiusMultiplier;
-            float _HeightMultiplier;
-            float _RadiusThreshold;
-
             //Area parameters
             float3 _areaMin;
             float3 _areaMax;
@@ -66,17 +61,6 @@
                 float4 second;
             };
             
-            float getHeight(float radius){
-                float r1 = radius;
-                if (r1 < _RadiusThreshold) return 0;
-                float a1 = 2 / (_RadiusThreshold - 1);
-                float a = a1 * a1;
-                float b = -a * (_RadiusThreshold + 1);
-                float c = 1 - a - b;
-                float h = 2.0f - a * r1 * r1 - b * r1 - c;
-                return _HeightMultiplier * h;
-            }
-
             intersection noIntersection(){
                 intersection res;
                 res.count = 0;
@@ -101,7 +85,7 @@
                 return res;
             }
 
-            intersection closestCylinder(float3 ro, float3 rd, float4 cylinder)
+            intersection closestCylinder(float3 ro, float3 rd, float4x4 cylinder)
             {
                 float a1 = rd.x;
                 float a2 = ro.x;
@@ -109,10 +93,10 @@
                 float a4 = ro.y;
                 float a5 = rd.z;
                 float a6 = ro.z;
-                float a7 = cylinder.w*_RadiusMultiplier;
-                float a8 = cylinder.x;
-                float a9 = cylinder.w*_RadiusMultiplier;
-                float a10 = cylinder.z;
+                float a7 = cylinder[0][3];
+                float a8 = cylinder[0][0];
+                float a9 = cylinder[0][3];
+                float a10 = cylinder[0][2];
                 float sqa7 = a7*a7;
                 float sqa5 = a5*a5;
                 float sqa9 = a9*a9;
@@ -152,8 +136,8 @@
                 }
                 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
                 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
-                float ymin = cylinder.y;
-                float ymax = ymin + getHeight(cylinder.w);
+                float ymin = cylinder[0][1];
+                float ymax = ymin + cylinder[1][0];
                 //3x3 of combinations of the positions
                 if(v1.y < ymin){
                     if(v2.y < ymin){
@@ -229,7 +213,7 @@
                 int closestIndex = 0;
                 for(int j=0; j<_CylinderCount; j++)
                 {
-                    intersection res = closestCylinder(ro, rd, _Cylinders[j]);
+                    intersection res = closestCylinder(ro, rd, _CylinderMatrices[j]);
                     if(res.count>0){
                         hits++;
                         float4 p = res.first;

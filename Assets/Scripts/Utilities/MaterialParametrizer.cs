@@ -1,5 +1,6 @@
 using UnityEngine;
 using Assets.Scripts.Models;
+using System.Linq;
 
 public static class MaterialParametrizer
 {
@@ -10,12 +11,8 @@ public static class MaterialParametrizer
     private static int PropertyId_LightColor = Shader.PropertyToID("_LightColor");
     private static int PropertyId_LightPosition = Shader.PropertyToID("_LightPosition");
 
-    private static int PropertyId_Cylinders = Shader.PropertyToID("_Cylinders");
+    private static int PropertyId_CylinderMatrices = Shader.PropertyToID("_CylinderMatrices");
     private static int PropertyId_CylinderCount = Shader.PropertyToID("_CylinderCount");
-
-    private static int PropertyId_RadiusMultiplier = Shader.PropertyToID("_RadiusMultiplier");
-    private static int PropertyId_HeightMultiplier = Shader.PropertyToID("_HeightMultiplier");
-    private static int PropertyId_RadiusThreshold = Shader.PropertyToID("_RadiusThreshold");
 
     private static int PropertyId_DensityNoise = Shader.PropertyToID("_DensityNoise");
     private static int PropertyId_DensityNoiseSize = Shader.PropertyToID("_DensityNoiseSize");
@@ -28,7 +25,6 @@ public static class MaterialParametrizer
         material.Parametrize(cloudConfig.CameraParameters);
         material.Parametrize(cloudConfig.LightParameters);
         material.Parametrize(cloudConfig.CylinderParameters);
-        material.Parametrize(cloudConfig.ShapeParameters);
         material.Parametrize(cloudConfig.DensityParameters);
         material.Parametrize(cloudConfig.AreaParameters);
     }
@@ -48,15 +44,8 @@ public static class MaterialParametrizer
 
     public static void Parametrize(this Material material, CylinderParameters cylinderParameters)
     {
-        material.SetVectorArray(PropertyId_Cylinders, cylinderParameters.Cylinders);
+        material.SetMatrixArray(PropertyId_CylinderMatrices, cylinderParameters.CylinderMatrices.Select(x=>x.transpose).ToList());
         material.SetInt(PropertyId_CylinderCount, cylinderParameters.CylinderCount);
-    }
-
-    public static void Parametrize(this Material material, ShapeParameters shapeParameters)
-    {
-        material.SetFloat(PropertyId_RadiusMultiplier, shapeParameters.RadiusMultiplier);
-        material.SetFloat(PropertyId_HeightMultiplier, shapeParameters.HeightMultiplier);
-        material.SetFloat(PropertyId_RadiusThreshold, shapeParameters.RadiusThreshold);
     }
 
     public static void Parametrize(this Material material, DensityParameters densityParameters)

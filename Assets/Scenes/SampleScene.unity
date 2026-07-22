@@ -306,6 +306,9 @@ MonoBehaviour:
       generatorParameters:
         cylinderCount: 50
         randomSeed: 1234
+        radiusMultiplier: 1
+        radiusThreshold: 0.2
+        heightMultiplier: 1
       generator: {fileID: 11400000, guid: b0ca920605c390d41a39262dd4e40fbb, type: 2}
     densityParameters:
       densityNoise: {fileID: 393466613}
@@ -314,10 +317,6 @@ MonoBehaviour:
     lightParameters:
       lightColor: {x: 1, y: 1, z: 1, w: 0}
       lightPosition: {x: 0, y: 0, z: 0}
-    shapeParameters:
-      radiusMultiplier: 1
-      heightMultiplier: 1
-      radiusThreshold: 0.2
   raymarchMat: {fileID: 2100000, guid: 19e8804431024704688f65e5139b0e6d, type: 2}
 --- !u!1 &1926647031
 GameObject:

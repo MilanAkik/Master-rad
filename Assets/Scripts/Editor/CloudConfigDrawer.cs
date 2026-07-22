@@ -27,7 +27,6 @@ namespace Assets.Scripts.Editor
                 var cylinderParametersProp = prop.FindPropertyRelative("cylinderParameters");
                 var densityParametersProp = prop.FindPropertyRelative("densityParameters");
                 var lightParametersProp = prop.FindPropertyRelative("lightParameters");
-                var shapeParametersProp = prop.FindPropertyRelative("shapeParameters");
 
                 var y = pos.y + fieldHeight + padding;
 
@@ -35,7 +34,6 @@ namespace Assets.Scripts.Editor
                 y = DrawProperty(pos, y, cylinderParametersProp, "Cylinder parameters");
                 y = DrawProperty(pos, y, densityParametersProp, "Density parameters");
                 y = DrawProperty(pos, y, lightParametersProp, "Light parameters");
-                DrawProperty(pos, y, shapeParametersProp, "Shape parameters");
 
                 EditorGUI.indentLevel--;
             }
@@ -54,15 +52,13 @@ namespace Assets.Scripts.Editor
             var cylinderParametersProp = prop.FindPropertyRelative("cylinderParameters");
             var densityParametersProp = prop.FindPropertyRelative("densityParameters");
             var lightParametersProp = prop.FindPropertyRelative("lightParameters");
-            var shapeParametersProp = prop.FindPropertyRelative("shapeParameters");
 
             return fieldHeight
                 + padding
                 + EditorGUI.GetPropertyHeight(areaParametersProp, includeChildren: true) + padding
                 + EditorGUI.GetPropertyHeight(cylinderParametersProp, includeChildren: true) + padding
                 + EditorGUI.GetPropertyHeight(densityParametersProp, includeChildren: true) + padding
-                + EditorGUI.GetPropertyHeight(lightParametersProp, includeChildren: true) + padding
-                + EditorGUI.GetPropertyHeight(shapeParametersProp, includeChildren: true);
+                + EditorGUI.GetPropertyHeight(lightParametersProp, includeChildren: true);
         }
 
         private static float DrawProperty(Rect pos, float y, SerializedProperty property, string displayName)

@@ -8,6 +8,7 @@ namespace Assets.Scripts.Generators
     [CreateAssetMenu(menuName = "CylinderGenerator/Random")]
     public class RandomCylinderGenerator : CylinderGenerator
     {
+
         public override Vector4[] getCylinders(GeneratorParameters parameters)
         {
             int count = parameters.CylinderCount;
@@ -25,6 +26,43 @@ namespace Assets.Scripts.Generators
             }
             Random.state = prevState;
             return res;
+        }
+
+        public override Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters)
+        {
+            int count = parameters.CylinderCount;
+            int seed = parameters.RandomSeed;
+            var res = new Matrix4x4[count];
+            var prevState = Random.state;
+            Random.InitState(seed);
+            for (int i = 0; i < count; i++)
+            {
+                var x = Random.Range(-1.0f, 1.0f);
+                var y = Random.Range(-0.5f, 0.5f);
+                var z = Random.Range(-1.0f, 1.0f);
+                var r = Random.Range(0.01f, 0.99f);
+                var h = getHeight(r, parameters);
+                res[i] = new Matrix4x4(
+                    new Vector4(x, y, z + 5.0f, r * parameters.RadiusMultiplier),
+                    new Vector4(h,0,0,0),
+                    Vector4.zero,
+                    Vector4.zero
+                );
+            }
+            Random.state = prevState;
+            return res;
+        }
+
+        private float getHeight(float radius, GeneratorParameters parameters)
+        {
+            float r1 = radius;
+            if (r1 < parameters.RadiusThreshold) return 0;
+            float a1 = 2 / (parameters.RadiusThreshold - 1);
+            float a = a1 * a1;
+            float b = -a * (parameters.RadiusThreshold + 1);
+            float c = 1 - a - b;
+            float h = 2.0f - a * r1 * r1 - b * r1 - c;
+            return parameters.HeightMultiplier * h;
         }
     }
 }
