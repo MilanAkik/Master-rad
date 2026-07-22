@@ -11,7 +11,6 @@ public static class MaterialParametrizer
     private static int PropertyId_LightColor = Shader.PropertyToID("_LightColor");
     private static int PropertyId_LightPosition = Shader.PropertyToID("_LightPosition");
 
-    private static int PropertyId_Cylinders = Shader.PropertyToID("_Cylinders");
     private static int PropertyId_CylinderMatrices = Shader.PropertyToID("_CylinderMatrices");
     private static int PropertyId_CylinderCount = Shader.PropertyToID("_CylinderCount");
 
@@ -30,7 +29,6 @@ public static class MaterialParametrizer
         material.Parametrize(cloudConfig.CameraParameters);
         material.Parametrize(cloudConfig.LightParameters);
         material.Parametrize(cloudConfig.CylinderParameters);
-        material.Parametrize(cloudConfig.ShapeParameters);
         material.Parametrize(cloudConfig.DensityParameters);
         material.Parametrize(cloudConfig.AreaParameters);
     }
