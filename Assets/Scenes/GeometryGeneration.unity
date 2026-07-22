@@ -280,10 +280,6 @@ MonoBehaviour:
     lightParameters:
       lightColor: {x: 1, y: 1, z: 1, w: 0}
       lightPosition: {x: 0, y: 0, z: 0}
-    shapeParameters:
-      radiusMultiplier: 1
-      heightMultiplier: 1
-      radiusThreshold: 0.2
   raymarchMat: {fileID: 2100000, guid: 2fa222c9538e12a41a969ed0e7adc30e, type: 2}
 --- !u!84 &31306506
 RenderTexture:
