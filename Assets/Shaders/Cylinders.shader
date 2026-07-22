@@ -33,11 +33,6 @@
             // Cylinders parameters
             float4x4 _CylinderMatrices[512];
             int _CylinderCount;
-            
-            //Cylinder shape parameters
-            float _RadiusMultiplier;
-            float _HeightMultiplier;
-            float _RadiusThreshold;
 
             //Area parameters
             float3 _areaMin;
