@@ -110,7 +110,8 @@ namespace Assets.Scripts.Generators
                 float x = ((float)maxi / (float)textureSize) * 2f - 1f;
                 float y = tex.GetPixel((maxi + 2) % textureSize, (maxj + 2) % textureSize).r;
                 float z = ((float)maxj / (float)textureSize) * 2f - 1f;
-                float r = tex.GetPixel((maxi + 5) % textureSize, (maxj + 5) % textureSize).r; ;
+                float r = tex.GetPixel((maxi + 5) % textureSize, (maxj + 5) % textureSize).r;
+                float h = tex.GetPixel((maxi + 3) % textureSize, (maxj + 3) % textureSize).r;
                 int radius = 8;
                 for (int i = -radius; i < radius + 1; i++)
                 {
@@ -130,30 +131,20 @@ namespace Assets.Scripts.Generators
                 if (y == 0) y = 0.001f;
                 if (z == 0) z = 0.001f;
                 if (r == 0) r = 0.001f;
+                if (h == 0) h = 0.001f;
                 x = 2f * x;
                 y = 1f - y;
                 z = 2f * z + 8f;
-                float h = getHeight(r, parameters);
+                r = r * parameters.RadiusMultiplier;
+                h = h * parameters.HeightMultiplier;
                 res[e] = new Matrix4x4(
-                    new Vector4(x, y, z, r * parameters.RadiusMultiplier),
+                    new Vector4(x, y, z, r),
                     new Vector4(h, 0, 0, 0),
                     Vector4.zero,
                     Vector4.zero
                 );
             }
             return res;
-        }
-
-        private float getHeight(float radius, GeneratorParameters parameters)
-        {
-            float r1 = radius;
-            if (r1 < parameters.RadiusThreshold) return 0;
-            float a1 = 2 / (parameters.RadiusThreshold - 1);
-            float a = a1 * a1;
-            float b = -a * (parameters.RadiusThreshold + 1);
-            float c = 1 - a - b;
-            float h = 2.0f - a * r1 * r1 - b * r1 - c;
-            return parameters.HeightMultiplier * h;
         }
     }
 }
