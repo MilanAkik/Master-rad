@@ -48,12 +48,7 @@ namespace Assets.Scripts.Generators
                 var z = Random.Range(_zRange.x, _zRange.y) + 5.0f;
                 var r = Random.Range(_rRange.x, _rRange.y) * parameters.RadiusMultiplier;
                 var h = Random.Range(_hRange.x, _hRange.y) * parameters.HeightMultiplier;
-                res[i] = new Matrix4x4(
-                    new Vector4(x, y, z, r),
-                    new Vector4(h,0,0,0),
-                    Vector4.zero,
-                    Vector4.zero
-                );
+                res[i] = new Matrix4x4( new Vector4(x, y, z, r), new Vector4(h,0,0,0), Vector4.zero, Vector4.zero );
             }
             Random.state = prevState;
             return res;

@@ -137,12 +137,7 @@ namespace Assets.Scripts.Generators
                 z = 2f * z + 8f;
                 r = r * parameters.RadiusMultiplier;
                 h = h * parameters.HeightMultiplier;
-                res[e] = new Matrix4x4(
-                    new Vector4(x, y, z, r),
-                    new Vector4(h, 0, 0, 0),
-                    Vector4.zero,
-                    Vector4.zero
-                );
+                res[e] = new Matrix4x4( new Vector4(x, y, z, r), new Vector4(h, 0, 0, 0), Vector4.zero, Vector4.zero );
             }
             return res;
         }
