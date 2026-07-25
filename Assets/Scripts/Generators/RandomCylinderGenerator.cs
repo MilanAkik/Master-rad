@@ -38,10 +38,10 @@ namespace Assets.Scripts.Generators
             for (int i = 0; i < count; i++)
             {
                 var x = Random.Range(-1.0f, 1.0f);
-                var y = Random.Range(-0.5f, 0.5f);
+                var y = Random.Range(-0.1f, 0.1f);
                 var z = Random.Range(-1.0f, 1.0f);
                 var r = Random.Range(0.01f, 0.99f);
-                var h = getHeight(r, parameters);
+                var h = Random.Range(0.01f, 0.99f);
                 res[i] = new Matrix4x4(
                     new Vector4(x, y, z + 5.0f, r * parameters.RadiusMultiplier),
                     new Vector4(h,0,0,0),
@@ -53,16 +53,5 @@ namespace Assets.Scripts.Generators
             return res;
         }
 
-        private float getHeight(float radius, GeneratorParameters parameters)
-        {
-            float r1 = radius;
-            if (r1 < parameters.RadiusThreshold) return 0;
-            float a1 = 2 / (parameters.RadiusThreshold - 1);
-            float a = a1 * a1;
-            float b = -a * (parameters.RadiusThreshold + 1);
-            float c = 1 - a - b;
-            float h = 2.0f - a * r1 * r1 - b * r1 - c;
-            return parameters.HeightMultiplier * h;
-        }
     }
 }
