@@ -99,7 +99,6 @@ namespace Assets.Scripts.Generators
                 float z = ((float)maxj / (float)textureSize) * 2f - 1f;
                 float r = tex.GetPixel((maxi + _rOffset.x) % textureSize, (maxj + _rOffset.y) % textureSize).r;
                 float h = tex.GetPixel((maxi + _hOffset.x) % textureSize, (maxj + _hOffset.y) % textureSize).r;
-                UpdateTexture(tex, maxi, maxj);
                 if (x == 0) x = 0.001f;
                 if (y == 0) y = 0.001f;
                 if (z == 0) z = 0.001f;
@@ -110,6 +109,7 @@ namespace Assets.Scripts.Generators
                 z = 2f * z + 8f;
                 r = r * parameters.RadiusMultiplier;
                 h = h * parameters.HeightMultiplier;
+                UpdateTexture(tex, maxi, maxj);
                 res[e] = new Matrix4x4( new Vector4(x, y, z, r), new Vector4(h, 0, 0, 0), Vector4.zero, Vector4.zero );
             }
             return res;
