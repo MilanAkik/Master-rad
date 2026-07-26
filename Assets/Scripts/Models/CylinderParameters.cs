@@ -12,7 +12,6 @@ namespace Assets.Scripts.Models
 
         public GeneratorParameters GeneratorParameters => generatorParameters;
         public CylinderGenerator Generator => generator;
-        public Vector4[] Cylinders => generator.getCylinders(generatorParameters);
         public Matrix4x4[] CylinderMatrices => generator.getCylinderMatrices(generatorParameters);
         public int CylinderCount => generatorParameters.CylinderCount;
 
