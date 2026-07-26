@@ -90,23 +90,7 @@ namespace Assets.Scripts.Generators
             var res = new Matrix4x4[count];
             for (int e = 0; e < count; e++)
             {
-
-                float max = 0;
-                int maxi = -1;
-                int maxj = -1;
-                for (int i = 0; i < tex.width; i++)
-                {
-                    for (int j = 0; j < tex.height; j++)
-                    {
-                        var curr = tex.GetPixel(i, j).r;
-                        if (curr > max)
-                        {
-                            max = curr;
-                            maxi = i;
-                            maxj = j;
-                        }
-                    }
-                }
+                var (maxi, maxj) = getMaxValue(tex);
                 float x = ((float)maxi / (float)textureSize) * 2f - 1f;
                 float y = tex.GetPixel((maxi + 2) % textureSize, (maxj + 2) % textureSize).r;
                 float z = ((float)maxj / (float)textureSize) * 2f - 1f;
@@ -141,5 +125,27 @@ namespace Assets.Scripts.Generators
             }
             return res;
         }
+
+        private (int, int) getMaxValue(Texture2D tex)
+        {
+            float max = 0;
+            int maxi = -1;
+            int maxj = -1;
+            for (int i = 0; i < tex.width; i++)
+            {
+                for (int j = 0; j < tex.height; j++)
+                {
+                    var curr = tex.GetPixel(i, j).r;
+                    if (curr > max)
+                    {
+                        max = curr;
+                        maxi = i;
+                        maxj = j;
+                    }
+                }
+            }
+            return (maxi, maxj);
+        }
+
     }
 }
