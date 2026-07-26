@@ -10,6 +10,9 @@ namespace Assets.Scripts.Generators
         public ComputeShader computeShader;
         public int textureSize = 128;
         private RenderTexture resultTexture;
+        private Vector2Int _yOffset = new Vector2Int(2, 2);
+        private Vector2Int _rOffset = new Vector2Int(5, 5);
+        private Vector2Int _hOffset = new Vector2Int(3, 3);
 
         public override Vector4[] getCylinders(GeneratorParameters parameters)
         {
@@ -92,10 +95,10 @@ namespace Assets.Scripts.Generators
             {
                 var (maxi, maxj) = getMaxValue(tex);
                 float x = ((float)maxi / (float)textureSize) * 2f - 1f;
-                float y = tex.GetPixel((maxi + 2) % textureSize, (maxj + 2) % textureSize).r;
+                float y = tex.GetPixel((maxi + _yOffset.x) % textureSize, (maxj + _yOffset.y) % textureSize).r;
                 float z = ((float)maxj / (float)textureSize) * 2f - 1f;
-                float r = tex.GetPixel((maxi + 5) % textureSize, (maxj + 5) % textureSize).r;
-                float h = tex.GetPixel((maxi + 3) % textureSize, (maxj + 3) % textureSize).r;
+                float r = tex.GetPixel((maxi + _rOffset.x) % textureSize, (maxj + _rOffset.y) % textureSize).r;
+                float h = tex.GetPixel((maxi + _hOffset.x) % textureSize, (maxj + _hOffset.y) % textureSize).r;
                 int radius = 8;
                 for (int i = -radius; i < radius + 1; i++)
                 {
