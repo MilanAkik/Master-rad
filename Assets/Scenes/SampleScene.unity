@@ -263,9 +263,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cloudConfigScriptable: {fileID: 0}
   cloudConfig:
-    areaParameters:
-      areaMin: {x: -10, y: -10, z: -10}
-      areaMax: {x: 10, y: 10, z: 10}
     cameraParameters:
       camToWorld:
         e00: 1
