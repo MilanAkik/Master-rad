@@ -1,6 +1,7 @@
-using UnityEngine;
 using Assets.Scripts.Models;
 using System.Linq;
+using System.Security.Cryptography;
+using UnityEngine;
 
 public static class MaterialParametrizer
 {
@@ -26,7 +27,6 @@ public static class MaterialParametrizer
         material.Parametrize(cloudConfig.LightParameters);
         material.Parametrize(cloudConfig.CylinderParameters);
         material.Parametrize(cloudConfig.DensityParameters);
-        material.Parametrize(cloudConfig.AreaParameters);
     }
 
     public static void Parametrize(this Material material, CameraParameters cameraParameters)
@@ -46,17 +46,13 @@ public static class MaterialParametrizer
     {
         material.SetMatrixArray(PropertyId_CylinderMatrices, cylinderParameters.CylinderMatrices.Select(x=>x.transpose).ToList());
         material.SetInt(PropertyId_CylinderCount, cylinderParameters.CylinderCount);
+        material.SetVector(PropertyId_AreaMin, cylinderParameters.GeneratorParameters.AreaMin);
+        material.SetVector(PropertyId_AreaMax, cylinderParameters.GeneratorParameters.AreaMax);
     }
 
     public static void Parametrize(this Material material, DensityParameters densityParameters)
     {
         material.SetTexture(PropertyId_DensityNoise, densityParameters.DensityNoise);
         material.SetInt(PropertyId_DensityNoiseSize, densityParameters.DensityNoiseSize);
-    }
-
-    public static void Parametrize(this Material material, AreaParameters areaParameters)
-    {
-        material.SetVector(PropertyId_AreaMin, areaParameters.AreaMin);
-        material.SetVector(PropertyId_AreaMax, areaParameters.AreaMax);
     }
 }
