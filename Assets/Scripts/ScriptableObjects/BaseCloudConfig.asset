@@ -56,6 +56,10 @@ MonoBehaviour:
       generatorParameters:
         cylinderCount: 50
         randomSeed: 1234
+        radiusMultiplier: 0
+        heightMultiplier: 0
+        areaMin: {x: -10, y: -10, z: -10}
+        areaMax: {x: 10, y: 10, z: 10}
       generator: {fileID: 11400000, guid: b0ca920605c390d41a39262dd4e40fbb, type: 2}
     densityParameters:
       densityNoise: {fileID: 0}
@@ -64,7 +68,3 @@ MonoBehaviour:
     lightParameters:
       lightColor: {x: 0, y: 0, z: 0, w: 0}
       lightPosition: {x: 0, y: 0, z: 0}
-    shapeParameters:
-      radiusMultiplier: 1
-      heightMultiplier: 0.5
-      radiusThreshold: 0.2

@@ -285,7 +285,7 @@ MonoBehaviour:
         e32: 0
         e33: 1
       camInverseProjection:
-        e00: 1.0906552
+        e00: 1.0264004
         e01: 0
         e02: 0
         e03: 0
@@ -307,8 +307,9 @@ MonoBehaviour:
         cylinderCount: 50
         randomSeed: 1234
         radiusMultiplier: 1
-        radiusThreshold: 0.2
         heightMultiplier: 1
+        areaMin: {x: -10, y: -10, z: -10}
+        areaMax: {x: 10, y: 10, z: 10}
       generator: {fileID: 11400000, guid: b0ca920605c390d41a39262dd4e40fbb, type: 2}
     densityParameters:
       densityNoise: {fileID: 393466613}
