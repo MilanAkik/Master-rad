@@ -13,12 +13,17 @@ namespace Assets.Scripts.Generators
         private Vector2Int _yOffset = new Vector2Int(2, 2);
         private Vector2Int _rOffset = new Vector2Int(5, 5);
         private Vector2Int _hOffset = new Vector2Int(3, 3);
+        private float rMin = 0.1f;
+        private float hMin = 0.1f;
 
         public override Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters)
         {
             int count = parameters.CylinderCount;
             int seed = parameters.RandomSeed;
-            
+            Vector3 areaMin = parameters.AreaMin;
+            Vector3 areaMax = parameters.AreaMax;
+            Vector3 areaSize = areaMax - areaMin;
+
             resultTexture = TextureUtilities.CreateRenderTexture2d(textureSize, textureSize);
             resultTexture = ComputeShaderUtilities.ComputeTexture2d(computeShader, "CSMain", textureSize, textureSize, resultTexture);
 
@@ -33,16 +38,16 @@ namespace Assets.Scripts.Generators
             for (int e = 0; e < count; e++)
             {
                 var (maxi, maxj) = getMaxValue(tex);
-                float x = ((float)maxi / (float)textureSize) * 2f - 1f;
+                float x = ((float)maxi / (float)textureSize);
                 float y = tex.GetPixel((maxi + _yOffset.x) % textureSize, (maxj + _yOffset.y) % textureSize).r;
-                float z = ((float)maxj / (float)textureSize) * 2f - 1f;
+                float z = ((float)maxj / (float)textureSize);
                 float r = tex.GetPixel((maxi + _rOffset.x) % textureSize, (maxj + _rOffset.y) % textureSize).r;
                 float h = tex.GetPixel((maxi + _hOffset.x) % textureSize, (maxj + _hOffset.y) % textureSize).r;
-                x = 2f * ((x == 0) ? 0.001f : x);
-                y = 1f - ((y == 0) ? 0.001f : y);
-                z = 2f * ((z == 0) ? 0.001f : z) + 8f;
-                r = ((r == 0) ? 0.001f : r) * parameters.RadiusMultiplier;
-                h = ((h == 0) ? 0.001f : h) * parameters.HeightMultiplier;
+                x = areaMin.x + x * areaSize.x;
+                y = areaMin.y + y * areaSize.y;
+                z = areaMin.z + z * areaSize.z;
+                r = (rMin + r * (1-rMin)) * parameters.RadiusMultiplier;
+                h = (hMin + h * (1-hMin)) * parameters.HeightMultiplier;
                 UpdateTexture(tex, maxi, maxj);
                 res[e] = new Matrix4x4( new Vector4(x, y, z, r), new Vector4(h, 0, 0, 0), Vector4.zero, Vector4.zero );
             }

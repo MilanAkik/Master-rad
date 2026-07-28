@@ -270,7 +270,7 @@ MonoBehaviour:
         heightMultiplier: 1.5
         areaMin: {x: -5, y: 0, z: -5}
         areaMax: {x: 5, y: 1, z: 5}
-      generator: {fileID: 11400000, guid: 3044fab94c2477544b1b28847818f3f7, type: 2}
+      generator: {fileID: 11400000, guid: b0ca920605c390d41a39262dd4e40fbb, type: 2}
     densityParameters:
       densityNoise: {fileID: 31306506}
       densityNoiseSize: 256
