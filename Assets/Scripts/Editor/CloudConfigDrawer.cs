@@ -23,14 +23,12 @@ namespace Assets.Scripts.Editor
             {
                 EditorGUI.indentLevel++;
 
-                var areaParametersProp = prop.FindPropertyRelative("areaParameters");
                 var cylinderParametersProp = prop.FindPropertyRelative("cylinderParameters");
                 var densityParametersProp = prop.FindPropertyRelative("densityParameters");
                 var lightParametersProp = prop.FindPropertyRelative("lightParameters");
 
                 var y = pos.y + fieldHeight + padding;
 
-                y = DrawProperty(pos, y, areaParametersProp, "Area parameters");
                 y = DrawProperty(pos, y, cylinderParametersProp, "Cylinder parameters");
                 y = DrawProperty(pos, y, densityParametersProp, "Density parameters");
                 y = DrawProperty(pos, y, lightParametersProp, "Light parameters");
@@ -48,14 +46,12 @@ namespace Assets.Scripts.Editor
                 return fieldHeight;
             }
 
-            var areaParametersProp = prop.FindPropertyRelative("areaParameters");
             var cylinderParametersProp = prop.FindPropertyRelative("cylinderParameters");
             var densityParametersProp = prop.FindPropertyRelative("densityParameters");
             var lightParametersProp = prop.FindPropertyRelative("lightParameters");
 
             return fieldHeight
                 + padding
-                + EditorGUI.GetPropertyHeight(areaParametersProp, includeChildren: true) + padding
                 + EditorGUI.GetPropertyHeight(cylinderParametersProp, includeChildren: true) + padding
                 + EditorGUI.GetPropertyHeight(densityParametersProp, includeChildren: true) + padding
                 + EditorGUI.GetPropertyHeight(lightParametersProp, includeChildren: true);

@@ -29,12 +29,16 @@ namespace Assets.Scripts.Editor
                 var randomSeedProp = generatorParametersProp.FindPropertyRelative("randomSeed");
                 var radiusMultiplierProp = generatorParametersProp.FindPropertyRelative("radiusMultiplier");
                 var heightMultiplierProp = generatorParametersProp.FindPropertyRelative("heightMultiplier");
+                var areaMinProp = generatorParametersProp.FindPropertyRelative("areaMin");
+                var areaMaxProp = generatorParametersProp.FindPropertyRelative("areaMax");
 
                 EditorGUI.PropertyField(GetPropertyPosition(pos, 1), generatorProp, new GUIContent("Generator"));
                 EditorGUI.PropertyField(GetPropertyPosition(pos, 2), cylinderCountProp, new GUIContent("Cylinder count"));
                 EditorGUI.PropertyField(GetPropertyPosition(pos, 3), randomSeedProp, new GUIContent("Random seed"));
                 EditorGUI.PropertyField(GetPropertyPosition(pos, 4), radiusMultiplierProp, new GUIContent("Radius multiplier"));
                 EditorGUI.PropertyField(GetPropertyPosition(pos, 5), heightMultiplierProp, new GUIContent("Height multiplier"));
+                EditorGUI.PropertyField(GetPropertyPosition(pos, 6), areaMinProp, new GUIContent("Area Min"));
+                EditorGUI.PropertyField(GetPropertyPosition(pos, 7), areaMaxProp, new GUIContent("Area Max"));
 
                 EditorGUI.indentLevel--;
             }
@@ -44,7 +48,7 @@ namespace Assets.Scripts.Editor
 
         public override float GetPropertyHeight(SerializedProperty prop, GUIContent label)
         {
-            return fieldHeight + (prop.isExpanded ? 5 * (fieldHeight + padding) : 0);
+            return fieldHeight + (prop.isExpanded ? 7 * (fieldHeight + padding) : 0);
         }
     }
 }
