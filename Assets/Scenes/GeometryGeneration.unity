@@ -266,11 +266,11 @@ MonoBehaviour:
       generatorParameters:
         cylinderCount: 50
         randomSeed: 1234
-        radiusMultiplier: 2
-        heightMultiplier: 1.5
-        areaMin: {x: -5, y: 0, z: -5}
-        areaMax: {x: 5, y: 1, z: 5}
-      generator: {fileID: 11400000, guid: b0ca920605c390d41a39262dd4e40fbb, type: 2}
+        radiusMultiplier: 7.75
+        heightMultiplier: 13.46
+        areaMin: {x: -5, y: -5, z: 5}
+        areaMax: {x: 5, y: 5, z: 15}
+      generator: {fileID: 11400000, guid: ff090ff5bbb85544294747d3b149e82c, type: 2}
     densityParameters:
       densityNoise: {fileID: 31306506}
       densityNoiseSize: 256
