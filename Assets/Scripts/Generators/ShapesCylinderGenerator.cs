@@ -8,15 +8,17 @@ namespace Assets.Scripts.Generators
     public class ShapesCylinderGenerator : CylinderGenerator
     {
 
-        public enum ShapeType { Cube, Circle, Sphere }
+        public enum ShapeType { Cube, Circle, Sphere, Spiral }
 
         public ShapeType shapeType = ShapeType.Cube;
+        public int spiralTurns = 3;
 
         public override Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters) => shapeType switch
         {
             ShapeType.Cube => GenerateCubeCylinders(parameters),
             ShapeType.Circle => GenerateCircleCylinders(parameters),
             ShapeType.Sphere => GenerateSphereCylinders(parameters),
+            ShapeType.Spiral => GenerateSpiralCylinders(parameters),
             _ => new Matrix4x4[parameters.CylinderCount]
         };
 
@@ -93,6 +95,13 @@ namespace Assets.Scripts.Generators
                 r = Mathf.Sqrt(1 - (r * r)) * rSize;
                 matrices[i] = new Matrix4x4(new Vector4(x, y, z, r), new Vector4(h, 0, 0, 0), Vector4.zero, Vector4.zero);
             }
+            return matrices;
+        }
+
+        private Matrix4x4[] GenerateSpiralCylinders(GeneratorParameters parameters)
+        {
+            var count = parameters.CylinderCount;
+            var matrices = new Matrix4x4[count];
             return matrices;
         }
 
