@@ -264,13 +264,13 @@ MonoBehaviour:
       camPos: {x: 0, y: 0, z: -12}
     cylinderParameters:
       generatorParameters:
-        cylinderCount: 50
+        cylinderCount: 35
         randomSeed: 1234
         radiusMultiplier: 1
         heightMultiplier: 1
         areaMin: {x: -5, y: -5, z: 5}
         areaMax: {x: 5, y: 5, z: 15}
-      generator: {fileID: 11400000, guid: 0e9814b39325c4f4face9c6829ceb2b4, type: 2}
+      generator: {fileID: 11400000, guid: fe52d5363bab2fa4a9fd9e9538c4e062, type: 2}
     densityParameters:
       densityNoise: {fileID: 31306506}
       densityNoiseSize: 256

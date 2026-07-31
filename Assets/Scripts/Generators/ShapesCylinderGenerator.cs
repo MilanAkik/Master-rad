@@ -49,7 +49,28 @@ namespace Assets.Scripts.Generators
             return matrices;
         }
 
-        private Matrix4x4[] GenerateCircleCylinders(GeneratorParameters parameters) => new Matrix4x4[parameters.CylinderCount];
+        private Matrix4x4[] GenerateCircleCylinders(GeneratorParameters parameters)
+        {
+            var count = parameters.CylinderCount;
+            var step = 360.0f / count;
+            var matrices = new Matrix4x4[count];
+            for (int i = 0; i < count; i++)
+            {
+                var angle = i * step * Mathf.Deg2Rad;
+                var x = 0.5f + 0.5f * Mathf.Cos(angle);
+                var y = 0.5f + 0.5f * Mathf.Sin(angle);
+                var z = 0.5f;
+                var r = 1f;
+                var h = 1f;
+                x = Mathf.Lerp(parameters.AreaMin.x, parameters.AreaMax.x, x);
+                y = Mathf.Lerp(parameters.AreaMin.y, parameters.AreaMax.y, y);
+                z = Mathf.Lerp(parameters.AreaMin.z, parameters.AreaMax.z, z);
+                r = r * parameters.RadiusMultiplier;
+                h = h * parameters.HeightMultiplier;
+                matrices[i] = new Matrix4x4(new Vector4(x, y, z, r), new Vector4(h, 0, 0, 0), Vector4.zero, Vector4.zero);
+            }
+            return matrices;
+        }
         
         private Matrix4x4[] GenerateSphereCylinders(GeneratorParameters parameters)
         {
