@@ -50,7 +50,30 @@ namespace Assets.Scripts.Generators
         }
 
         private Matrix4x4[] GenerateCircleCylinders(GeneratorParameters parameters) => new Matrix4x4[parameters.CylinderCount];
-        private Matrix4x4[] GenerateSphereCylinders(GeneratorParameters parameters) => new Matrix4x4[parameters.CylinderCount];
+        
+        private Matrix4x4[] GenerateSphereCylinders(GeneratorParameters parameters)
+        {
+            var count = parameters.CylinderCount;
+            var step = 1.0f / count;
+            var matrices = new Matrix4x4[count];
+            for(int i = 0; i < count; i++)
+            {
+                var x = 0.5f;
+                var y = i * step;
+                var z = 0.5f;
+                var r = Mathf.Abs((2 * i + 1 - count) * step);
+                var h = step * (parameters.AreaMax.y - parameters.AreaMin.y);
+                var xSize = 0.5f * (parameters.AreaMax.x - parameters.AreaMin.x);
+                var zSize = 0.5f * (parameters.AreaMax.z - parameters.AreaMin.z);
+                var rSize = (xSize < zSize ? xSize : zSize);
+                x = Mathf.Lerp(parameters.AreaMin.x, parameters.AreaMax.x, x);
+                y = Mathf.Lerp(parameters.AreaMin.y, parameters.AreaMax.y, y);
+                z = Mathf.Lerp(parameters.AreaMin.z, parameters.AreaMax.z, z);
+                r = Mathf.Sqrt(1 - (r * r)) * rSize;
+                matrices[i] = new Matrix4x4(new Vector4(x, y, z, r), new Vector4(h, 0, 0, 0), Vector4.zero, Vector4.zero);
+            }
+            return matrices;
+        }
 
     }
 }
