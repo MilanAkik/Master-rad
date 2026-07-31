@@ -101,7 +101,24 @@ namespace Assets.Scripts.Generators
         private Matrix4x4[] GenerateSpiralCylinders(GeneratorParameters parameters)
         {
             var count = parameters.CylinderCount;
+            var step = (spiralTurns * 360.0f) / count;
             var matrices = new Matrix4x4[count];
+            for (int i = 0; i < count; i++)
+            {
+                var angle = i * step * Mathf.Deg2Rad;
+                var fromCenter = (float)i / count;
+                var x = 0.5f + 0.5f * Mathf.Cos(angle) * fromCenter;
+                var y = 0.5f;
+                var z = 0.5f + 0.5f * Mathf.Sin(angle) * fromCenter;
+                var r = fromCenter;
+                var h = fromCenter;
+                x = Mathf.Lerp(parameters.AreaMin.x, parameters.AreaMax.x, x);
+                y = Mathf.Lerp(parameters.AreaMin.y, parameters.AreaMax.y, y);
+                z = Mathf.Lerp(parameters.AreaMin.z, parameters.AreaMax.z, z);
+                r = Mathf.Lerp(0.3f, 1f,r) * parameters.RadiusMultiplier;
+                h = h * parameters.HeightMultiplier;
+                matrices[i] = new Matrix4x4(new Vector4(x, y, z, r), new Vector4(h, 0, 0, 0), Vector4.zero, Vector4.zero);
+            }
             return matrices;
         }
 
