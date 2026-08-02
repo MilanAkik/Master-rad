@@ -1,5 +1,5 @@
 using Assets.Scripts.Models;
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Generators
@@ -62,7 +62,38 @@ namespace Assets.Scripts.Generators
 
         private Matrix4x4[] getMatricesFromCurrentState(string currentState, GeneratorParameters parameters)
         {
-            return new Matrix4x4[parameters.CylinderCount];
+            var matricesList = new List<Matrix4x4>();
+            var stateList = new List<LSystemState>();
+            stateList.Add(new LSystemState(new Vector3(0.5f,0.5f,0.5f), 0f, 1f, 1f));
+            foreach (var c in currentState)
+            {
+                switch (c)
+                {
+                    case 'F':
+                        break;
+                    case 'B':
+                        break;
+                    case 'L':
+                        break;
+                    case 'R':
+                        break;
+                    case 'U':
+                        break;
+                    case 'D':
+                        break;
+                    case 'G':
+                        break;
+                    case 'S':
+                        break;
+                    case 'P':
+                        break;
+                    case 'V':
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return matricesList.ToArray();
         }
 
         private record LSystemState
