@@ -19,6 +19,21 @@ namespace Assets.Scripts.Generators
         public string axiomV = "";
         public string startingState = "";
 
-        public override Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters) => new Matrix4x4[parameters.CylinderCount];
+        private int maxLoops = 100;
+
+        public override Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters)
+        {
+            string currentState = startingState;
+            var matrices = new Matrix4x4[parameters.CylinderCount];
+            //Matrix4x4[] matrices = getMatricesFromCurrentState(currentState, parameters);
+            var numLoops = 0;
+            while (matrices.Length < parameters.CylinderCount && numLoops < maxLoops)
+            {
+                //currentState = applyAxiomsToState(currentState, parameters);
+                //matrices = getMatricesFromCurrentState(currentState, parameters);
+                numLoops++;
+            }
+            return matrices;
+        }
     }
 }
