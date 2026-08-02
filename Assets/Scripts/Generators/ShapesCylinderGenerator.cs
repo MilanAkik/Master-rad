@@ -106,12 +106,14 @@ namespace Assets.Scripts.Generators
             for (int i = 0; i < count; i++)
             {
                 var angle = i * step * Mathf.Deg2Rad;
-                var fromCenter = (float)i / count;
-                var x = 0.5f + 0.5f * Mathf.Cos(angle) * fromCenter;
+                var t = (i+1f) / (count);
+                var distMod = Mathf.Pow(t, 1.2f);
+                var radMod = Mathf.Pow(t, 1.6f);
+                var x = 0.5f + 0.5f * Mathf.Cos(angle) * distMod;
                 var y = 0.5f;
-                var z = 0.5f + 0.5f * Mathf.Sin(angle) * fromCenter;
-                var r = fromCenter;
-                var h = fromCenter;
+                var z = 0.5f + 0.5f * Mathf.Sin(angle) * distMod;
+                var r = radMod;
+                var h = radMod;
                 x = Mathf.Lerp(parameters.AreaMin.x, parameters.AreaMax.x, x);
                 y = Mathf.Lerp(parameters.AreaMin.y, parameters.AreaMax.y, y);
                 z = Mathf.Lerp(parameters.AreaMin.z, parameters.AreaMax.z, z);
