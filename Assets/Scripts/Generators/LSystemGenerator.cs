@@ -64,5 +64,21 @@ namespace Assets.Scripts.Generators
         {
             return new Matrix4x4[parameters.CylinderCount];
         }
+
+        private record LSystemState
+        {
+            public Vector3 position;
+            public float angle;
+            public float radius;
+            public float height;
+
+            public LSystemState(Vector3 position, float angle, float radius, float height)
+            {
+                this.position = position;
+                this.angle = angle;
+                this.radius = radius;
+                this.height = height;
+            }
+        }
     }
 }
