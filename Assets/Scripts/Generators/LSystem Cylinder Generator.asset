@@ -12,3 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1da4ebddff0a7294ca1a792e0673ed05, type: 3}
   m_Name: LSystem Cylinder Generator
   m_EditorClassIdentifier: 
+  axiomF: 
+  axiomB: 
+  axiomL: 
+  axiomR: 
+  axiomU: 
+  axiomD: 
+  axiomG: 
+  axiomS: 
+  axiomP: 
+  axiomV: 
+  startingState: 
