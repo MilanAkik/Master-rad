@@ -1,4 +1,5 @@
 using Assets.Scripts.Models;
+using System;
 using UnityEngine;
 
 namespace Assets.Scripts.Generators
@@ -19,21 +20,49 @@ namespace Assets.Scripts.Generators
         public string axiomV = "";
         public string startingState = "";
 
-        private int maxLoops = 100;
+        [System.NonSerialized]
+        private int maxLoops = 5;
 
         public override Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters)
         {
-            string currentState = startingState;
-            var matrices = new Matrix4x4[parameters.CylinderCount];
-            //Matrix4x4[] matrices = getMatricesFromCurrentState(currentState, parameters);
+            var currentState = startingState;
+            var matrices = getMatricesFromCurrentState(currentState, parameters);
             var numLoops = 0;
             while (matrices.Length < parameters.CylinderCount && numLoops < maxLoops)
             {
-                //currentState = applyAxiomsToState(currentState, parameters);
-                //matrices = getMatricesFromCurrentState(currentState, parameters);
+                currentState = applyAxiomsToState(currentState, parameters);
+                matrices = getMatricesFromCurrentState(currentState, parameters);
                 numLoops++;
             }
             return matrices;
+        }
+
+        private string applyAxiomsToState(string currentState, GeneratorParameters parameters)
+        {
+            var newState = "";
+            foreach (var c in currentState)
+            {
+                switch (c)
+                {
+                    case 'F': newState += string.IsNullOrEmpty(axiomF) ? "F" : axiomF; break;
+                    case 'B': newState += string.IsNullOrEmpty(axiomB) ? "B" : axiomB; break;
+                    case 'L': newState += string.IsNullOrEmpty(axiomL) ? "L" : axiomL; break;
+                    case 'R': newState += string.IsNullOrEmpty(axiomR) ? "R" : axiomR; break;
+                    case 'U': newState += string.IsNullOrEmpty(axiomU) ? "U" : axiomU; break;
+                    case 'D': newState += string.IsNullOrEmpty(axiomD) ? "D" : axiomD; break;
+                    case 'G': newState += string.IsNullOrEmpty(axiomG) ? "G" : axiomG; break;
+                    case 'S': newState += string.IsNullOrEmpty(axiomS) ? "S" : axiomS; break;
+                    case 'P': newState += string.IsNullOrEmpty(axiomP) ? "P" : axiomP; break;
+                    case 'V': newState += string.IsNullOrEmpty(axiomV) ? "V" : axiomV; break;
+                    default: newState += c; break;
+                }
+            }
+            return newState;
+        }
+
+        private Matrix4x4[] getMatricesFromCurrentState(string currentState, GeneratorParameters parameters)
+        {
+            return new Matrix4x4[parameters.CylinderCount];
         }
     }
 }
