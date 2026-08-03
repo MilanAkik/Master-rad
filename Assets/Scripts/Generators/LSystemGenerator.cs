@@ -1,5 +1,6 @@
 using Assets.Scripts.Models;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Scripts.Generators
@@ -22,6 +23,14 @@ namespace Assets.Scripts.Generators
 
         [System.NonSerialized]
         private int maxLoops = 5;
+        [System.NonSerialized]
+        private float stepSize = 2f;
+        [System.NonSerialized]
+        private float rotationAngle = 45f;
+        [System.NonSerialized]
+        private Vector3 verticalMovement = new Vector3(0f, 0.1f, 0f);
+        [System.NonSerialized]
+        private float radiusMultiplier = 1.1f;
 
         public override Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters)
         {
@@ -70,24 +79,37 @@ namespace Assets.Scripts.Generators
                 switch (c)
                 {
                     case 'F':
+                        stateList = stateList.Select(s => new LSystemState(s.position + stepSize * new Vector3(Mathf.Sin(s.angle * Mathf.Deg2Rad), 0f, Mathf.Cos(s.angle * Mathf.Deg2Rad)), s.angle, s.radius, s.height)).ToList();
                         break;
                     case 'B':
+                        stateList = stateList.Select(s => new LSystemState(s.position - stepSize * new Vector3(Mathf.Sin(s.angle * Mathf.Deg2Rad), 0f, Mathf.Cos(s.angle * Mathf.Deg2Rad)), s.angle, s.radius, s.height)).ToList();
                         break;
                     case 'L':
+                        stateList = stateList.Select(s => new LSystemState(s.position, s.angle + rotationAngle, s.radius, s.height)).ToList();
                         break;
                     case 'R':
+                        stateList = stateList.Select(s => new LSystemState(s.position, s.angle - rotationAngle, s.radius, s.height)).ToList();
                         break;
                     case 'U':
+                        stateList = stateList.Select(s => new LSystemState(s.position + verticalMovement, s.angle, s.radius, s.height)).ToList();
                         break;
                     case 'D':
+                        stateList = stateList.Select(s => new LSystemState(s.position - verticalMovement, s.angle, s.radius, s.height)).ToList();
                         break;
                     case 'G':
+                        stateList = stateList.Select(s => new LSystemState(s.position, s.angle, s.radius * radiusMultiplier, s.height)).ToList();
                         break;
                     case 'S':
+                        stateList = stateList.Select(s => new LSystemState(s.position, s.angle, s.radius / radiusMultiplier, s.height)).ToList();
                         break;
                     case 'P':
+                        matricesList.AddRange(stateList.Select(s => new Matrix4x4(new Vector4(s.position.x, s.position.y, s.position.z, s.radius), new Vector4(s.height,0,0,0), new Vector4(0,0,0,0), new Vector4(0,0,0,0))));
                         break;
                     case 'V':
+                        stateList = stateList.SelectMany(s => new List<LSystemState> {
+                            new LSystemState(s.position, s.angle + rotationAngle, s.radius, s.height),
+                            new LSystemState(s.position, s.angle - rotationAngle, s.radius, s.height)
+                        }).ToList();    
                         break;
                     default:
                         break;
