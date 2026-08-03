@@ -79,40 +79,40 @@ namespace Assets.Scripts.Generators
                 switch (c)
                 {
                     case 'F':
-                        stateList = stateList.Select(s => new LSystemState(s.position + stepSize * new Vector3(Mathf.Sin(s.angle * Mathf.Deg2Rad), 0f, Mathf.Cos(s.angle * Mathf.Deg2Rad)), s.angle, s.radius, s.height)).ToList();
+                        stateList = stateList.Select(s => s.Translate(stepSize)).ToList();
                         break;
                     case 'B':
-                        stateList = stateList.Select(s => new LSystemState(s.position - stepSize * new Vector3(Mathf.Sin(s.angle * Mathf.Deg2Rad), 0f, Mathf.Cos(s.angle * Mathf.Deg2Rad)), s.angle, s.radius, s.height)).ToList();
+                        stateList = stateList.Select(s => s.Translate(-stepSize)).ToList();
                         break;
                     case 'L':
-                        stateList = stateList.Select(s => new LSystemState(s.position, s.angle + rotationAngle, s.radius, s.height)).ToList();
+                        stateList = stateList.Select(s => s.Rotated( rotationAngle)).ToList();
                         break;
                     case 'R':
-                        stateList = stateList.Select(s => new LSystemState(s.position, s.angle - rotationAngle, s.radius, s.height)).ToList();
+                        stateList = stateList.Select(s => s.Rotated(-rotationAngle)).ToList();
                         break;
                     case 'U':
-                        stateList = stateList.Select(s => new LSystemState(s.position + verticalMovement, s.angle, s.radius, s.height)).ToList();
+                        stateList = stateList.Select(s => s.Translate( verticalMovement)).ToList();
                         break;
                     case 'D':
-                        stateList = stateList.Select(s => new LSystemState(s.position - verticalMovement, s.angle, s.radius, s.height)).ToList();
+                        stateList = stateList.Select(s => s.Translate(-verticalMovement)).ToList();
                         break;
                     case 'G':
-                        stateList = stateList.Select(s => new LSystemState(s.position, s.angle, s.radius * radiusMultiplier, s.height)).ToList();
+                        stateList = stateList.Select(s => s.Scaled(radiusMultiplier)).ToList();
                         break;
                     case 'S':
-                        stateList = stateList.Select(s => new LSystemState(s.position, s.angle, s.radius / radiusMultiplier, s.height)).ToList();
+                        stateList = stateList.Select(s => s.Scaled(1f / radiusMultiplier)).ToList();
                         break;
                     case 'P':
-                        matricesList.AddRange(stateList.Select(s => new Matrix4x4(new Vector4(s.position.x, s.position.y, s.position.z, s.radius), new Vector4(s.height,0,0,0), new Vector4(0,0,0,0), new Vector4(0,0,0,0))));
+                        matricesList.AddRange(stateList.Select(s => s.ToMatrix()));
                         break;
                     case 'V':
                         stateList = stateList.SelectMany(s => new List<LSystemState> {
-                            new LSystemState(s.position, s.angle + rotationAngle, s.radius, s.height),
-                            new LSystemState(s.position, s.angle - rotationAngle, s.radius, s.height)
-                        }).ToList();    
+                            s.Rotated(rotationAngle),
+                            s.Rotated(-rotationAngle)
+                        }).ToList();
                         break;
                     default:
-                        break;
+                        throw new System.Exception($"Unknown character in L-system state: {c}");
                 }
             }
             return matricesList.ToArray();
@@ -124,6 +124,7 @@ namespace Assets.Scripts.Generators
             public float angle;
             public float radius;
             public float height;
+            public float AngleRad => angle * Mathf.Deg2Rad;
 
             public LSystemState(Vector3 position, float angle, float radius, float height)
             {
@@ -132,6 +133,13 @@ namespace Assets.Scripts.Generators
                 this.radius = radius;
                 this.height = height;
             }
+
+            public LSystemState Translate(Vector3 translation) => new LSystemState(position + translation, angle, radius, height);
+            public LSystemState Translate(float stepSize) => Translate(stepSize * new Vector3(Mathf.Sin(AngleRad), 0f, Mathf.Cos(AngleRad)));
+            public LSystemState Rotated(float rotationAngle) => new LSystemState(position, angle + rotationAngle, radius, height);
+            public LSystemState Scaled(float scale) => new LSystemState(position, angle, radius * scale, height);
+            public Matrix4x4 ToMatrix() => new Matrix4x4(new Vector4(position.x, position.y, position.z, radius), new Vector4(height, 0, 0, 0), Vector4.zero, Vector4.zero);
+
         }
     }
 }
