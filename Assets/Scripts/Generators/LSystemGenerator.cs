@@ -8,7 +8,7 @@ namespace Assets.Scripts.Generators
     [CreateAssetMenu(menuName = "CylinderGenerator/LSystem")]
     public class LSystemGenerator : CylinderGenerator
     {
-        // Foreward, Backward, Left, Right, Up, Down, Grow, Shrink, Place, VSplit, Invert
+        // Foreward, Backward, Left, Right, Up, Down, Grow, Shrink, Place, VSplit, Invert, Elongate, Compress
         public string axiomF = "";
         public string axiomB = "";
         public string axiomL = "";
@@ -20,6 +20,8 @@ namespace Assets.Scripts.Generators
         public string axiomP = "";
         public string axiomV = "";
         public string axiomI = "";
+        public string axiomE = "";
+        public string axiomC = "";
         public string startingState = "";
 
         [System.NonSerialized]
@@ -32,6 +34,8 @@ namespace Assets.Scripts.Generators
         private Vector3 verticalMovement = new Vector3(0f, 0.1f, 0f);
         [System.NonSerialized]
         private float radiusMultiplier = 1.1f;
+        [System.NonSerialized]
+        private float heightMultiplier = 1.1f;
 
         public override Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters)
         {
@@ -65,6 +69,8 @@ namespace Assets.Scripts.Generators
                     case 'P': newState += string.IsNullOrEmpty(axiomP) ? "P" : axiomP; break;
                     case 'V': newState += string.IsNullOrEmpty(axiomV) ? "V" : axiomV; break;
                     case 'I': newState += string.IsNullOrEmpty(axiomI) ? "I" : axiomI; break;
+                    case 'E': newState += string.IsNullOrEmpty(axiomE) ? "E" : axiomE; break;
+                    case 'C': newState += string.IsNullOrEmpty(axiomC) ? "C" : axiomC; break;
                     default: newState += c; break;
                 }
             }
@@ -116,6 +122,12 @@ namespace Assets.Scripts.Generators
                     case 'I':
                         stateList = stateList.Select(s => s.Inverted()).ToList();
                         break;
+                    case 'E':
+                        stateList = stateList.Select(s => s.AdjustHeight(heightMultiplier)).ToList();
+                        break;
+                    case 'C':
+                        stateList = stateList.Select(s => s.AdjustHeight(1f / heightMultiplier)).ToList();
+                        break;
                     default:
                         throw new System.Exception($"Unknown character in L-system state: {c}");
                 }
@@ -147,6 +159,7 @@ namespace Assets.Scripts.Generators
             public LSystemState Scaled(float scale) => new LSystemState(position, angle, radius * scale, height, rotationDirection);
             public Matrix4x4 ToMatrix() => new Matrix4x4(new Vector4(position.x, position.y, position.z, radius), new Vector4(height, 0, 0, 0), Vector4.zero, Vector4.zero);
             public LSystemState Inverted() => new LSystemState(position, angle, radius, height, !rotationDirection);
+            public LSystemState AdjustHeight(float factor) => new LSystemState(position, angle, radius, height * factor, rotationDirection);
 
         }
     }
