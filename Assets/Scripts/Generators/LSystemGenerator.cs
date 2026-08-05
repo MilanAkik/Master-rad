@@ -8,7 +8,7 @@ namespace Assets.Scripts.Generators
     [CreateAssetMenu(menuName = "CylinderGenerator/LSystem")]
     public class LSystemGenerator : CylinderGenerator
     {
-        // Foreward, Backward, Left, Right, Up, Down, Grow, Shrink, Place, VSplit
+        // Foreward, Backward, Left, Right, Up, Down, Grow, Shrink, Place, VSplit, Invert
         public string axiomF = "";
         public string axiomB = "";
         public string axiomL = "";
@@ -19,6 +19,7 @@ namespace Assets.Scripts.Generators
         public string axiomS = "";
         public string axiomP = "";
         public string axiomV = "";
+        public string axiomI = "";
         public string startingState = "";
 
         [System.NonSerialized]
@@ -63,6 +64,7 @@ namespace Assets.Scripts.Generators
                     case 'S': newState += string.IsNullOrEmpty(axiomS) ? "S" : axiomS; break;
                     case 'P': newState += string.IsNullOrEmpty(axiomP) ? "P" : axiomP; break;
                     case 'V': newState += string.IsNullOrEmpty(axiomV) ? "V" : axiomV; break;
+                    case 'I': newState += string.IsNullOrEmpty(axiomI) ? "I" : axiomI; break;
                     default: newState += c; break;
                 }
             }
@@ -73,7 +75,7 @@ namespace Assets.Scripts.Generators
         {
             var matricesList = new List<Matrix4x4>();
             var stateList = new List<LSystemState>();
-            stateList.Add(new LSystemState(new Vector3(0.5f,0.5f,0.5f), 0f, 1f, 1f));
+            stateList.Add(new LSystemState(new Vector3(0.5f, 0.5f, 0.5f), 0f, 1f, 1f, false));
             foreach (var c in currentState)
             {
                 switch (c)
@@ -108,8 +110,11 @@ namespace Assets.Scripts.Generators
                     case 'V':
                         stateList = stateList.SelectMany(s => new List<LSystemState> {
                             s.Rotated(rotationAngle),
-                            s.Rotated(-rotationAngle)
+                            s.Rotated(-rotationAngle).Inverted()
                         }).ToList();
+                        break;
+                    case 'I':
+                        stateList = stateList.Select(s => s.Inverted()).ToList();
                         break;
                     default:
                         throw new System.Exception($"Unknown character in L-system state: {c}");
