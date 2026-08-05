@@ -124,21 +124,24 @@ namespace Assets.Scripts.Generators
             public float angle;
             public float radius;
             public float height;
+            public bool rotationDirection = true; // true for clockwise, false for counter-clockwise
             public float AngleRad => angle * Mathf.Deg2Rad;
 
-            public LSystemState(Vector3 position, float angle, float radius, float height)
+            public LSystemState(Vector3 position, float angle, float radius, float height, bool rotationDirection)
             {
                 this.position = position;
                 this.angle = angle;
                 this.radius = radius;
                 this.height = height;
+                this.rotationDirection = rotationDirection;
             }
 
-            public LSystemState Translate(Vector3 translation) => new LSystemState(position + translation, angle, radius, height);
+            public LSystemState Translate(Vector3 translation) => new LSystemState(position + translation, angle, radius, height, rotationDirection);
             public LSystemState Translate(float stepSize) => Translate(stepSize * new Vector3(Mathf.Sin(AngleRad), 0f, Mathf.Cos(AngleRad)));
-            public LSystemState Rotated(float rotationAngle) => new LSystemState(position, angle + rotationAngle, radius, height);
-            public LSystemState Scaled(float scale) => new LSystemState(position, angle, radius * scale, height);
+            public LSystemState Rotated(float rotationAngle) => new LSystemState(position, rotationDirection ? angle + rotationAngle : angle - rotationAngle, radius, height, rotationDirection);
+            public LSystemState Scaled(float scale) => new LSystemState(position, angle, radius * scale, height, rotationDirection);
             public Matrix4x4 ToMatrix() => new Matrix4x4(new Vector4(position.x, position.y, position.z, radius), new Vector4(height, 0, 0, 0), Vector4.zero, Vector4.zero);
+            public LSystemState Inverted() => new LSystemState(position, angle, radius, height, !rotationDirection);
 
         }
     }
