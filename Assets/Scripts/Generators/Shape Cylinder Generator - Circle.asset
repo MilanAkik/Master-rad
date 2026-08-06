@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: Shape Cylinder Generator - Circle
   m_EditorClassIdentifier: 
   shapeType: 1
+  spiralTurns: 0

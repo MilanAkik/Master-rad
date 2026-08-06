@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: Shape Cylinder Generator - Sphere
   m_EditorClassIdentifier: 
   shapeType: 2
+  spiralTurns: 0
