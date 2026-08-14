@@ -60,8 +60,8 @@ namespace Assets.Scripts.Generators
             {
                 var angle = i * step * Mathf.Deg2Rad;
                 var x = 0.5f + 0.5f * Mathf.Cos(angle);
-                var y = 0.5f + 0.5f * Mathf.Sin(angle);
-                var z = 0.5f;
+                var y = 0.5f;
+                var z = 0.5f + 0.5f * Mathf.Sin(angle);
                 var r = 1f;
                 var h = 1f;
                 x = Mathf.Lerp(parameters.AreaMin.x, parameters.AreaMax.x, x);
