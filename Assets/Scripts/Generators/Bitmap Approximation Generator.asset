@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d04095fe28e6c1f4cb38900197ea3ea8, type: 3}
+  m_Name: Bitmap Approximation Generator
+  m_EditorClassIdentifier: 
+  bitmap: {fileID: 2800000, guid: 806e657d751adf14dad3260ce8ec5bab, type: 3}
+  threshold: 0.5
+  whitePixelsAreForeground: 1
