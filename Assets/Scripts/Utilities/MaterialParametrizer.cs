@@ -44,8 +44,12 @@ public static class MaterialParametrizer
 
     public static void Parametrize(this Material material, CylinderParameters cylinderParameters)
     {
-        material.SetMatrixArray(PropertyId_CylinderMatrices, cylinderParameters.CylinderMatrices.Select(x=>x.transpose).ToList());
-        material.SetInt(PropertyId_CylinderCount, cylinderParameters.CylinderCount);
+        var cylinderMatrices = cylinderParameters.CylinderMatrices;
+        if (cylinderMatrices.Length > 0)
+        {
+            material.SetMatrixArray(PropertyId_CylinderMatrices, cylinderMatrices.Select(x=>x.transpose).ToList());
+        }
+        material.SetInt(PropertyId_CylinderCount, cylinderMatrices.Length);
         material.SetVector(PropertyId_AreaMin, cylinderParameters.GeneratorParameters.AreaMin);
         material.SetVector(PropertyId_AreaMax, cylinderParameters.GeneratorParameters.AreaMax);
     }
