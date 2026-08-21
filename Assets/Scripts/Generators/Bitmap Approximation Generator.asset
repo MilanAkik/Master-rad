@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d04095fe28e6c1f4cb38900197ea3ea8, type: 3}
   m_Name: Bitmap Approximation Generator
   m_EditorClassIdentifier: 
-  bitmap: {fileID: 2800000, guid: 806e657d751adf14dad3260ce8ec5bab, type: 3}
-  threshold: 0.5
-  whitePixelsAreForeground: 1
+  bitmap: {fileID: 2800000, guid: 4027309fd6d89e344a8474d561334382, type: 3}
+  threshold: 0.9
+  whitePixelsAreForeground: 0
