@@ -191,6 +191,19 @@
                 uint3 h = uint3( pcg(seed), pcg(seed + 1u), pcg(seed + 2u) );
                 return float3(h) * (1.0 / float(0xffffffffu));
             }
+            
+            float3 getNormal(float4 ri, float4x4 cylinder)
+            {
+                float cx = cylinder[0][0];
+                float cy = cylinder[0][1];
+                float cz = cylinder[0][2];
+                float cr = cylinder[0][3];
+                float ch = cylinder[1][0];
+                if (ri.y<=cy) return float3(0,-1,0);
+                if (ri.y>=cy+ch) return float3(0,1,0);
+                float3 axisPoint = float3(cx, ri.y, cz);
+                return ri.xyz - axisPoint;
+            }
 
             fixed4 frag(v2f i) : SV_Target
             {
