@@ -185,9 +185,9 @@
 
             float3 map3ToZeroOne(float3 a){
                 return float3(
-                    mapToZeroOne(a.x, _areaMin.x, _areaMax.x),
-                    mapToZeroOne(a.y, _areaMin.y, _areaMax.y),
-                    mapToZeroOne(a.z, _areaMin.z, _areaMax.z)
+                    mapToZeroOne(a.x, _AreaMin.x, _AreaMax.x),
+                    mapToZeroOne(a.y, _AreaMin.y, _AreaMax.y),
+                    mapToZeroOne(a.z, _AreaMin.z, _AreaMax.z)
                 );
             }
 
