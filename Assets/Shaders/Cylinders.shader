@@ -214,9 +214,7 @@
                 float c11 = c011 * (1-dx) + c111 * dx;
                 float c0 = c00 * (1-dy) + c10 * dy;
                 float c1 = c01 * (1-dy) + c11 * dy;
-                float val = tex3D(_DensityNoise, coords);
-                val = c0 * (1-dz) + c1 * dz;
-                return val;
+                float val = c0 * (1-dz) + c1 * dz;
                 return val;
             }
 
