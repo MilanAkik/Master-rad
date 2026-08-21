@@ -206,7 +206,7 @@ Transform:
   m_GameObject: {fileID: 25160900}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 10, z: 10}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -239,7 +239,7 @@ MonoBehaviour:
         e20: 0
         e21: 0.9999999
         e22: 0.00000011920926
-        e23: 10
+        e23: 0
         e30: 0
         e31: 0
         e32: 0
@@ -261,15 +261,15 @@ MonoBehaviour:
         e31: 0
         e32: -1.6661667
         e33: 1.6671666
-      camPos: {x: 0, y: 10, z: 10}
+      camPos: {x: 0, y: 10, z: 0}
     cylinderParameters:
       generatorParameters:
-        cylinderCount: 50
-        randomSeed: 1234
+        cylinderCount: 100
+        randomSeed: 12345
         radiusMultiplier: 1
         heightMultiplier: 1
-        areaMin: {x: -5, y: -5, z: 5}
-        areaMax: {x: 5, y: 5, z: 15}
+        areaMin: {x: -5, y: -5, z: -5}
+        areaMax: {x: 5, y: 5, z: 5}
       generator: {fileID: 11400000, guid: 571ac938c6530ed4c9c0731514a62307, type: 2}
     densityParameters:
       densityNoise: {fileID: 31306506}
@@ -277,7 +277,7 @@ MonoBehaviour:
       densityShader: {fileID: 7200000, guid: 347d913f3ac6e9d439a5cc7f208deed4, type: 3}
     lightParameters:
       lightColor: {x: 1, y: 1, z: 1, w: 0}
-      lightPosition: {x: 0, y: 0, z: 0}
+      lightPosition: {x: 0, y: 5, z: -5}
   raymarchMat: {fileID: 2100000, guid: 2fa222c9538e12a41a969ed0e7adc30e, type: 2}
 --- !u!84 &31306506
 RenderTexture:
