@@ -222,6 +222,7 @@
                 int hits = 0;
                 float steps = 20;
                 intersection closest;
+                float4 closestPoint;
                 float closestDistance = 1000000;
                 int closestIndex = 0;
                 for(int j=0; j<_CylinderCount; j++)
@@ -234,6 +235,7 @@
                         float currDist = distance(ro, p);
                         if(currDist<closestDistance){
                             closest = res;
+                            closestPoint = p;
                             closestDistance = currDist;
                             closestIndex = j;
                         }
@@ -241,7 +243,32 @@
                 }
                 float4 skyColor = tex2D(_MainTex, i.uv);
                 if(hits==0)return skyColor;
-                return float4(random3(closestIndex), 1.0f);
+
+                float3 surfacePoint = closestPoint.xyz;
+                float3 normal = normalize(getNormal(closestPoint, _CylinderMatrices[closestIndex]));
+                float3 viewDirection = normalize(ro - surfacePoint);
+
+                // The cylinders are visible from both outside and inside.
+                if (dot(normal, viewDirection) < 0.0)
+                {
+                    normal = -normal;
+                }
+
+                float3 lightDirection = normalize(_LightPosition - surfacePoint);
+                float3 reflectedLight = reflect(-lightDirection, normal);
+
+                const float shininess = 64.0;
+                const float ambientStrength = 0.1;
+                float diffuse = saturate(dot(normal, lightDirection));
+                float specular = 0;
+                if (diffuse > 0.0)
+                {
+                    specular = pow(saturate(dot(reflectedLight, viewDirection)), shininess);
+                }
+
+                float3 baseColor = random3(closestIndex);
+                float3 color = baseColor * (ambientStrength + _LightColor.rgb * diffuse) + _LightColor.rgb * specular;
+                return float4(color, 1.0f);
             }
             ENDCG
         }
