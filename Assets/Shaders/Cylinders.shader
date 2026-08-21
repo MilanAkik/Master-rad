@@ -219,6 +219,7 @@
                 int hits = 0;
                 float steps = 20;
                 intersection closest;
+                float4 closestPoint = float4(0,0,0,0);
                 float closestDistance = 1000000;
                 int closestIndex = 0;
                 for(int j=0; j<_CylinderCount; j++)
@@ -233,11 +234,14 @@
                             closest = res;
                             closestDistance = distance(ro, p);
                             closestIndex = j;
+                            closestPoint=p;
                         }
                     }
                 }
                 float4 skyColor = tex2D(_MainTex, i.uv);
                 if(hits==0)return skyColor;
+                float den = densityAtPoint(closestPoint.xyz);
+                return float4(den,den,den,1.0f);
                 float val = 0;
                 float dv = rd*0.1f;
                 for(int i=0; i<steps; i++){
