@@ -35,8 +35,8 @@
             int _CylinderCount;
 
             //Area parameters
-            float3 _areaMin;
-            float3 _areaMax;
+            float3 _AreaMin;
+            float3 _AreaMax;
 
             //Density noise parameters
             sampler3D _DensityNoise;
