@@ -199,8 +199,8 @@
                 float cz = cylinder[0][2];
                 float cr = cylinder[0][3];
                 float ch = cylinder[1][0];
-                if (ri.y<=cy) return float3(0,-1,0);
-                if (ri.y>=cy+ch) return float3(0,1,0);
+                if (ri.y<=cy+0.0001) return float3(0,-1,0);
+                if (ri.y>=cy+ch-0.0001) return float3(0,1,0);
                 float3 axisPoint = float3(cx, ri.y, cz);
                 return ri.xyz - axisPoint;
             }
