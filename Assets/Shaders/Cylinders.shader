@@ -8,6 +8,8 @@
         _PrimaryStepLength ("Primary step length (l_g)", Float) = 0.1
         _ShadowStepLength ("Shadow step length (l_p)", Float) = 0.1
         _IsotropicCoefficient ("Isotropic coefficient (s)", Float) = 1.0
+        [Toggle(_MULTI_CYLINDER)] _MultiCylinder ("March multiple cylinders", Float) = 0
+        _MaxCylinderSegments ("Maximum cylinder segments", Range(1, 32)) = 8
     }
     SubShader
     {
@@ -21,11 +23,14 @@
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 3.5
+            #pragma shader_feature_local_fragment _MULTI_CYLINDER
             #include "UnityCG.cginc"		
             #include "noiseSimplex.cginc"
 
             #define MAX_PRIMARY_MARCH_STEPS 128
             #define MAX_SHADOW_MARCH_STEPS 128
+            #define MAX_CYLINDER_SEGMENTS 32
+            #define CYLINDER_MASK_WORD_COUNT 16
             
             sampler2D _MainTex;
 
@@ -55,6 +60,7 @@
             float _PrimaryStepLength;
             float _ShadowStepLength;
             float _IsotropicCoefficient;
+            float _MaxCylinderSegments;
 
             struct appdata
             {
