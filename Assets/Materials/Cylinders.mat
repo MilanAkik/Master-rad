@@ -11,7 +11,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: 2670c55d61dabd64bb8b61fe46d2dc6b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _MULTI_CYLINDER
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -73,12 +74,14 @@ Material:
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _IsotropicCoefficient: 1
+    - _MaxCylinderSegments: 8
     - _Metallic: 0
     - _Mode: 0
+    - _MultiCylinder: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _PrimaryStepLength: 0.5
-    - _ShadowStepLength: 0.5
+    - _PrimaryStepLength: 0.1
+    - _ShadowStepLength: 0.1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1

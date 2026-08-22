@@ -8,6 +8,8 @@
         _PrimaryStepLength ("Primary step length (l_g)", Float) = 0.1
         _ShadowStepLength ("Shadow step length (l_p)", Float) = 0.1
         _IsotropicCoefficient ("Isotropic coefficient (s)", Float) = 1.0
+        [Toggle(_MULTI_CYLINDER)] _MultiCylinder ("March multiple cylinders", Float) = 0
+        _MaxCylinderSegments ("Maximum cylinder segments", Range(1, 32)) = 8
     }
     SubShader
     {
@@ -21,11 +23,14 @@
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 3.5
+            #pragma shader_feature_local_fragment _MULTI_CYLINDER
             #include "UnityCG.cginc"		
             #include "noiseSimplex.cginc"
 
             #define MAX_PRIMARY_MARCH_STEPS 128
             #define MAX_SHADOW_MARCH_STEPS 128
+            #define MAX_CYLINDER_SEGMENTS 32
+            #define CYLINDER_MASK_WORD_COUNT 16
             
             sampler2D _MainTex;
 
@@ -55,6 +60,7 @@
             float _PrimaryStepLength;
             float _ShadowStepLength;
             float _IsotropicCoefficient;
+            float _MaxCylinderSegments;
 
             struct appdata
             {
@@ -375,11 +381,18 @@
                 return backgroundOcclusion * baseCloudColor * incomingLight * absorbedLight;
             }
 
+            bool isUsableCylinderIntersection(intersection cylinderIntersection)
+            {
+                return cylinderIntersection.count == 2 &&
+                    distance(cylinderIntersection.first.xyz, cylinderIntersection.second.xyz) > 0.0001;
+            }
+
             // Returns accumulated cloud light in RGB and remaining background visibility in A.
             float4 marchSingleScatteringThroughCylinder(
                 float3 primaryRayDirection,
                 intersection cylinderIntersection,
-                float4x4 cylinder)
+                float4x4 cylinder,
+                float initialBackgroundVisibility)
             {
                 const float minimumLength = 0.0001;
                 const float minimumDensity = 0.0001;
@@ -387,7 +400,7 @@
 
                 if (cylinderIntersection.count < 2)
                 {
-                    return float4(0.0, 0.0, 0.0, 1.0);
+                    return float4(0.0, 0.0, 0.0, initialBackgroundVisibility);
                 }
 
                 float3 marchStart = cylinderIntersection.first.xyz;
@@ -395,7 +408,7 @@
                 float marchDistance = distance(marchStart, marchEnd);
                 if (marchDistance <= minimumLength)
                 {
-                    return float4(0.0, 0.0, 0.0, 1.0);
+                    return float4(0.0, 0.0, 0.0, initialBackgroundVisibility);
                 }
 
                 float targetStepLength = max(_PrimaryStepLength, minimumLength);
@@ -403,7 +416,7 @@
                     ceil(marchDistance / targetStepLength),
                     (float)MAX_PRIMARY_MARCH_STEPS);
                 float primaryStepLength = marchDistance / (float)primaryStepCount;
-                float backgroundVisibility = 1.0;
+                float backgroundVisibility = initialBackgroundVisibility;
                 float3 accumulatedCloudColor = float3(0.0, 0.0, 0.0);
 
                 [loop]
@@ -468,6 +481,169 @@
                 return float4(accumulatedCloudColor, backgroundVisibility);
             }
 
+            #if !defined(_MULTI_CYLINDER)
+            // Finds and marches only the closest cylinder intersected by this camera ray.
+            float4 marchSingleScatteringThroughClosestCylinder(
+                float3 primaryRayOrigin,
+                float3 primaryRayDirection)
+            {
+                int closestCylinderIndex = -1;
+                float closestDistance = 1e20;
+                intersection closestIntersection;
+
+                [loop]
+                for (int cylinderIndex = 0;
+                    cylinderIndex < _CylinderCount;
+                    cylinderIndex++)
+                {
+                    intersection candidateIntersection = closestCylinder(
+                        primaryRayOrigin,
+                        primaryRayDirection,
+                        _CylinderMatrices[cylinderIndex]);
+                    if (!isUsableCylinderIntersection(candidateIntersection))
+                    {
+                        continue;
+                    }
+
+                    float candidateDistance = distance(
+                        primaryRayOrigin,
+                        candidateIntersection.first.xyz);
+                    if (candidateDistance < closestDistance)
+                    {
+                        closestDistance = candidateDistance;
+                        closestCylinderIndex = cylinderIndex;
+                        closestIntersection = candidateIntersection;
+                    }
+                }
+
+                if (closestCylinderIndex < 0)
+                {
+                    return float4(0.0, 0.0, 0.0, 1.0);
+                }
+
+                return marchSingleScatteringThroughCylinder(
+                    primaryRayDirection,
+                    closestIntersection,
+                    _CylinderMatrices[closestCylinderIndex],
+                    1.0);
+            }
+            #endif
+
+            #if defined(_MULTI_CYLINDER)
+            // Builds a compact 512-bit set of cylinders intersecting this camera ray, then
+            // repeatedly selects the closest remaining segment. Intersections are recalculated
+            // only for cylinders whose candidate bit is still set.
+            float4 marchSingleScatteringThroughMultipleCylinders(
+                float3 primaryRayOrigin,
+                float3 primaryRayDirection)
+            {
+                const float cursorOffset = 0.0001;
+                const float minimumBackgroundVisibility = 0.05;
+
+                uint candidateMask[CYLINDER_MASK_WORD_COUNT];
+                [unroll]
+                for (int maskWordIndex = 0;
+                    maskWordIndex < CYLINDER_MASK_WORD_COUNT;
+                    maskWordIndex++)
+                {
+                    candidateMask[maskWordIndex] = 0u;
+                }
+
+                [loop]
+                for (int cylinderIndex = 0; cylinderIndex < _CylinderCount; cylinderIndex++)
+                {
+                    intersection candidateIntersection = closestCylinder(
+                        primaryRayOrigin,
+                        primaryRayDirection,
+                        _CylinderMatrices[cylinderIndex]);
+                    if (isUsableCylinderIntersection(candidateIntersection))
+                    {
+                        int maskWordIndex = cylinderIndex >> 5;
+                        uint maskBit = 1u << (cylinderIndex & 31);
+                        candidateMask[maskWordIndex] |= maskBit;
+                    }
+                }
+
+                int maximumSegments = (int)clamp(
+                    _MaxCylinderSegments,
+                    1.0,
+                    (float)MAX_CYLINDER_SEGMENTS);
+                float3 rayCursor = primaryRayOrigin;
+                float backgroundVisibility = 1.0;
+                float3 accumulatedCloudColor = float3(0.0, 0.0, 0.0);
+
+                [loop]
+                for (int segmentIndex = 0;
+                    segmentIndex < MAX_CYLINDER_SEGMENTS;
+                    segmentIndex++)
+                {
+                    if (segmentIndex >= maximumSegments ||
+                        backgroundVisibility <= minimumBackgroundVisibility)
+                    {
+                        break;
+                    }
+
+                    int closestCylinderIndex = -1;
+                    float closestDistance = 1e20;
+                    intersection closestIntersection;
+
+                    [loop]
+                    for (int cylinderIndex = 0;
+                        cylinderIndex < _CylinderCount;
+                        cylinderIndex++)
+                    {
+                        int maskWordIndex = cylinderIndex >> 5;
+                        uint maskBit = 1u << (cylinderIndex & 31);
+                        if ((candidateMask[maskWordIndex] & maskBit) == 0u)
+                        {
+                            continue;
+                        }
+
+                        intersection candidateIntersection = closestCylinder(
+                            rayCursor,
+                            primaryRayDirection,
+                            _CylinderMatrices[cylinderIndex]);
+                        if (!isUsableCylinderIntersection(candidateIntersection))
+                        {
+                            candidateMask[maskWordIndex] &= ~maskBit;
+                            continue;
+                        }
+
+                        float candidateDistance = distance(
+                            rayCursor,
+                            candidateIntersection.first.xyz);
+                        if (candidateDistance < closestDistance)
+                        {
+                            closestDistance = candidateDistance;
+                            closestCylinderIndex = cylinderIndex;
+                            closestIntersection = candidateIntersection;
+                        }
+                    }
+
+                    if (closestCylinderIndex < 0)
+                    {
+                        break;
+                    }
+
+                    float4 segmentScattering = marchSingleScatteringThroughCylinder(
+                        primaryRayDirection,
+                        closestIntersection,
+                        _CylinderMatrices[closestCylinderIndex],
+                        backgroundVisibility);
+                    accumulatedCloudColor += segmentScattering.rgb;
+                    backgroundVisibility = segmentScattering.a;
+
+                    int closestMaskWordIndex = closestCylinderIndex >> 5;
+                    uint closestMaskBit = 1u << (closestCylinderIndex & 31);
+                    candidateMask[closestMaskWordIndex] &= ~closestMaskBit;
+                    rayCursor = closestIntersection.second.xyz +
+                        primaryRayDirection * cursorOffset;
+                }
+
+                return float4(accumulatedCloudColor, backgroundVisibility);
+            }
+            #endif
+
             uint pcg(uint v)
             {
                 uint state = v * 747796405u + 2891336453u;
@@ -494,66 +670,18 @@
                 // World-space ray
                 float3 ro = _CamPos;
                 float3 rd = normalize(worldPos - ro);
-                int hits = 0;
-                intersection closest;
-                float closestDistance = 1e20;
-                int closestIndex = 0;
-                for(int j=0; j<_CylinderCount; j++)
-                {
-                    intersection res = closestCylinder(ro, rd, _CylinderMatrices[j]);
-                    if(res.count == 2 && distance(res.first.xyz, res.second.xyz) > 0.0001){
-                        hits++;
-                        float currentDistance = distance(ro, res.first.xyz);
-                        if(currentDistance < closestDistance){
-                            closest = res;
-                            closestDistance = currentDistance;
-                            closestIndex = j;
-                        }
-                    }
-                }
-                float4 skyColor = tex2D(_MainTex, i.uv);
-                if(hits==0)return skyColor;
 
-                float4 scattering = marchSingleScatteringThroughCylinder(
-                    rd,
-                    closest,
-                    _CylinderMatrices[closestIndex]);
+                float4 skyColor = tex2D(_MainTex, i.uv);
+                float4 scattering;
+
+                #if defined(_MULTI_CYLINDER)
+                scattering = marchSingleScatteringThroughMultipleCylinders(ro, rd);
+                #else
+                scattering = marchSingleScatteringThroughClosestCylinder(ro, rd);
+                #endif
+
                 float3 finalColor = scattering.rgb + skyColor.rgb * scattering.a;
                 return float4(finalColor, 1.0);
-
-                /* Previous density preview and experimental fragment code,
-                   retained for later cleanup.
-                float den = densityAtPoint(closestPoint.xyz);
-                return float4(den,den,den,1.0f);
-                float val = 0;
-                float dv = rd*0.1f;
-                for(int i=0; i<steps; i++){
-                    float3 currPoint = closest.first.xyz + i * dv;
-                    float den = densityAtPoint(currPoint);
-                    float4x4 cyl = _CylinderMatrices[closestIndex];
-                    // float4 cyl = _Cylinders[closestIndex];
-                    float halfheight = cyl[1][0]/2.0f;
-                    float middle = cyl[0][1] + halfheight;
-                    float dist = abs(currPoint.y - middle)/halfheight;
-                    val += den;
-                }
-                val = val/steps;
-                return float4(random3(closestIndex), 1.0f);
-                return (1,1,1,1)*val+skyColor*(1-val);
-                return float4(val, val, val, 1.0f);
-                // float lengthInside = distance(closest.first.xyz,closest.second.xyz);
-                // return float4(1-exp(-0.1*closestDistance), 1, lengthInside, 1.0);
-                // float xtime = sin(_Time.y);
-                // float ytime = cos(_Time.y);
-                // float3 LightPos = _LightPosition + float3(xtime, 0, ytime);
-                // float4 col = raymarch(ro, rd, LightPos)*_LightColor;
-                // float alfa = col.w;
-                // float r = (alfa) * col.x + (1-alfa) * sceneCol.x;
-                // float g = (alfa) * col.y + (1-alfa) * sceneCol.y;
-                // float b = (alfa) * col.z + (1-alfa) * sceneCol.z;
-                // fixed4 res = alfa*col+(1-alfa)*sceneCol;
-                // return res;
-                */
             }
             ENDCG
         }
