@@ -622,14 +622,22 @@
                 // World-space ray
                 float3 ro = _CamPos;
                 float3 rd = normalize(worldPos - ro);
+
+                float4 skyColor = tex2D(_MainTex, i.uv);
+                float4 scattering;
+
+                #if defined(_MULTI_CYLINDER)
+                scattering = marchSingleScatteringThroughMultipleCylinders(ro, rd);
+                #else
                 int hits = 0;
                 intersection closest;
                 float closestDistance = 1e20;
                 int closestIndex = 0;
+                [loop]
                 for(int j=0; j<_CylinderCount; j++)
                 {
                     intersection res = closestCylinder(ro, rd, _CylinderMatrices[j]);
-                    if(res.count == 2 && distance(res.first.xyz, res.second.xyz) > 0.0001){
+                    if(isUsableCylinderIntersection(res)){
                         hits++;
                         float currentDistance = distance(ro, res.first.xyz);
                         if(currentDistance < closestDistance){
@@ -639,13 +647,15 @@
                         }
                     }
                 }
-                float4 skyColor = tex2D(_MainTex, i.uv);
                 if(hits==0)return skyColor;
 
-                float4 scattering = marchSingleScatteringThroughCylinder(
+                scattering = marchSingleScatteringThroughCylinder(
                     rd,
                     closest,
-                    _CylinderMatrices[closestIndex]);
+                    _CylinderMatrices[closestIndex],
+                    1.0);
+                #endif
+
                 float3 finalColor = scattering.rgb + skyColor.rgb * scattering.a;
                 return float4(finalColor, 1.0);
 
