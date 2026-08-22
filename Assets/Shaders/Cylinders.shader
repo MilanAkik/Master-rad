@@ -481,6 +481,54 @@
                 return float4(accumulatedCloudColor, backgroundVisibility);
             }
 
+            #if !defined(_MULTI_CYLINDER)
+            // Finds and marches only the closest cylinder intersected by this camera ray.
+            float4 marchSingleScatteringThroughClosestCylinder(
+                float3 primaryRayOrigin,
+                float3 primaryRayDirection)
+            {
+                int closestCylinderIndex = -1;
+                float closestDistance = 1e20;
+                intersection closestIntersection;
+
+                [loop]
+                for (int cylinderIndex = 0;
+                    cylinderIndex < _CylinderCount;
+                    cylinderIndex++)
+                {
+                    intersection candidateIntersection = closestCylinder(
+                        primaryRayOrigin,
+                        primaryRayDirection,
+                        _CylinderMatrices[cylinderIndex]);
+                    if (!isUsableCylinderIntersection(candidateIntersection))
+                    {
+                        continue;
+                    }
+
+                    float candidateDistance = distance(
+                        primaryRayOrigin,
+                        candidateIntersection.first.xyz);
+                    if (candidateDistance < closestDistance)
+                    {
+                        closestDistance = candidateDistance;
+                        closestCylinderIndex = cylinderIndex;
+                        closestIntersection = candidateIntersection;
+                    }
+                }
+
+                if (closestCylinderIndex < 0)
+                {
+                    return float4(0.0, 0.0, 0.0, 1.0);
+                }
+
+                return marchSingleScatteringThroughCylinder(
+                    primaryRayDirection,
+                    closestIntersection,
+                    _CylinderMatrices[closestCylinderIndex],
+                    1.0);
+            }
+            #endif
+
             #if defined(_MULTI_CYLINDER)
             // Builds a compact 512-bit set of cylinders intersecting this camera ray, then
             // repeatedly selects the closest remaining segment. Intersections are recalculated
@@ -629,31 +677,7 @@
                 #if defined(_MULTI_CYLINDER)
                 scattering = marchSingleScatteringThroughMultipleCylinders(ro, rd);
                 #else
-                int hits = 0;
-                intersection closest;
-                float closestDistance = 1e20;
-                int closestIndex = 0;
-                [loop]
-                for(int j=0; j<_CylinderCount; j++)
-                {
-                    intersection res = closestCylinder(ro, rd, _CylinderMatrices[j]);
-                    if(isUsableCylinderIntersection(res)){
-                        hits++;
-                        float currentDistance = distance(ro, res.first.xyz);
-                        if(currentDistance < closestDistance){
-                            closest = res;
-                            closestDistance = currentDistance;
-                            closestIndex = j;
-                        }
-                    }
-                }
-                if(hits==0)return skyColor;
-
-                scattering = marchSingleScatteringThroughCylinder(
-                    rd,
-                    closest,
-                    _CylinderMatrices[closestIndex],
-                    1.0);
+                scattering = marchSingleScatteringThroughClosestCylinder(ro, rd);
                 #endif
 
                 float3 finalColor = scattering.rgb + skyColor.rgb * scattering.a;
