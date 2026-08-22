@@ -682,40 +682,6 @@
 
                 float3 finalColor = scattering.rgb + skyColor.rgb * scattering.a;
                 return float4(finalColor, 1.0);
-
-                /* Previous density preview and experimental fragment code,
-                   retained for later cleanup.
-                float den = densityAtPoint(closestPoint.xyz);
-                return float4(den,den,den,1.0f);
-                float val = 0;
-                float dv = rd*0.1f;
-                for(int i=0; i<steps; i++){
-                    float3 currPoint = closest.first.xyz + i * dv;
-                    float den = densityAtPoint(currPoint);
-                    float4x4 cyl = _CylinderMatrices[closestIndex];
-                    // float4 cyl = _Cylinders[closestIndex];
-                    float halfheight = cyl[1][0]/2.0f;
-                    float middle = cyl[0][1] + halfheight;
-                    float dist = abs(currPoint.y - middle)/halfheight;
-                    val += den;
-                }
-                val = val/steps;
-                return float4(random3(closestIndex), 1.0f);
-                return (1,1,1,1)*val+skyColor*(1-val);
-                return float4(val, val, val, 1.0f);
-                // float lengthInside = distance(closest.first.xyz,closest.second.xyz);
-                // return float4(1-exp(-0.1*closestDistance), 1, lengthInside, 1.0);
-                // float xtime = sin(_Time.y);
-                // float ytime = cos(_Time.y);
-                // float3 LightPos = _LightPosition + float3(xtime, 0, ytime);
-                // float4 col = raymarch(ro, rd, LightPos)*_LightColor;
-                // float alfa = col.w;
-                // float r = (alfa) * col.x + (1-alfa) * sceneCol.x;
-                // float g = (alfa) * col.y + (1-alfa) * sceneCol.y;
-                // float b = (alfa) * col.z + (1-alfa) * sceneCol.z;
-                // fixed4 res = alfa*col+(1-alfa)*sceneCol;
-                // return res;
-                */
             }
             ENDCG
         }
