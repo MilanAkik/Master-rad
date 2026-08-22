@@ -205,13 +205,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: -10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!114 &963194229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -232,14 +232,14 @@ MonoBehaviour:
         e01: 0
         e02: 0
         e03: 0
-        e10: 0
+        e10: -0
         e11: -0.00000011920926
-        e12: 0.9999999
-        e13: 10
-        e20: 0
-        e21: 0.9999999
+        e12: -0.9999999
+        e13: -10
+        e20: -0
+        e21: -0.9999999
         e22: 0.00000011920926
-        e23: 0
+        e23: -0
         e30: 0
         e31: 0
         e32: 0
@@ -261,22 +261,22 @@ MonoBehaviour:
         e31: 0
         e32: -1.6661667
         e33: 1.6671666
-      camPos: {x: 0, y: 10, z: 0}
+      camPos: {x: 0, y: -10, z: 0}
     cylinderParameters:
       generatorParameters:
         cylinderCount: 100
         randomSeed: 1234
-        radiusMultiplier: 1.2
+        radiusMultiplier: 1
         heightMultiplier: 1
         areaMin: {x: -5, y: -5, z: -5}
         areaMax: {x: 5, y: 5, z: 5}
-      generator: {fileID: 11400000, guid: 571ac938c6530ed4c9c0731514a62307, type: 2}
+      generator: {fileID: 11400000, guid: bd483f5690f37844691478e2a9350235, type: 2}
     densityParameters:
-      densityNoiseSize: 512
+      densityNoiseSize: 256
       densityShader: {fileID: 7200000, guid: 347d913f3ac6e9d439a5cc7f208deed4, type: 3}
     lightParameters:
       lightColor: {x: 1, y: 1, z: 1, w: 0}
-      lightPosition: {x: 0, y: 0, z: 0}
+      lightPosition: {x: 2, y: 0, z: 2}
   raymarchMat: {fileID: 2100000, guid: 19e8804431024704688f65e5139b0e6d, type: 2}
 --- !u!1 &1926647031
 GameObject:
