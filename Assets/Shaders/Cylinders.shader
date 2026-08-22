@@ -20,9 +20,11 @@
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 3.5
             #include "UnityCG.cginc"		
-		    #include "noiseSimplex.cginc"
+            #include "noiseSimplex.cginc"
 
+            #define MAX_PRIMARY_MARCH_STEPS 128
             #define MAX_SHADOW_MARCH_STEPS 128
             
             sampler2D _MainTex;
@@ -373,6 +375,99 @@
                 return backgroundOcclusion * baseCloudColor * incomingLight * absorbedLight;
             }
 
+            // Returns accumulated cloud light in RGB and remaining background visibility in A.
+            float4 marchSingleScatteringThroughCylinder(
+                float3 primaryRayDirection,
+                intersection cylinderIntersection,
+                float4x4 cylinder)
+            {
+                const float minimumLength = 0.0001;
+                const float minimumDensity = 0.0001;
+                const float minimumBackgroundVisibility = 0.05;
+
+                if (cylinderIntersection.count < 2)
+                {
+                    return float4(0.0, 0.0, 0.0, 1.0);
+                }
+
+                float3 marchStart = cylinderIntersection.first.xyz;
+                float3 marchEnd = cylinderIntersection.second.xyz;
+                float marchDistance = distance(marchStart, marchEnd);
+                if (marchDistance <= minimumLength)
+                {
+                    return float4(0.0, 0.0, 0.0, 1.0);
+                }
+
+                float targetStepLength = max(_PrimaryStepLength, minimumLength);
+                int primaryStepCount = (int)min(
+                    ceil(marchDistance / targetStepLength),
+                    (float)MAX_PRIMARY_MARCH_STEPS);
+                float primaryStepLength = marchDistance / (float)primaryStepCount;
+                float backgroundVisibility = 1.0;
+                float3 accumulatedCloudColor = float3(0.0, 0.0, 0.0);
+
+                [loop]
+                for (int primaryStepIndex = 0;
+                    primaryStepIndex < MAX_PRIMARY_MARCH_STEPS;
+                    primaryStepIndex++)
+                {
+                    if (primaryStepIndex >= primaryStepCount)
+                    {
+                        break;
+                    }
+
+                    float distanceAlongPrimaryRay =
+                        ((float)primaryStepIndex + 0.5) * primaryStepLength;
+                    float3 primarySamplePoint =
+                        marchStart + primaryRayDirection * distanceAlongPrimaryRay;
+                    float density = densityAtPoint(primarySamplePoint);
+
+                    if (density <= minimumDensity)
+                    {
+                        continue;
+                    }
+
+                    float shadowOpticalDepth = shadowRayOpticalDepth(
+                        primarySamplePoint,
+                        _LightPosition,
+                        cylinder,
+                        _ShadowStepLength);
+
+                    float3 sampleToLight = _LightPosition - primarySamplePoint;
+                    float sampleToLightDistance = length(sampleToLight);
+                    float3 shadowRayDirection = sampleToLightDistance > minimumLength
+                        ? sampleToLight / sampleToLightDistance
+                        : primaryRayDirection;
+                    float viewLightDot = dot(primaryRayDirection, shadowRayDirection);
+                    float incomingLight = incomingSingleScatteredLight(
+                        viewLightDot,
+                        shadowOpticalDepth,
+                        _IsotropicCoefficient);
+
+                    // Equation (1) defines alpha_x through the current sample, so update it
+                    // before evaluating the corresponding term of equation (2).
+                    backgroundVisibility = backgroundOcclusionFactor(
+                        backgroundVisibility,
+                        density,
+                        primaryStepLength);
+                    accumulatedCloudColor += singleScatteringColorContribution(
+                        backgroundVisibility,
+                        _CloudColor.rgb * _LightColor.rgb,
+                        incomingLight,
+                        density,
+                        primaryStepLength);
+
+                    // Once at least 95% of the background is occluded, later samples have
+                    // little visible influence and can be skipped.
+                    if (backgroundVisibility <= minimumBackgroundVisibility)
+                    {
+                        break;
+                    }
+                }
+
+                return float4(accumulatedCloudColor, backgroundVisibility);
+            }
+
             uint pcg(uint v)
             {
                 uint state = v * 747796405u + 2891336453u;
@@ -386,7 +481,7 @@
                 return float3(h) * (1.0 / float(0xffffffffu));
             }
 
-            fixed4 frag(v2f i) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
                 // Convert screen UV to NDC (-1..1)
                 float2 uv = i.uv * 2.0 - 1.0;
@@ -399,34 +494,37 @@
                 // World-space ray
                 float3 ro = _CamPos;
                 float3 rd = normalize(worldPos - ro);
-                float dist = 0;
                 int hits = 0;
-                float steps = 20;
                 intersection closest;
-                float4 closestPoint = float4(0,0,0,0);
-                float closestDistance = 1000000;
+                float closestDistance = 1e20;
                 int closestIndex = 0;
                 for(int j=0; j<_CylinderCount; j++)
                 {
-                    // intersection res = closestCylinder(ro, rd, _Cylinders[j]);
                     intersection res = closestCylinder(ro, rd, _CylinderMatrices[j]);
-                    if(res.count>0){
+                    if(res.count == 2 && distance(res.first.xyz, res.second.xyz) > 0.0001){
                         hits++;
-                        float4 p = res.first;
-                        if(p.x == ro.x && p.y == ro.y && p.z == ro.z) p=res.second;
-                        if(distance(ro, p)<closestDistance){
+                        float currentDistance = distance(ro, res.first.xyz);
+                        if(currentDistance < closestDistance){
                             closest = res;
-                            closestDistance = distance(ro, p);
+                            closestDistance = currentDistance;
                             closestIndex = j;
-                            closestPoint=p;
                         }
                     }
                 }
                 float4 skyColor = tex2D(_MainTex, i.uv);
                 if(hits==0)return skyColor;
+
+                float4 scattering = marchSingleScatteringThroughCylinder(
+                    rd,
+                    closest,
+                    _CylinderMatrices[closestIndex]);
+                float3 finalColor = scattering.rgb + skyColor.rgb * scattering.a;
+                return float4(finalColor, 1.0);
+
+                /* Previous density preview and experimental fragment code,
+                   retained for later cleanup.
                 float den = densityAtPoint(closestPoint.xyz);
                 return float4(den,den,den,1.0f);
-                /* Previous experimental fragment code, retained for later cleanup.
                 float val = 0;
                 float dv = rd*0.1f;
                 for(int i=0; i<steps; i++){
