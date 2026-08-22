@@ -4,6 +4,10 @@
     {
         _MainTex ("Texture", 2D) = "white" {}
         _DensityNoise ("Density noise 3d texture", 3D) = "white" {}
+        _CloudColor ("Base cloud color (c_ss)", Color) = (1, 1, 1, 1)
+        _PrimaryStepLength ("Primary step length (l_g)", Float) = 0.1
+        _ShadowStepLength ("Shadow step length (l_p)", Float) = 0.1
+        _IsotropicCoefficient ("Isotropic coefficient (s)", Float) = 1.0
     }
     SubShader
     {
@@ -16,8 +20,12 @@
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 3.5
             #include "UnityCG.cginc"		
-		    #include "noiseSimplex.cginc"
+            #include "noiseSimplex.cginc"
+
+            #define MAX_PRIMARY_MARCH_STEPS 128
+            #define MAX_SHADOW_MARCH_STEPS 128
             
             sampler2D _MainTex;
 
@@ -35,12 +43,18 @@
             int _CylinderCount;
 
             //Area parameters
-            float3 _areaMin;
-            float3 _areaMax;
+            float3 _AreaMin;
+            float3 _AreaMax;
 
             //Density noise parameters
             sampler3D _DensityNoise;
             int _DensityNoiseSize;
+
+            // Single-scattering parameters
+            float4 _CloudColor;
+            float _PrimaryStepLength;
+            float _ShadowStepLength;
+            float _IsotropicCoefficient;
 
             struct appdata
             {
@@ -177,47 +191,281 @@
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
                 return o;
+            }          
+            
+            float densityAtPoint(float3 p)
+            {
+                float3 extent = _AreaMax - _AreaMin;
+                float3 normalizedPosition = saturate((p - _AreaMin) / extent);
+                float size = (float)_DensityNoiseSize;
+                // Map areaMin/areaMax to the centers of the first/last texels.
+                float3 uvw = (normalizedPosition * (size - 1.0f) + 0.5f) / size;
+                return tex3D(_DensityNoise, uvw).r;
             }
 
-            float mapToZeroOne(float n, float mn, float mx){
-                return (n-mn)/(mx-mn);
+            // Beer-Lambert transmittance for one primary-ray step: e^(-d_x * l_g).
+            float primaryStepTransmittance(float density, float primaryStepLength)
+            {
+                return exp(-density * primaryStepLength);
             }
 
-            float3 map3ToZeroOne(float3 a){
-                return float3(
-                    mapToZeroOne(a.x, _areaMin.x, _areaMax.x),
-                    mapToZeroOne(a.y, _areaMin.y, _areaMax.y),
-                    mapToZeroOne(a.z, _areaMin.z, _areaMax.z)
-                );
+            // Alpha from equation (1), represented incrementally instead of as a product loop.
+            float backgroundOcclusionFactor(float previousOcclusionFactor, float density, float primaryStepLength)
+            {
+                return previousOcclusionFactor * primaryStepTransmittance(density, primaryStepLength);
             }
 
-            float denistyAtPoint(float3 p){
-                float3 coords = map3ToZeroOne(p);
-                float resol = 1 / (float)_DensityNoiseSize;
-                float dx1 = fmod(coords.x, resol);
-                float dx = dx1 / resol;
-                float dy1 = fmod(coords.y, resol);
-                float dy = dy1 / resol;
-                float dz1 = fmod(coords.z, resol);
-                float dz = dz1 / resol;
-                float c000 = tex3D(_DensityNoise, coords);
-                float c100 = tex3D(_DensityNoise, coords+float3(resol,0,0));
-                float c001 = tex3D(_DensityNoise, coords+float3(0,0,resol));
-                float c101 = tex3D(_DensityNoise, coords+float3(resol,0,resol));
-                float c010 = tex3D(_DensityNoise, coords+float3(0,resol,0));
-                float c110 = tex3D(_DensityNoise, coords+float3(resol,resol,0));
-                float c011 = tex3D(_DensityNoise, coords+float3(0,resol,resol));
-                float c111 = tex3D(_DensityNoise, coords+float3(resol,resol,resol));
-                float c00 = c000 * (1-dx) + c100 * dx;
-                float c01 = c001 * (1-dx) + c101 * dx;
-                float c10 = c010 * (1-dx) + c110 * dx;
-                float c11 = c011 * (1-dx) + c111 * dx;
-                float c0 = c00 * (1-dy) + c10 * dy;
-                float c1 = c01 * (1-dy) + c11 * dy;
-                float val = tex3D(_DensityNoise, coords);
-                val = c0 * (1-dz) + c1 * dz;
-                return val;
-                return val;
+            // The final factor in equation (2): 1 - e^(-d_x * l_g).
+            float primaryStepAbsorption(float density, float primaryStepLength)
+            {
+                return 1.0 - primaryStepTransmittance(density, primaryStepLength);
+            }
+
+            // One term of the shadow-ray optical-depth sum: d_j * l_p.
+            float shadowOpticalDepthContribution(float density, float shadowStepLength)
+            {
+                return density * shadowStepLength;
+            }
+
+            // Equation (4), accumulated one shadow-ray sample at a time.
+            float accumulateShadowOpticalDepth(float currentOpticalDepth, float density, float shadowStepLength)
+            {
+                return currentOpticalDepth + shadowOpticalDepthContribution(density, shadowStepLength);
+            }
+
+            // Distance from a point inside a finite vertical cylinder to its boundary.
+            // This handles vertical rays explicitly, unlike the general camera-ray intersection.
+            float distanceToCylinderExitFromInside(float3 rayOrigin, float3 rayDirection, float4x4 cylinder)
+            {
+                const float directionEpsilon = 0.000001;
+                const float maximumDistance = 1e20;
+
+                float centerX = cylinder[0][0];
+                float minimumY = cylinder[0][1];
+                float centerZ = cylinder[0][2];
+                float radius = cylinder[0][3];
+                float maximumY = minimumY + cylinder[1][0];
+
+                float sideExitDistance = maximumDistance;
+                float radialDirectionLengthSquared =
+                    rayDirection.x * rayDirection.x + rayDirection.z * rayDirection.z;
+
+                if (radialDirectionLengthSquared > directionEpsilon)
+                {
+                    float relativeX = rayOrigin.x - centerX;
+                    float relativeZ = rayOrigin.z - centerZ;
+                    float halfB = relativeX * rayDirection.x + relativeZ * rayDirection.z;
+                    float c = relativeX * relativeX + relativeZ * relativeZ - radius * radius;
+                    float discriminant = max(
+                        halfB * halfB - radialDirectionLengthSquared * c,
+                        0.0);
+
+                    // For an origin inside the cylinder, the larger root is the forward exit.
+                    sideExitDistance =
+                        (-halfB + sqrt(discriminant)) / radialDirectionLengthSquared;
+                }
+
+                float capExitDistance = maximumDistance;
+                if (rayDirection.y > directionEpsilon)
+                {
+                    capExitDistance = (maximumY - rayOrigin.y) / rayDirection.y;
+                }
+                else if (rayDirection.y < -directionEpsilon)
+                {
+                    capExitDistance = (minimumY - rayOrigin.y) / rayDirection.y;
+                }
+
+                return max(0.0, min(sideExitDistance, capExitDistance));
+            }
+
+            // Marches the shadow ray only through the cylinder containing the primary sample.
+            float shadowRayOpticalDepth(
+                float3 primarySamplePoint,
+                float3 lightPosition,
+                float4x4 cylinder,
+                float requestedShadowStepLength)
+            {
+                const float minimumLength = 0.0001;
+
+                float3 pointToLight = lightPosition - primarySamplePoint;
+                float lightDistance = length(pointToLight);
+                if (lightDistance <= minimumLength)
+                {
+                    return 0.0;
+                }
+
+                float3 shadowRayDirection = pointToLight / lightDistance;
+                float cylinderExitDistance = distanceToCylinderExitFromInside(
+                    primarySamplePoint,
+                    shadowRayDirection,
+                    cylinder);
+                float marchDistance = min(lightDistance, cylinderExitDistance);
+                if (marchDistance <= minimumLength)
+                {
+                    return 0.0;
+                }
+
+                float targetStepLength = max(requestedShadowStepLength, minimumLength);
+                int shadowStepCount = (int)min(
+                    ceil(marchDistance / targetStepLength),
+                    (float)MAX_SHADOW_MARCH_STEPS);
+                float shadowStepLength = marchDistance / (float)shadowStepCount;
+                float opticalDepth = 0.0;
+
+                [loop]
+                for (int shadowStepIndex = 0;
+                    shadowStepIndex < MAX_SHADOW_MARCH_STEPS;
+                    shadowStepIndex++)
+                {
+                    if (shadowStepIndex >= shadowStepCount)
+                    {
+                        break;
+                    }
+
+                    float distanceAlongShadowRay =
+                        ((float)shadowStepIndex + 0.5) * shadowStepLength;
+                    float3 shadowSamplePoint =
+                        primarySamplePoint + shadowRayDirection * distanceAlongShadowRay;
+                    float shadowDensity = densityAtPoint(shadowSamplePoint);
+                    opticalDepth = accumulateShadowOpticalDepth(
+                        opticalDepth,
+                        shadowDensity,
+                        shadowStepLength);
+                }
+
+                return opticalDepth;
+            }
+
+            // The phase parameter supplied by equation (3): d_p = 10 / t_xss.
+            float phaseParameterFromOpticalDepth(float shadowOpticalDepth)
+            {
+                const float minimumOpticalDepth = 0.0001;
+                return 10.0 / max(shadowOpticalDepth, minimumOpticalDepth);
+            }
+
+            // Equation (5): modified approximate Lorenz-Mie phase function.
+            float approximateLorenzMiePhase(float viewLightDot, float phaseParameter)
+            {
+                float angularFactor = saturate((1.0 + viewLightDot) * 0.5);
+                return (phaseParameter / (4.0 * UNITY_PI)) * pow(angularFactor, phaseParameter);
+            }
+
+            // Equation (6), preserving the requested positive exponent in its second term.
+            float isotropicLightFactor(float shadowOpticalDepth, float isotropicCoefficient)
+            {
+                float firstTerm = exp(-shadowOpticalDepth);
+                float secondTerm = isotropicCoefficient * exp(shadowOpticalDepth / 10.0);
+                float thirdTerm = (2.0 * isotropicCoefficient / 5.0) * exp(-shadowOpticalDepth / 50.0);
+                return firstTerm + secondTerm + thirdTerm;
+            }
+
+            // Equation (3): light intensity arriving along the shadow ray.
+            float incomingSingleScatteredLight(float viewLightDot, float shadowOpticalDepth, float isotropicCoefficient)
+            {
+                float phaseParameter = phaseParameterFromOpticalDepth(shadowOpticalDepth);
+                float directionalLight = approximateLorenzMiePhase(viewLightDot, phaseParameter);
+                float isotropicLight = isotropicLightFactor(shadowOpticalDepth, isotropicCoefficient);
+                return directionalLight + isotropicLight;
+            }
+
+            // One term of the color sum in equation (2).
+            float3 singleScatteringColorContribution(float backgroundOcclusion, float3 baseCloudColor, float incomingLight, float density, float primaryStepLength)
+            {
+                float absorbedLight = primaryStepAbsorption(density, primaryStepLength);
+                return backgroundOcclusion * baseCloudColor * incomingLight * absorbedLight;
+            }
+
+            // Returns accumulated cloud light in RGB and remaining background visibility in A.
+            float4 marchSingleScatteringThroughCylinder(
+                float3 primaryRayDirection,
+                intersection cylinderIntersection,
+                float4x4 cylinder)
+            {
+                const float minimumLength = 0.0001;
+                const float minimumDensity = 0.0001;
+                const float minimumBackgroundVisibility = 0.05;
+
+                if (cylinderIntersection.count < 2)
+                {
+                    return float4(0.0, 0.0, 0.0, 1.0);
+                }
+
+                float3 marchStart = cylinderIntersection.first.xyz;
+                float3 marchEnd = cylinderIntersection.second.xyz;
+                float marchDistance = distance(marchStart, marchEnd);
+                if (marchDistance <= minimumLength)
+                {
+                    return float4(0.0, 0.0, 0.0, 1.0);
+                }
+
+                float targetStepLength = max(_PrimaryStepLength, minimumLength);
+                int primaryStepCount = (int)min(
+                    ceil(marchDistance / targetStepLength),
+                    (float)MAX_PRIMARY_MARCH_STEPS);
+                float primaryStepLength = marchDistance / (float)primaryStepCount;
+                float backgroundVisibility = 1.0;
+                float3 accumulatedCloudColor = float3(0.0, 0.0, 0.0);
+
+                [loop]
+                for (int primaryStepIndex = 0;
+                    primaryStepIndex < MAX_PRIMARY_MARCH_STEPS;
+                    primaryStepIndex++)
+                {
+                    if (primaryStepIndex >= primaryStepCount)
+                    {
+                        break;
+                    }
+
+                    float distanceAlongPrimaryRay =
+                        ((float)primaryStepIndex + 0.5) * primaryStepLength;
+                    float3 primarySamplePoint =
+                        marchStart + primaryRayDirection * distanceAlongPrimaryRay;
+                    float density = densityAtPoint(primarySamplePoint);
+
+                    if (density <= minimumDensity)
+                    {
+                        continue;
+                    }
+
+                    float shadowOpticalDepth = shadowRayOpticalDepth(
+                        primarySamplePoint,
+                        _LightPosition,
+                        cylinder,
+                        _ShadowStepLength);
+
+                    float3 sampleToLight = _LightPosition - primarySamplePoint;
+                    float sampleToLightDistance = length(sampleToLight);
+                    float3 shadowRayDirection = sampleToLightDistance > minimumLength
+                        ? sampleToLight / sampleToLightDistance
+                        : primaryRayDirection;
+                    float viewLightDot = dot(primaryRayDirection, shadowRayDirection);
+                    float incomingLight = incomingSingleScatteredLight(
+                        viewLightDot,
+                        shadowOpticalDepth,
+                        _IsotropicCoefficient);
+
+                    // Equation (1) defines alpha_x through the current sample, so update it
+                    // before evaluating the corresponding term of equation (2).
+                    backgroundVisibility = backgroundOcclusionFactor(
+                        backgroundVisibility,
+                        density,
+                        primaryStepLength);
+                    accumulatedCloudColor += singleScatteringColorContribution(
+                        backgroundVisibility,
+                        _CloudColor.rgb * _LightColor.rgb,
+                        incomingLight,
+                        density,
+                        primaryStepLength);
+
+                    // Once at least 95% of the background is occluded, later samples have
+                    // little visible influence and can be skipped.
+                    if (backgroundVisibility <= minimumBackgroundVisibility)
+                    {
+                        break;
+                    }
+                }
+
+                return float4(accumulatedCloudColor, backgroundVisibility);
             }
 
             uint pcg(uint v)
@@ -233,7 +481,7 @@
                 return float3(h) * (1.0 / float(0xffffffffu));
             }
 
-            fixed4 frag(v2f i) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
                 // Convert screen UV to NDC (-1..1)
                 float2 uv = i.uv * 2.0 - 1.0;
@@ -246,34 +494,42 @@
                 // World-space ray
                 float3 ro = _CamPos;
                 float3 rd = normalize(worldPos - ro);
-                float dist = 0;
                 int hits = 0;
-                float steps = 20;
                 intersection closest;
-                float closestDistance = 1000000;
+                float closestDistance = 1e20;
                 int closestIndex = 0;
                 for(int j=0; j<_CylinderCount; j++)
                 {
-                    // intersection res = closestCylinder(ro, rd, _Cylinders[j]);
                     intersection res = closestCylinder(ro, rd, _CylinderMatrices[j]);
-                    if(res.count>0){
+                    if(res.count == 2 && distance(res.first.xyz, res.second.xyz) > 0.0001){
                         hits++;
-                        float4 p = res.first;
-                        if(p.x == ro.x && p.y == ro.y && p.z == ro.z) p=res.second;
-                        if(distance(ro, p)<closestDistance){
+                        float currentDistance = distance(ro, res.first.xyz);
+                        if(currentDistance < closestDistance){
                             closest = res;
-                            closestDistance = distance(ro, p);
+                            closestDistance = currentDistance;
                             closestIndex = j;
                         }
                     }
                 }
                 float4 skyColor = tex2D(_MainTex, i.uv);
                 if(hits==0)return skyColor;
+
+                float4 scattering = marchSingleScatteringThroughCylinder(
+                    rd,
+                    closest,
+                    _CylinderMatrices[closestIndex]);
+                float3 finalColor = scattering.rgb + skyColor.rgb * scattering.a;
+                return float4(finalColor, 1.0);
+
+                /* Previous density preview and experimental fragment code,
+                   retained for later cleanup.
+                float den = densityAtPoint(closestPoint.xyz);
+                return float4(den,den,den,1.0f);
                 float val = 0;
                 float dv = rd*0.1f;
                 for(int i=0; i<steps; i++){
                     float3 currPoint = closest.first.xyz + i * dv;
-                    float den = denistyAtPoint(currPoint);
+                    float den = densityAtPoint(currPoint);
                     float4x4 cyl = _CylinderMatrices[closestIndex];
                     // float4 cyl = _Cylinders[closestIndex];
                     float halfheight = cyl[1][0]/2.0f;
@@ -297,6 +553,7 @@
                 // float b = (alfa) * col.z + (1-alfa) * sceneCol.z;
                 // fixed4 res = alfa*col+(1-alfa)*sceneCol;
                 // return res;
+                */
             }
             ENDCG
         }

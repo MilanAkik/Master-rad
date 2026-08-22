@@ -22,7 +22,8 @@ namespace Assets.Scripts.Utilities
                 enableRandomWrite = true,
                 volumeDepth = depth,
                 dimension = UnityEngine.Rendering.TextureDimension.Tex3D,
-                filterMode = FilterMode.Point
+                filterMode = FilterMode.Bilinear,
+                wrapMode = TextureWrapMode.Repeat
             };
             texture.Create();
             return texture;

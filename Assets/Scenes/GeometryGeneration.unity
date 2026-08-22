@@ -272,50 +272,12 @@ MonoBehaviour:
         areaMax: {x: 5, y: 5, z: 5}
       generator: {fileID: 11400000, guid: 571ac938c6530ed4c9c0731514a62307, type: 2}
     densityParameters:
-      densityNoise: {fileID: 31306506}
       densityNoiseSize: 256
       densityShader: {fileID: 7200000, guid: 347d913f3ac6e9d439a5cc7f208deed4, type: 3}
     lightParameters:
       lightColor: {x: 1, y: 1, z: 1, w: 0}
       lightPosition: {x: 0, y: 5, z: -5}
   raymarchMat: {fileID: 2100000, guid: 2fa222c9538e12a41a969ed0e7adc30e, type: 2}
---- !u!84 &31306506
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1
-  m_Height: 1
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 0
-  m_ColorFormat: 4
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 1
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 0
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 3
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1 &1226074091
 GameObject:
   m_ObjectHideFlags: 0
