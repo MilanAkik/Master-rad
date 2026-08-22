@@ -4,6 +4,10 @@
     {
         _MainTex ("Texture", 2D) = "white" {}
         _DensityNoise ("Density noise 3d texture", 3D) = "white" {}
+        _CloudColor ("Base cloud color (c_ss)", Color) = (1, 1, 1, 1)
+        _PrimaryStepLength ("Primary step length (l_g)", Float) = 0.1
+        _ShadowStepLength ("Shadow step length (l_p)", Float) = 0.1
+        _IsotropicCoefficient ("Isotropic coefficient (s)", Float) = 1.0
     }
     SubShader
     {
@@ -41,6 +45,12 @@
             //Density noise parameters
             sampler3D _DensityNoise;
             int _DensityNoiseSize;
+
+            // Single-scattering parameters
+            float4 _CloudColor;
+            float _PrimaryStepLength;
+            float _ShadowStepLength;
+            float _IsotropicCoefficient;
 
             struct appdata
             {
@@ -187,6 +197,75 @@
                 // Map areaMin/areaMax to the centers of the first/last texels.
                 float3 uvw = (normalizedPosition * (size - 1.0f) + 0.5f) / size;
                 return tex3D(_DensityNoise, uvw).r;
+            }
+
+            // Beer-Lambert transmittance for one primary-ray step: e^(-d_x * l_g).
+            float primaryStepTransmittance(float density, float primaryStepLength)
+            {
+                return exp(-density * primaryStepLength);
+            }
+
+            // Alpha from equation (1), represented incrementally instead of as a product loop.
+            float backgroundOcclusionFactor(float previousOcclusionFactor, float density, float primaryStepLength)
+            {
+                return previousOcclusionFactor * primaryStepTransmittance(density, primaryStepLength);
+            }
+
+            // The final factor in equation (2): 1 - e^(-d_x * l_g).
+            float primaryStepAbsorption(float density, float primaryStepLength)
+            {
+                return 1.0 - primaryStepTransmittance(density, primaryStepLength);
+            }
+
+            // One term of the shadow-ray optical-depth sum: d_j * l_p.
+            float shadowOpticalDepthContribution(float density, float shadowStepLength)
+            {
+                return density * shadowStepLength;
+            }
+
+            // Equation (4), accumulated one shadow-ray sample at a time.
+            float accumulateShadowOpticalDepth(float currentOpticalDepth, float density, float shadowStepLength)
+            {
+                return currentOpticalDepth + shadowOpticalDepthContribution(density, shadowStepLength);
+            }
+
+            // The phase parameter supplied by equation (3): d_p = 10 / t_xss.
+            float phaseParameterFromOpticalDepth(float shadowOpticalDepth)
+            {
+                const float minimumOpticalDepth = 0.0001;
+                return 10.0 / max(shadowOpticalDepth, minimumOpticalDepth);
+            }
+
+            // Equation (5): modified approximate Lorenz-Mie phase function.
+            float approximateLorenzMiePhase(float viewLightDot, float phaseParameter)
+            {
+                float angularFactor = saturate((1.0 + viewLightDot) * 0.5);
+                return (phaseParameter / (4.0 * UNITY_PI)) * pow(angularFactor, phaseParameter);
+            }
+
+            // Equation (6), preserving the requested positive exponent in its second term.
+            float isotropicLightFactor(float shadowOpticalDepth, float isotropicCoefficient)
+            {
+                float firstTerm = exp(-shadowOpticalDepth);
+                float secondTerm = isotropicCoefficient * exp(shadowOpticalDepth / 10.0);
+                float thirdTerm = (2.0 * isotropicCoefficient / 5.0) * exp(-shadowOpticalDepth / 50.0);
+                return firstTerm + secondTerm + thirdTerm;
+            }
+
+            // Equation (3): light intensity arriving along the shadow ray.
+            float incomingSingleScatteredLight(float viewLightDot, float shadowOpticalDepth, float isotropicCoefficient)
+            {
+                float phaseParameter = phaseParameterFromOpticalDepth(shadowOpticalDepth);
+                float directionalLight = approximateLorenzMiePhase(viewLightDot, phaseParameter);
+                float isotropicLight = isotropicLightFactor(shadowOpticalDepth, isotropicCoefficient);
+                return directionalLight + isotropicLight;
+            }
+
+            // One term of the color sum in equation (2).
+            float3 singleScatteringColorContribution(float backgroundOcclusion, float3 baseCloudColor, float incomingLight, float density, float primaryStepLength)
+            {
+                float absorbedLight = primaryStepAbsorption(density, primaryStepLength);
+                return backgroundOcclusion * baseCloudColor * incomingLight * absorbedLight;
             }
 
             uint pcg(uint v)
