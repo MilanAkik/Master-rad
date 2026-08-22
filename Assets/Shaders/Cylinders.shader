@@ -22,6 +22,8 @@
             #pragma fragment frag
             #include "UnityCG.cginc"		
 		    #include "noiseSimplex.cginc"
+
+            #define MAX_SHADOW_MARCH_STEPS 128
             
             sampler2D _MainTex;
 
@@ -229,6 +231,109 @@
                 return currentOpticalDepth + shadowOpticalDepthContribution(density, shadowStepLength);
             }
 
+            // Distance from a point inside a finite vertical cylinder to its boundary.
+            // This handles vertical rays explicitly, unlike the general camera-ray intersection.
+            float distanceToCylinderExitFromInside(float3 rayOrigin, float3 rayDirection, float4x4 cylinder)
+            {
+                const float directionEpsilon = 0.000001;
+                const float maximumDistance = 1e20;
+
+                float centerX = cylinder[0][0];
+                float minimumY = cylinder[0][1];
+                float centerZ = cylinder[0][2];
+                float radius = cylinder[0][3];
+                float maximumY = minimumY + cylinder[1][0];
+
+                float sideExitDistance = maximumDistance;
+                float radialDirectionLengthSquared =
+                    rayDirection.x * rayDirection.x + rayDirection.z * rayDirection.z;
+
+                if (radialDirectionLengthSquared > directionEpsilon)
+                {
+                    float relativeX = rayOrigin.x - centerX;
+                    float relativeZ = rayOrigin.z - centerZ;
+                    float halfB = relativeX * rayDirection.x + relativeZ * rayDirection.z;
+                    float c = relativeX * relativeX + relativeZ * relativeZ - radius * radius;
+                    float discriminant = max(
+                        halfB * halfB - radialDirectionLengthSquared * c,
+                        0.0);
+
+                    // For an origin inside the cylinder, the larger root is the forward exit.
+                    sideExitDistance =
+                        (-halfB + sqrt(discriminant)) / radialDirectionLengthSquared;
+                }
+
+                float capExitDistance = maximumDistance;
+                if (rayDirection.y > directionEpsilon)
+                {
+                    capExitDistance = (maximumY - rayOrigin.y) / rayDirection.y;
+                }
+                else if (rayDirection.y < -directionEpsilon)
+                {
+                    capExitDistance = (minimumY - rayOrigin.y) / rayDirection.y;
+                }
+
+                return max(0.0, min(sideExitDistance, capExitDistance));
+            }
+
+            // Marches the shadow ray only through the cylinder containing the primary sample.
+            float shadowRayOpticalDepth(
+                float3 primarySamplePoint,
+                float3 lightPosition,
+                float4x4 cylinder,
+                float requestedShadowStepLength)
+            {
+                const float minimumLength = 0.0001;
+
+                float3 pointToLight = lightPosition - primarySamplePoint;
+                float lightDistance = length(pointToLight);
+                if (lightDistance <= minimumLength)
+                {
+                    return 0.0;
+                }
+
+                float3 shadowRayDirection = pointToLight / lightDistance;
+                float cylinderExitDistance = distanceToCylinderExitFromInside(
+                    primarySamplePoint,
+                    shadowRayDirection,
+                    cylinder);
+                float marchDistance = min(lightDistance, cylinderExitDistance);
+                if (marchDistance <= minimumLength)
+                {
+                    return 0.0;
+                }
+
+                float targetStepLength = max(requestedShadowStepLength, minimumLength);
+                int shadowStepCount = (int)min(
+                    ceil(marchDistance / targetStepLength),
+                    (float)MAX_SHADOW_MARCH_STEPS);
+                float shadowStepLength = marchDistance / (float)shadowStepCount;
+                float opticalDepth = 0.0;
+
+                [loop]
+                for (int shadowStepIndex = 0;
+                    shadowStepIndex < MAX_SHADOW_MARCH_STEPS;
+                    shadowStepIndex++)
+                {
+                    if (shadowStepIndex >= shadowStepCount)
+                    {
+                        break;
+                    }
+
+                    float distanceAlongShadowRay =
+                        ((float)shadowStepIndex + 0.5) * shadowStepLength;
+                    float3 shadowSamplePoint =
+                        primarySamplePoint + shadowRayDirection * distanceAlongShadowRay;
+                    float shadowDensity = densityAtPoint(shadowSamplePoint);
+                    opticalDepth = accumulateShadowOpticalDepth(
+                        opticalDepth,
+                        shadowDensity,
+                        shadowStepLength);
+                }
+
+                return opticalDepth;
+            }
+
             // The phase parameter supplied by equation (3): d_p = 10 / t_xss.
             float phaseParameterFromOpticalDepth(float shadowOpticalDepth)
             {
@@ -321,6 +426,7 @@
                 if(hits==0)return skyColor;
                 float den = densityAtPoint(closestPoint.xyz);
                 return float4(den,den,den,1.0f);
+                /* Previous experimental fragment code, retained for later cleanup.
                 float val = 0;
                 float dv = rd*0.1f;
                 for(int i=0; i<steps; i++){
@@ -349,6 +455,7 @@
                 // float b = (alfa) * col.z + (1-alfa) * sceneCol.z;
                 // fixed4 res = alfa*col+(1-alfa)*sceneCol;
                 // return res;
+                */
             }
             ENDCG
         }
