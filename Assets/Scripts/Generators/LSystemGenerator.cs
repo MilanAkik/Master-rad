@@ -48,6 +48,28 @@ namespace Assets.Scripts.Generators
                 matrices = getMatricesFromCurrentState(currentState, parameters);
                 numLoops++;
             }
+            return applyGeneratorParameters(matrices, parameters).Take(parameters.CylinderCount).ToArray();
+        }
+
+        private Matrix4x4[] applyGeneratorParameters(Matrix4x4[] matrices, GeneratorParameters parameters)
+        {
+            for (int i = 0; i < matrices.Length; i++)
+            {
+                var positionAndRadius = matrices[i].GetColumn(0);
+                positionAndRadius.x = Mathf.Lerp(parameters.AreaMin.x, parameters.AreaMax.x, positionAndRadius.x);
+                positionAndRadius.y = Mathf.Lerp(parameters.AreaMin.y, parameters.AreaMax.y, positionAndRadius.y);
+                positionAndRadius.z = Mathf.Lerp(parameters.AreaMin.z, parameters.AreaMax.z, positionAndRadius.z);
+                positionAndRadius.w *= parameters.RadiusMultiplier;
+
+                var height = matrices[i].GetColumn(1);
+                height.x *= parameters.HeightMultiplier;
+
+                var adjustedMatrix = matrices[i];
+                adjustedMatrix.SetColumn(0, positionAndRadius);
+                adjustedMatrix.SetColumn(1, height);
+                matrices[i] = adjustedMatrix;
+            }
+
             return matrices;
         }
 
