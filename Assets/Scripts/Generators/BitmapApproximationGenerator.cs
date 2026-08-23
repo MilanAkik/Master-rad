@@ -38,7 +38,6 @@ namespace Assets.Scripts.Generators
             List<Pixel> backgroundPixels = GetBackgroundPixels(foreground);
             List<CircleCandidate> candidates = BuildCandidates(foregroundPixels, backgroundPixels);
             List<CircleCandidate> selected = SelectGreedyCover(candidates, foregroundPixels.Count, parameters.CylinderCount);
-            foreach(var x in selected)Debug.Log(x.center.x + " " + x.center.z + " " + x.radius);
             var res = CreateMatrices(selected, parameters);
             return res;
         }

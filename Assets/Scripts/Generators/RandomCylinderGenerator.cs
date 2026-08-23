@@ -30,7 +30,6 @@ namespace Assets.Scripts.Generators
                 var x = areaMin.x + Random.Range(_xRange.x, _xRange.y) * areaSize.x;
                 var y = areaMin.y + Random.Range(_yRange.x, _yRange.y) * areaSize.y;
                 var z = areaMin.z + Random.Range(_zRange.x, _zRange.y) * areaSize.z;
-                Debug.Log($"RandomCylinderGenerator: x={x}, y={y}, z={z}");
                 var r = Random.Range(_rRange.x, _rRange.y) * parameters.RadiusMultiplier;
                 var h = Random.Range(_hRange.x, _hRange.y) * parameters.HeightMultiplier;
                 res[i] = new Matrix4x4( new Vector4(x, y, z, r), new Vector4(h,0,0,0), Vector4.zero, Vector4.zero );
