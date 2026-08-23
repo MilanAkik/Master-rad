@@ -23,3 +23,12 @@ MonoBehaviour:
   axiomP: PFVFP
   axiomV: 
   startingState: P
+  axiomI: 
+  axiomE: 
+  axiomC: 
+  maxLoops: 5
+  stepSize: 0.0085
+  rotationAngle: 45
+  verticalMovement: {x: 0, y: 0.02, z: 0}
+  radiusMultiplier: 1.12
+  heightMultiplier: 1.08
