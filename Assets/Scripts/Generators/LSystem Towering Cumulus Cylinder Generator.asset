@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1da4ebddff0a7294ca1a792e0673ed05, type: 3}
   m_Name: LSystem Towering Cumulus Cylinder Generator
   m_EditorClassIdentifier:
-  axiomF: FFP
+  axiomF: FFLPRF
   axiomB: ""
   axiomL: ""
   axiomR: ""
@@ -25,10 +25,10 @@ MonoBehaviour:
   axiomI: ""
   axiomE: ""
   axiomC: ""
-  startingState: PVLVFP
+  startingState: PVLVLVFP
   maxLoops: 4
-  stepSize: 0.012
-  rotationAngle: 35
-  verticalMovement: {x: 0, y: 0.025, z: 0}
+  stepSize: 0.018
+  rotationAngle: 30
+  verticalMovement: {x: 0, y: 0.03, z: 0}
   radiusMultiplier: 1.05
   heightMultiplier: 1.03
