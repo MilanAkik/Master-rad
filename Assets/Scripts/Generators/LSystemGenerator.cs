@@ -24,18 +24,18 @@ namespace Assets.Scripts.Generators
         public string axiomC = "";
         public string startingState = "";
 
-        [System.NonSerialized]
+        [SerializeField]
         private int maxLoops = 5;
-        [System.NonSerialized]
-        private float stepSize = 2f;
-        [System.NonSerialized]
+        [SerializeField]
+        private float stepSize = 0.0085f;
+        [SerializeField]
         private float rotationAngle = 45f;
-        [System.NonSerialized]
-        private Vector3 verticalMovement = new Vector3(0f, 0.1f, 0f);
-        [System.NonSerialized]
-        private float radiusMultiplier = 1.1f;
-        [System.NonSerialized]
-        private float heightMultiplier = 1.1f;
+        [SerializeField]
+        private Vector3 verticalMovement = new Vector3(0f, 0.02f, 0f);
+        [SerializeField]
+        private float radiusMultiplier = 1.12f;
+        [SerializeField]
+        private float heightMultiplier = 1.08f;
 
         public override Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters)
         {
@@ -48,6 +48,28 @@ namespace Assets.Scripts.Generators
                 matrices = getMatricesFromCurrentState(currentState, parameters);
                 numLoops++;
             }
+            return applyGeneratorParameters(matrices, parameters).Take(parameters.CylinderCount).ToArray();
+        }
+
+        private Matrix4x4[] applyGeneratorParameters(Matrix4x4[] matrices, GeneratorParameters parameters)
+        {
+            for (int i = 0; i < matrices.Length; i++)
+            {
+                var positionAndRadius = matrices[i].GetColumn(0);
+                positionAndRadius.x = Mathf.Lerp(parameters.AreaMin.x, parameters.AreaMax.x, positionAndRadius.x);
+                positionAndRadius.y = Mathf.Lerp(parameters.AreaMin.y, parameters.AreaMax.y, positionAndRadius.y);
+                positionAndRadius.z = Mathf.Lerp(parameters.AreaMin.z, parameters.AreaMax.z, positionAndRadius.z);
+                positionAndRadius.w *= parameters.RadiusMultiplier;
+
+                var height = matrices[i].GetColumn(1);
+                height.x *= parameters.HeightMultiplier;
+
+                var adjustedMatrix = matrices[i];
+                adjustedMatrix.SetColumn(0, positionAndRadius);
+                adjustedMatrix.SetColumn(1, height);
+                matrices[i] = adjustedMatrix;
+            }
+
             return matrices;
         }
 

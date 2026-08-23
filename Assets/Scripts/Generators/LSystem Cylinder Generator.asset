@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1da4ebddff0a7294ca1a792e0673ed05, type: 3}
   m_Name: LSystem Cylinder Generator
   m_EditorClassIdentifier: 
-  axiomF: 
+  axiomF: FFLPRF
   axiomB: 
   axiomL: 
   axiomR: 
@@ -20,6 +20,15 @@ MonoBehaviour:
   axiomD: 
   axiomG: 
   axiomS: 
-  axiomP: PFVFP
+  axiomP: PGEUPSCD
   axiomV: 
-  startingState: P
+  axiomI: 
+  axiomE: 
+  axiomC: 
+  startingState: PVLVFP
+  maxLoops: 5
+  stepSize: 0.0085
+  rotationAngle: 45
+  verticalMovement: {x: 0, y: 0.02, z: 0}
+  radiusMultiplier: 1.12
+  heightMultiplier: 1.08

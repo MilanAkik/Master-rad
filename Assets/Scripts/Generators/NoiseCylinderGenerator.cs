@@ -10,11 +10,11 @@ namespace Assets.Scripts.Generators
         public ComputeShader computeShader;
         public int textureSize = 128;
         private RenderTexture resultTexture;
-        private Vector2Int _yOffset = new Vector2Int(2, 2);
-        private Vector2Int _rOffset = new Vector2Int(5, 5);
-        private Vector2Int _hOffset = new Vector2Int(3, 3);
-        private float rMin = 0.1f;
-        private float hMin = 0.1f;
+        private Vector2Int _yOffset = new(2, 2);
+        private Vector2Int _rOffset = new(5, 5);
+        private Vector2Int _hOffset = new(3, 3);
+        private float rMin = 0.01f;
+        private float hMin = 0.01f;
 
         public override Matrix4x4[] getCylinderMatrices(GeneratorParameters parameters)
         {
@@ -22,7 +22,6 @@ namespace Assets.Scripts.Generators
             int seed = parameters.RandomSeed;
             Vector3 areaMin = parameters.AreaMin;
             Vector3 areaMax = parameters.AreaMax;
-            Vector3 areaSize = areaMax - areaMin;
 
             resultTexture = TextureUtilities.CreateRenderTexture2d(textureSize, textureSize);
             resultTexture = ComputeShaderUtilities.ComputeTexture2d(computeShader, "CSMain", textureSize, textureSize, resultTexture);
@@ -43,11 +42,11 @@ namespace Assets.Scripts.Generators
                 float z = ((float)maxj / (float)textureSize);
                 float r = tex.GetPixel((maxi + _rOffset.x) % textureSize, (maxj + _rOffset.y) % textureSize).r;
                 float h = tex.GetPixel((maxi + _hOffset.x) % textureSize, (maxj + _hOffset.y) % textureSize).r;
-                x = areaMin.x + x * areaSize.x;
-                y = areaMin.y + y * areaSize.y;
-                z = areaMin.z + z * areaSize.z;
-                r = (rMin + r * (1-rMin)) * parameters.RadiusMultiplier;
-                h = (hMin + h * (1-hMin)) * parameters.HeightMultiplier;
+                x = Mathf.Lerp(areaMin.x, areaMax.x, x);
+                y = Mathf.Lerp(areaMin.y, areaMax.y, y);
+                z = Mathf.Lerp(areaMin.z, areaMax.z, z);
+                r = Mathf.Lerp(rMin, 1f, r) * parameters.RadiusMultiplier;
+                h = Mathf.Lerp(hMin, 1f, h) * parameters.HeightMultiplier;
                 UpdateTexture(tex, maxi, maxj);
                 res[e] = new Matrix4x4( new Vector4(x, y, z, r), new Vector4(h, 0, 0, 0), Vector4.zero, Vector4.zero );
             }
