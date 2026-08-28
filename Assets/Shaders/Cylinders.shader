@@ -190,15 +190,17 @@
             }
 
             // Alpha from equation (1), represented incrementally instead of as a product loop.
-            float backgroundOcclusionFactor(float previousOcclusionFactor, float density, float primaryStepLength)
+            float backgroundOcclusionFactor(
+                float previousOcclusionFactor,
+                float stepTransmittance)
             {
-                return previousOcclusionFactor * primaryStepTransmittance(density, primaryStepLength);
+                return previousOcclusionFactor * stepTransmittance;
             }
 
             // The final factor in equation (2): 1 - e^(-d_x * l_g).
-            float primaryStepAbsorption(float density, float primaryStepLength)
+            float primaryStepAbsorption(float stepTransmittance)
             {
-                return 1.0 - primaryStepTransmittance(density, primaryStepLength);
+                return 1.0 - stepTransmittance;
             }
 
             // One term of the shadow-ray optical-depth sum: d_j * l_p.
@@ -261,20 +263,18 @@
             // Marches the shadow ray only through the cylinder containing the primary sample.
             float shadowRayOpticalDepth(
                 float3 primarySamplePoint,
-                float3 lightPosition,
+                float3 shadowRayDirection,
+                float lightDistance,
                 float4x4 cylinder,
                 float requestedShadowStepLength)
             {
                 const float minimumLength = 0.0001;
 
-                float3 pointToLight = lightPosition - primarySamplePoint;
-                float lightDistance = length(pointToLight);
                 if (lightDistance <= minimumLength)
                 {
                     return 0.0;
                 }
 
-                float3 shadowRayDirection = pointToLight / lightDistance;
                 float cylinderExitDistance = distanceToCylinderExitFromInside(
                     primarySamplePoint,
                     shadowRayDirection,
@@ -349,9 +349,13 @@
             }
 
             // One term of the color sum in equation (2).
-            float3 singleScatteringColorContribution(float backgroundOcclusion, float3 baseCloudColor, float incomingLight, float density, float primaryStepLength)
+            float3 singleScatteringColorContribution(
+                float backgroundOcclusion,
+                float3 baseCloudColor,
+                float incomingLight,
+                float stepTransmittance)
             {
-                float absorbedLight = primaryStepAbsorption(density, primaryStepLength);
+                float absorbedLight = primaryStepAbsorption(stepTransmittance);
                 return backgroundOcclusion * baseCloudColor * incomingLight * absorbedLight;
             }
 
@@ -416,17 +420,18 @@
                         continue;
                     }
 
-                    float shadowOpticalDepth = shadowRayOpticalDepth(
-                        primarySamplePoint,
-                        _LightPosition,
-                        cylinder,
-                        _ShadowStepLength);
-
                     float3 sampleToLight = _LightPosition - primarySamplePoint;
                     float sampleToLightDistance = length(sampleToLight);
                     float3 shadowRayDirection = sampleToLightDistance > minimumLength
                         ? sampleToLight / sampleToLightDistance
                         : primaryRayDirection;
+                    float shadowOpticalDepth = shadowRayOpticalDepth(
+                        primarySamplePoint,
+                        shadowRayDirection,
+                        sampleToLightDistance,
+                        cylinder,
+                        _ShadowStepLength);
+
                     float viewLightDot = dot(primaryRayDirection, shadowRayDirection);
                     float incomingLight = incomingSingleScatteredLight(
                         viewLightDot,
@@ -435,16 +440,17 @@
 
                     // Equation (1) defines alpha_x through the current sample, so update it
                     // before evaluating the corresponding term of equation (2).
-                    backgroundVisibility = backgroundOcclusionFactor(
-                        backgroundVisibility,
+                    float stepTransmittance = primaryStepTransmittance(
                         density,
                         primaryStepLength);
+                    backgroundVisibility = backgroundOcclusionFactor(
+                        backgroundVisibility,
+                        stepTransmittance);
                     accumulatedCloudColor += singleScatteringColorContribution(
                         backgroundVisibility,
                         _CloudColor.rgb * _LightColor.rgb,
                         incomingLight,
-                        density,
-                        primaryStepLength);
+                        stepTransmittance);
 
                     // Once at least 95% of the background is occluded, later samples have
                     // little visible influence and can be skipped.
