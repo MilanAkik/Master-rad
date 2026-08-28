@@ -77,118 +77,92 @@
             struct intersection
             {
                 int count;
-                float4 first;
-                float4 second;
+                float entryDistance;
+                float exitDistance;
             };
 
             intersection noIntersection(){
                 intersection res;
                 res.count = 0;
-                res.first = float4(0,0,0,0);
-                res.second = float4(0,0,0,0);
+                res.entryDistance = 0.0;
+                res.exitDistance = 0.0;
                 return res;
             }
 
-            intersection oneIntersection(float3 point1){
-                intersection res;
-                res.count = 1;
-                res.first = float4(point1,0);
-                res.second = float4(0,0,0,0);
-                return res;
-            }
-
-            intersection twoIntersections(float3 point1, float3 point2){
+            intersection twoIntersections(float entryDistance, float exitDistance){
                 intersection res;
                 res.count = 2;
-                res.first = float4(point1,0);
-                res.second = float4(point2,0);
+                res.entryDistance = entryDistance;
+                res.exitDistance = exitDistance;
                 return res;
             }
 
-            intersection closestCylinder(float3 ro, float3 rd, float4x4 cylinder)
+            intersection intersectCylinder(float3 ro, float3 rd, float4x4 cylinder)
             {
-                float a1 = rd.x;
-                float a2 = ro.x;
-                float a3 = rd.y;
-                float a4 = ro.y;
-                float a5 = rd.z;
-                float a6 = ro.z;
-                float a7 = cylinder[0][3];
-                float a8 = cylinder[0][0];
-                float a9 = cylinder[0][3];
-                float a10 = cylinder[0][2];
-                float sqa7 = a7*a7;
-                float sqa5 = a5*a5;
-                float sqa9 = a9*a9;
-                float sqa1 = a1*a1;
-                float a6m10 = (a6-a10);
-                float a2m8 = (a2-a8);
-                float a = sqa7*sqa5+sqa9*sqa1;
-                float b = 2 * (sqa7*a5*a6m10+sqa9*a1*a2m8);
-                float c = sqa7*a6m10*a6m10+sqa9*a2m8*a2m8-sqa7*sqa9;
-                float disc = b*b-4*a*c;
-                if(disc<0) return noIntersection();
-                float t1 = (-b+sqrt(disc))/(2*a);
-                float t2 = (-b-sqrt(disc))/(2*a);
-                float3 v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
-                float3 v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
-                float pos1 = dot(v1-ro, rd);
-                float pos2 = dot(v2-ro, rd);
-                // If-elseif-else that checks which of the intersections are behind camera
-                if(pos1 < 0 && pos2 < 0){
+                const float directionEpsilon = 0.000001;
+                const float minimumIntersectionLength = 0.0001;
+                const float maximumDistance = 1e20;
+
+                float centerX = cylinder[0][0];
+                float minimumY = cylinder[0][1];
+                float centerZ = cylinder[0][2];
+                float radius = cylinder[0][3];
+                float maximumY = minimumY + cylinder[1][0];
+
+                float2 radialOrigin = ro.xz - float2(centerX, centerZ);
+                float radialDirectionLengthSquared = dot(rd.xz, rd.xz);
+                float radialOriginLengthSquared = dot(radialOrigin, radialOrigin);
+                float radialEntryDistance = -maximumDistance;
+                float radialExitDistance = maximumDistance;
+
+                if (radialDirectionLengthSquared > directionEpsilon * directionEpsilon)
+                {
+                    float halfB = dot(radialOrigin, rd.xz);
+                    float c = radialOriginLengthSquared - radius * radius;
+                    float discriminant = halfB * halfB -
+                        radialDirectionLengthSquared * c;
+                    if (discriminant < 0.0)
+                    {
+                        return noIntersection();
+                    }
+
+                    float squareRootDiscriminant = sqrt(discriminant);
+                    float inverseRadialDirectionLengthSquared =
+                        1.0 / radialDirectionLengthSquared;
+                    radialEntryDistance =
+                        (-halfB - squareRootDiscriminant) *
+                        inverseRadialDirectionLengthSquared;
+                    radialExitDistance =
+                        (-halfB + squareRootDiscriminant) *
+                        inverseRadialDirectionLengthSquared;
+                }
+                else if (radialOriginLengthSquared > radius * radius)
+                {
                     return noIntersection();
                 }
-                else if(pos1 < 0) {
-                    t1 = 0;
+
+                float verticalEntryDistance = -maximumDistance;
+                float verticalExitDistance = maximumDistance;
+                if (abs(rd.y) > directionEpsilon)
+                {
+                    float firstCapDistance = (minimumY - ro.y) / rd.y;
+                    float secondCapDistance = (maximumY - ro.y) / rd.y;
+                    verticalEntryDistance = min(firstCapDistance, secondCapDistance);
+                    verticalExitDistance = max(firstCapDistance, secondCapDistance);
                 }
-                else if(pos2 < 0) {
-                    t2 = t1;
-                    t1 = 0;
+                else if (ro.y < minimumY || ro.y > maximumY)
+                {
+                    return noIntersection();
                 }
-                else {
-                    float d1 = distance(ro, v1);
-                    float d2 = distance(ro, v2);
-                    if(d1>d2){
-                        float tmp = t1;
-                        t1 = t2;
-                        t2 = tmp;
-                    }
+
+                float entryDistance = max(max(radialEntryDistance, verticalEntryDistance), 0.0);
+                float exitDistance = min(radialExitDistance, verticalExitDistance);
+                if (exitDistance - entryDistance <= minimumIntersectionLength)
+                {
+                    return noIntersection();
                 }
-                v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
-                v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
-                float ymin = cylinder[0][1];
-                float ymax = ymin + cylinder[1][0];
-                //3x3 of combinations of the positions
-                if(v1.y < ymin){
-                    if(v2.y < ymin){
-                        return noIntersection();
-                    }
-                    else if(v2.y > ymax) {
-                        t2=(ymax-a4)/a3;
-                    }
-                    t1=(ymin-a4)/a3;
-                }
-                else if(v1.y > ymax) {
-                    if(v2.y > ymax){
-                        return noIntersection();
-                    }
-                    else if(v2.y < ymin) {
-                        t2=(ymin-a4)/a3;
-                    }
-                    t1=(ymax-a4)/a3;
-                }
-                else {
-                    if(v2.y < ymin){
-                        t2=(ymin-a4)/a3;
-                    }
-                    else if(v2.y > ymax) {
-                        t2=(ymax-a4)/a3;
-                    }
-                }
-                v1 = float3(a1*t1+a2, a3*t1+a4, a5*t1+a6);
-                v2 = float3(a1*t2+a2, a3*t2+a4, a5*t2+a6);
-                if(t1==t2) return oneIntersection(v1);
-                return twoIntersections(v1,v2);
+
+                return twoIntersections(entryDistance, exitDistance);
             }            
 
             v2f vert(appdata v)
@@ -216,15 +190,17 @@
             }
 
             // Alpha from equation (1), represented incrementally instead of as a product loop.
-            float backgroundOcclusionFactor(float previousOcclusionFactor, float density, float primaryStepLength)
+            float backgroundOcclusionFactor(
+                float previousOcclusionFactor,
+                float stepTransmittance)
             {
-                return previousOcclusionFactor * primaryStepTransmittance(density, primaryStepLength);
+                return previousOcclusionFactor * stepTransmittance;
             }
 
             // The final factor in equation (2): 1 - e^(-d_x * l_g).
-            float primaryStepAbsorption(float density, float primaryStepLength)
+            float primaryStepAbsorption(float stepTransmittance)
             {
-                return 1.0 - primaryStepTransmittance(density, primaryStepLength);
+                return 1.0 - stepTransmittance;
             }
 
             // One term of the shadow-ray optical-depth sum: d_j * l_p.
@@ -240,7 +216,7 @@
             }
 
             // Distance from a point inside a finite vertical cylinder to its boundary.
-            // This handles vertical rays explicitly, unlike the general camera-ray intersection.
+            // This handles vertical rays explicitly, like the general camera-ray intersection.
             float distanceToCylinderExitFromInside(float3 rayOrigin, float3 rayDirection, float4x4 cylinder)
             {
                 const float directionEpsilon = 0.000001;
@@ -287,20 +263,18 @@
             // Marches the shadow ray only through the cylinder containing the primary sample.
             float shadowRayOpticalDepth(
                 float3 primarySamplePoint,
-                float3 lightPosition,
+                float3 shadowRayDirection,
+                float lightDistance,
                 float4x4 cylinder,
                 float requestedShadowStepLength)
             {
                 const float minimumLength = 0.0001;
 
-                float3 pointToLight = lightPosition - primarySamplePoint;
-                float lightDistance = length(pointToLight);
                 if (lightDistance <= minimumLength)
                 {
                     return 0.0;
                 }
 
-                float3 shadowRayDirection = pointToLight / lightDistance;
                 float cylinderExitDistance = distanceToCylinderExitFromInside(
                     primarySamplePoint,
                     shadowRayDirection,
@@ -375,20 +349,25 @@
             }
 
             // One term of the color sum in equation (2).
-            float3 singleScatteringColorContribution(float backgroundOcclusion, float3 baseCloudColor, float incomingLight, float density, float primaryStepLength)
+            float3 singleScatteringColorContribution(
+                float backgroundOcclusion,
+                float3 baseCloudColor,
+                float incomingLight,
+                float stepTransmittance)
             {
-                float absorbedLight = primaryStepAbsorption(density, primaryStepLength);
+                float absorbedLight = primaryStepAbsorption(stepTransmittance);
                 return backgroundOcclusion * baseCloudColor * incomingLight * absorbedLight;
             }
 
             bool isUsableCylinderIntersection(intersection cylinderIntersection)
             {
                 return cylinderIntersection.count == 2 &&
-                    distance(cylinderIntersection.first.xyz, cylinderIntersection.second.xyz) > 0.0001;
+                    cylinderIntersection.exitDistance - cylinderIntersection.entryDistance > 0.0001;
             }
 
             // Returns accumulated cloud light in RGB and remaining background visibility in A.
             float4 marchSingleScatteringThroughCylinder(
+                float3 primaryRayOrigin,
                 float3 primaryRayDirection,
                 intersection cylinderIntersection,
                 float4x4 cylinder,
@@ -403,9 +382,10 @@
                     return float4(0.0, 0.0, 0.0, initialBackgroundVisibility);
                 }
 
-                float3 marchStart = cylinderIntersection.first.xyz;
-                float3 marchEnd = cylinderIntersection.second.xyz;
-                float marchDistance = distance(marchStart, marchEnd);
+                float3 marchStart = primaryRayOrigin +
+                    primaryRayDirection * cylinderIntersection.entryDistance;
+                float marchDistance = cylinderIntersection.exitDistance -
+                    cylinderIntersection.entryDistance;
                 if (marchDistance <= minimumLength)
                 {
                     return float4(0.0, 0.0, 0.0, initialBackgroundVisibility);
@@ -440,17 +420,18 @@
                         continue;
                     }
 
-                    float shadowOpticalDepth = shadowRayOpticalDepth(
-                        primarySamplePoint,
-                        _LightPosition,
-                        cylinder,
-                        _ShadowStepLength);
-
                     float3 sampleToLight = _LightPosition - primarySamplePoint;
                     float sampleToLightDistance = length(sampleToLight);
                     float3 shadowRayDirection = sampleToLightDistance > minimumLength
                         ? sampleToLight / sampleToLightDistance
                         : primaryRayDirection;
+                    float shadowOpticalDepth = shadowRayOpticalDepth(
+                        primarySamplePoint,
+                        shadowRayDirection,
+                        sampleToLightDistance,
+                        cylinder,
+                        _ShadowStepLength);
+
                     float viewLightDot = dot(primaryRayDirection, shadowRayDirection);
                     float incomingLight = incomingSingleScatteredLight(
                         viewLightDot,
@@ -459,16 +440,17 @@
 
                     // Equation (1) defines alpha_x through the current sample, so update it
                     // before evaluating the corresponding term of equation (2).
-                    backgroundVisibility = backgroundOcclusionFactor(
-                        backgroundVisibility,
+                    float stepTransmittance = primaryStepTransmittance(
                         density,
                         primaryStepLength);
+                    backgroundVisibility = backgroundOcclusionFactor(
+                        backgroundVisibility,
+                        stepTransmittance);
                     accumulatedCloudColor += singleScatteringColorContribution(
                         backgroundVisibility,
                         _CloudColor.rgb * _LightColor.rgb,
                         incomingLight,
-                        density,
-                        primaryStepLength);
+                        stepTransmittance);
 
                     // Once at least 95% of the background is occluded, later samples have
                     // little visible influence and can be skipped.
@@ -496,7 +478,7 @@
                     cylinderIndex < _CylinderCount;
                     cylinderIndex++)
                 {
-                    intersection candidateIntersection = closestCylinder(
+                    intersection candidateIntersection = intersectCylinder(
                         primaryRayOrigin,
                         primaryRayDirection,
                         _CylinderMatrices[cylinderIndex]);
@@ -505,9 +487,7 @@
                         continue;
                     }
 
-                    float candidateDistance = distance(
-                        primaryRayOrigin,
-                        candidateIntersection.first.xyz);
+                    float candidateDistance = candidateIntersection.entryDistance;
                     if (candidateDistance < closestDistance)
                     {
                         closestDistance = candidateDistance;
@@ -522,6 +502,7 @@
                 }
 
                 return marchSingleScatteringThroughCylinder(
+                    primaryRayOrigin,
                     primaryRayDirection,
                     closestIntersection,
                     _CylinderMatrices[closestCylinderIndex],
@@ -549,10 +530,14 @@
                     candidateMask[maskWordIndex] = 0u;
                 }
 
+                int firstClosestCylinderIndex = -1;
+                float firstClosestDistance = 1e20;
+                intersection firstClosestIntersection = noIntersection();
+
                 [loop]
                 for (int cylinderIndex = 0; cylinderIndex < _CylinderCount; cylinderIndex++)
                 {
-                    intersection candidateIntersection = closestCylinder(
+                    intersection candidateIntersection = intersectCylinder(
                         primaryRayOrigin,
                         primaryRayDirection,
                         _CylinderMatrices[cylinderIndex]);
@@ -561,6 +546,14 @@
                         int maskWordIndex = cylinderIndex >> 5;
                         uint maskBit = 1u << (cylinderIndex & 31);
                         candidateMask[maskWordIndex] |= maskBit;
+
+                        float candidateDistance = candidateIntersection.entryDistance;
+                        if (candidateDistance < firstClosestDistance)
+                        {
+                            firstClosestDistance = candidateDistance;
+                            firstClosestCylinderIndex = cylinderIndex;
+                            firstClosestIntersection = candidateIntersection;
+                        }
                     }
                 }
 
@@ -587,36 +580,43 @@
                     float closestDistance = 1e20;
                     intersection closestIntersection;
 
-                    [loop]
-                    for (int cylinderIndex = 0;
-                        cylinderIndex < _CylinderCount;
-                        cylinderIndex++)
+                    if (segmentIndex == 0)
                     {
-                        int maskWordIndex = cylinderIndex >> 5;
-                        uint maskBit = 1u << (cylinderIndex & 31);
-                        if ((candidateMask[maskWordIndex] & maskBit) == 0u)
+                        closestCylinderIndex = firstClosestCylinderIndex;
+                        closestDistance = firstClosestDistance;
+                        closestIntersection = firstClosestIntersection;
+                    }
+                    else
+                    {
+                        [loop]
+                        for (int cylinderIndex = 0;
+                            cylinderIndex < _CylinderCount;
+                            cylinderIndex++)
                         {
-                            continue;
-                        }
+                            int maskWordIndex = cylinderIndex >> 5;
+                            uint maskBit = 1u << (cylinderIndex & 31);
+                            if ((candidateMask[maskWordIndex] & maskBit) == 0u)
+                            {
+                                continue;
+                            }
 
-                        intersection candidateIntersection = closestCylinder(
-                            rayCursor,
-                            primaryRayDirection,
-                            _CylinderMatrices[cylinderIndex]);
-                        if (!isUsableCylinderIntersection(candidateIntersection))
-                        {
-                            candidateMask[maskWordIndex] &= ~maskBit;
-                            continue;
-                        }
+                            intersection candidateIntersection = intersectCylinder(
+                                rayCursor,
+                                primaryRayDirection,
+                                _CylinderMatrices[cylinderIndex]);
+                            if (!isUsableCylinderIntersection(candidateIntersection))
+                            {
+                                candidateMask[maskWordIndex] &= ~maskBit;
+                                continue;
+                            }
 
-                        float candidateDistance = distance(
-                            rayCursor,
-                            candidateIntersection.first.xyz);
-                        if (candidateDistance < closestDistance)
-                        {
-                            closestDistance = candidateDistance;
-                            closestCylinderIndex = cylinderIndex;
-                            closestIntersection = candidateIntersection;
+                            float candidateDistance = candidateIntersection.entryDistance;
+                            if (candidateDistance < closestDistance)
+                            {
+                                closestDistance = candidateDistance;
+                                closestCylinderIndex = cylinderIndex;
+                                closestIntersection = candidateIntersection;
+                            }
                         }
                     }
 
@@ -626,6 +626,7 @@
                     }
 
                     float4 segmentScattering = marchSingleScatteringThroughCylinder(
+                        rayCursor,
                         primaryRayDirection,
                         closestIntersection,
                         _CylinderMatrices[closestCylinderIndex],
@@ -636,8 +637,8 @@
                     int closestMaskWordIndex = closestCylinderIndex >> 5;
                     uint closestMaskBit = 1u << (closestCylinderIndex & 31);
                     candidateMask[closestMaskWordIndex] &= ~closestMaskBit;
-                    rayCursor = closestIntersection.second.xyz +
-                        primaryRayDirection * cursorOffset;
+                    rayCursor += primaryRayDirection *
+                        (closestIntersection.exitDistance + cursorOffset);
                 }
 
                 return float4(accumulatedCloudColor, backgroundVisibility);

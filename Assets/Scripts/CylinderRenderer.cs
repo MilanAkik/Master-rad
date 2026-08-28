@@ -1,5 +1,8 @@
+using System;
+using System.IO;
 using Assets.Scripts.Models;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
 public class CylinderRenderer : MonoBehaviour
@@ -37,7 +40,24 @@ public class CylinderRenderer : MonoBehaviour
     }
 
     private void Start() => Setup();
-
+    
+    void Update()
+    {
+        if (Keyboard.current != null && Keyboard.current.kKey.wasPressedThisFrame)
+        {
+            var dt = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            string subfolderPath = Path.Combine(Application.dataPath, "Screenshots");
+            // subfolderPath = $"{Application.dataPath}/Screenshots";
+            
+            if (!Directory.Exists(subfolderPath)) Directory.CreateDirectory(subfolderPath);
+            
+            string finalPath = Path.Combine(subfolderPath, $"{dt}.png");
+            // finalPath = $"{subfolderPath}/{}"
+            
+            ScreenCapture.CaptureScreenshot(finalPath, 1); 
+            Debug.Log($"{dt}: Frame captured");
+        }
+    }
     private void LateUpdate()
     {
         bool transformChanged = transform.hasChanged;
