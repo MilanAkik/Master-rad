@@ -549,6 +549,10 @@
                     candidateMask[maskWordIndex] = 0u;
                 }
 
+                int firstClosestCylinderIndex = -1;
+                float firstClosestDistance = 1e20;
+                intersection firstClosestIntersection = noIntersection();
+
                 [loop]
                 for (int cylinderIndex = 0; cylinderIndex < _CylinderCount; cylinderIndex++)
                 {
@@ -561,6 +565,16 @@
                         int maskWordIndex = cylinderIndex >> 5;
                         uint maskBit = 1u << (cylinderIndex & 31);
                         candidateMask[maskWordIndex] |= maskBit;
+
+                        float candidateDistance = distance(
+                            primaryRayOrigin,
+                            candidateIntersection.first.xyz);
+                        if (candidateDistance < firstClosestDistance)
+                        {
+                            firstClosestDistance = candidateDistance;
+                            firstClosestCylinderIndex = cylinderIndex;
+                            firstClosestIntersection = candidateIntersection;
+                        }
                     }
                 }
 
@@ -587,36 +601,45 @@
                     float closestDistance = 1e20;
                     intersection closestIntersection;
 
-                    [loop]
-                    for (int cylinderIndex = 0;
-                        cylinderIndex < _CylinderCount;
-                        cylinderIndex++)
+                    if (segmentIndex == 0)
                     {
-                        int maskWordIndex = cylinderIndex >> 5;
-                        uint maskBit = 1u << (cylinderIndex & 31);
-                        if ((candidateMask[maskWordIndex] & maskBit) == 0u)
+                        closestCylinderIndex = firstClosestCylinderIndex;
+                        closestDistance = firstClosestDistance;
+                        closestIntersection = firstClosestIntersection;
+                    }
+                    else
+                    {
+                        [loop]
+                        for (int cylinderIndex = 0;
+                            cylinderIndex < _CylinderCount;
+                            cylinderIndex++)
                         {
-                            continue;
-                        }
+                            int maskWordIndex = cylinderIndex >> 5;
+                            uint maskBit = 1u << (cylinderIndex & 31);
+                            if ((candidateMask[maskWordIndex] & maskBit) == 0u)
+                            {
+                                continue;
+                            }
 
-                        intersection candidateIntersection = closestCylinder(
-                            rayCursor,
-                            primaryRayDirection,
-                            _CylinderMatrices[cylinderIndex]);
-                        if (!isUsableCylinderIntersection(candidateIntersection))
-                        {
-                            candidateMask[maskWordIndex] &= ~maskBit;
-                            continue;
-                        }
+                            intersection candidateIntersection = closestCylinder(
+                                rayCursor,
+                                primaryRayDirection,
+                                _CylinderMatrices[cylinderIndex]);
+                            if (!isUsableCylinderIntersection(candidateIntersection))
+                            {
+                                candidateMask[maskWordIndex] &= ~maskBit;
+                                continue;
+                            }
 
-                        float candidateDistance = distance(
-                            rayCursor,
-                            candidateIntersection.first.xyz);
-                        if (candidateDistance < closestDistance)
-                        {
-                            closestDistance = candidateDistance;
-                            closestCylinderIndex = cylinderIndex;
-                            closestIntersection = candidateIntersection;
+                            float candidateDistance = distance(
+                                rayCursor,
+                                candidateIntersection.first.xyz);
+                            if (candidateDistance < closestDistance)
+                            {
+                                closestDistance = candidateDistance;
+                                closestCylinderIndex = cylinderIndex;
+                                closestIntersection = candidateIntersection;
+                            }
                         }
                     }
 
