@@ -276,7 +276,7 @@ MonoBehaviour:
       densityShader: {fileID: 7200000, guid: 347d913f3ac6e9d439a5cc7f208deed4, type: 3}
     lightParameters:
       lightColor: {x: 1, y: 1, z: 1, w: 0}
-      lightPosition: {x: 0, y: 5, z: -5}
+      lightPosition: {x: 1, y: 10, z: 1}
   raymarchMat: {fileID: 2100000, guid: 2fa222c9538e12a41a969ed0e7adc30e, type: 2}
 --- !u!1 &1226074091
 GameObject:
